@@ -19,6 +19,28 @@ services:
     depends_on:
       - mysql_db
 
+  client:
+    image: client
+    build:
+      context: ./client
+      dockerfile: DockerFile
+    ports:
+      - "5001:8080"
+    networks:
+      - network1
+    depends_on:
+      - mysql_db
+      - apiserver
+
+ # proxy:
+  #  image: proxy
+   # ports:
+    #  - "80:80"
+    #volumes:
+     # - ./nginx.config:/etc/nginx/nginx.config
+    #networks:
+     # - network1
+
   phpmyadmin:
     container_name: phpmyadmin
     image: phpmyadmin
