@@ -1,0 +1,48 @@
+version: '3.8'
+
+networks:
+  network1:
+    name: network1
+
+services:
+  apiserver:
+    container_name: apiserver
+    build:
+      context: ./apiServer
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - network1
+    depends_on:
+      - mysql_db
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin
+    ports:
+      - "1500:80"
+    environment:
+      - PMA_HOST=mysql_db
+    networks:
+      - network1
+    depends_on:
+      - mysql_db
+
+  mysql_db:
+    container_name: mysql_db
+    image: mysql:8.0
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    networks:
+      - network1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "9000:3306"
