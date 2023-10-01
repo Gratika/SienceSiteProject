@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace apiServer.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EmotionController : ControllerBase
     {
@@ -20,29 +20,17 @@ namespace apiServer.Controllers
         }
 
         // GET: api/Emotions
-         [HttpGet(Name ="All")]
+         [HttpGet(Name = "All")]
 
          public async Task<ActionResult<IEnumerable<Emotions>>> GetEmotions()
          {
              return await _context.Emotions.ToListAsync();
          }
 
-        // GET: api/Emotions
-        /*[HttpGet(Name = "All")]
-
-        public  ActionResult<IEnumerable<string>> GetEmotions()
-        {
-            return new string[] { "Value 1", "Value 2" };
-        }*/
-
-       /* [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
-        {
-            return new string[] { "Value 1", "Value 2" };
-        }*/
+               
 
         // GET: api/Emotions/5
-       /* [HttpGet("{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Emotions>> GetEmotion(int id)
         {
             var emotion = await _context.Emotions.FindAsync(id);
@@ -53,6 +41,6 @@ namespace apiServer.Controllers
             }
 
             return emotion;
-        }*/
+        }
     }
 }
