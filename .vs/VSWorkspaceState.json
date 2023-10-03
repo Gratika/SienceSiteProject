@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\apiServer",
+    "\\apiServer\\Controllers",
     "\\apiServer\\Models"
   ],
-  "SelectedNode": "\\apiServer\\Models\\Users.cs",
+  "SelectedNode": "\\apiServer\\Controllers\\EmotionController.cs",
   "PreviewInSolutionExplorer": false
 }
