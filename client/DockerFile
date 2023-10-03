@@ -1,4 +1,17 @@
-FROM node:lts-alpine
+# Інструкція для видалення всіх старих layers
+FROM node:lts-alpine as cleanup
+
+# Устанавливаем утиліту для видалення кешу
+RUN apk --no-cache add curl
+RUN curl -sSL https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_amd64 -o /usr/local/bin/dumb-init
+RUN chmod +x /usr/local/bin/dumb-init
+
+# Використовуємо dumb-init для запуску команди, яка видалить кеш
+CMD ["dumb-init", "rm", "-rf", "/root/.npm", "/root/.node-gyp"]
+# Викликаємо етап cleanup
+RUN ["docker-entrypoint.sh", "cleanup"]
+
+FROM node:lts-alpine as build
 
 # устанавливаем простой HTTP-сервер для статики
 RUN npm install -g http-server

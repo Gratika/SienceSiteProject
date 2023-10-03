@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using System.Collections;
 
 namespace apiServer.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EmotionController : ControllerBase
     {
-        private readonly ArhivistDbContext _context; // Замість YourDbContext вставте назву вашого контексту бази даних
+       private readonly ArhivistDbContext _context; // Замість YourDbContext вставте назву вашого контексту бази даних
         private readonly ILogger<EmotionController> _logger;
 
         public EmotionController(ArhivistDbContext context, ILogger<EmotionController> logger) // Тут також вставте назву вашого контексту бази даних
@@ -20,12 +20,14 @@ namespace apiServer.Controllers
         }
 
         // GET: api/Emotions
-        [HttpGet(Name ="All")]
-        
-        public async Task<ActionResult<IEnumerable<Emotions>>> GetEmotions()
-        {
-            return await _context.Emotions.ToListAsync();
-        }
+         [HttpGet(Name = "All")]
+
+         public async Task<ActionResult<IEnumerable<Emotions>>> GetEmotions()
+         {
+             return await _context.Emotions.ToListAsync();
+         }
+
+               
 
         // GET: api/Emotions/5
         [HttpGet("{id}")]

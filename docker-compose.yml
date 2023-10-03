@@ -7,39 +7,55 @@ networks:
 services:
   apiserver:
     container_name: apiserver
+    image: apiserver
     build:
       context: ./apiServer
       dockerfile: Dockerfile
     ports:
       - "5000:80"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - NAME=apiserver
     networks:
       - network1
     depends_on:
       - mysql_db
 
   client:
+    container_name: client
     image: client
     build:
       context: ./client
       dockerfile: DockerFile
     ports:
       - "5001:8080"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    environment:
+      - NAME=client
     networks:
       - network1
     depends_on:
       - mysql_db
       - apiserver
 
- # proxy:
-  #  image: proxy
-   # ports:
-    #  - "80:80"
-    #volumes:
-     # - ./nginx.config:/etc/nginx/nginx.config
-    #networks:
-     # - network1
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ./nginx.config:/etc/nginx/nginx.conf:ro
+    networks:
+      - network1
+    depends_on:
+      - mysql_db
+      - apiserver
+      - client
 
   phpmyadmin:
     container_name: phpmyadmin
