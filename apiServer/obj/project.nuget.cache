@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "V1ZDPGZV6w4cv12Zz5uyjc8ZCbOIf6EYdI3kOrVmRyKkM1tfqcWlzpT22R3EQMTRX2n4kfXm8CKpCLoxvZHdKA==",
+  "dgSpecHash": "RbMkRNv/HyQZBjvOtPb2Jt0XOWuNelryivFzYTvF6Aq9buQBt0dRZ246xFfgnxTrjGx08LF3d5AfvIxbedBU3A==",
   "success": true,
-  "projectFilePath": "D:\\myProject\\diplom\\SienceSiteProject\\apiServer\\apiServer.csproj",
+  "projectFilePath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Gratika\\.nuget\\packages\\google.protobuf\\3.21.9\\google.protobuf.3.21.9.nupkg.sha512",
     "C:\\Users\\Gratika\\.nuget\\packages\\k4os.compression.lz4\\1.3.5\\k4os.compression.lz4.1.3.5.nupkg.sha512",

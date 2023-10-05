@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\myProject\\diplom\\SienceSiteProject\\apiServer\\apiServer.csproj": {}
+    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj": {}
   },
   "projects": {
-    "D:\\myProject\\diplom\\SienceSiteProject\\apiServer\\apiServer.csproj": {
+    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\myProject\\diplom\\SienceSiteProject\\apiServer\\apiServer.csproj",
+        "projectUniqueName": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj",
         "projectName": "apiServer",
-        "projectPath": "D:\\myProject\\diplom\\SienceSiteProject\\apiServer\\apiServer.csproj",
+        "projectPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj",
         "packagesPath": "C:\\Users\\Gratika\\.nuget\\packages\\",
-        "outputPath": "D:\\myProject\\diplom\\SienceSiteProject\\apiServer\\obj\\",
+        "outputPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Gratika\\AppData\\Roaming\\NuGet\\NuGet.Config",
