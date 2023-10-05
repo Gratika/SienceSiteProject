@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "RbMkRNv/HyQZBjvOtPb2Jt0XOWuNelryivFzYTvF6Aq9buQBt0dRZ246xFfgnxTrjGx08LF3d5AfvIxbedBU3A==",
+  "dgSpecHash": "M6edOmyUcY/EHxKn63WHlVQRYgaUB33R41NOgu6SqgnRnv7eFCnzL8ov/PGE6w+Md0cpUs3bdOW88YroSsA7OA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj",
   "expectedPackageFiles": [
@@ -29,6 +29,7 @@
     "C:\\Users\\Gratika\\.nuget\\packages\\microsoft.win32.systemevents\\4.7.0\\microsoft.win32.systemevents.4.7.0.nupkg.sha512",
     "C:\\Users\\Gratika\\.nuget\\packages\\mysql.data\\8.1.0\\mysql.data.8.1.0.nupkg.sha512",
     "C:\\Users\\Gratika\\.nuget\\packages\\mysql.entityframeworkcore\\7.0.5\\mysql.entityframeworkcore.7.0.5.nupkg.sha512",
+    "C:\\Users\\Gratika\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
     "C:\\Users\\Gratika\\.nuget\\packages\\portable.bouncycastle\\1.9.0\\portable.bouncycastle.1.9.0.nupkg.sha512",
     "C:\\Users\\Gratika\\.nuget\\packages\\swashbuckle.aspnetcore\\6.5.0\\swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
     "C:\\Users\\Gratika\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.5.0\\swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
@@ -58,5 +59,12 @@
     "C:\\Users\\Gratika\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512",
     "C:\\Users\\Gratika\\.nuget\\packages\\zstdsharp.port\\0.7.1\\zstdsharp.port.0.7.1.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Ошибка чтения файла кэша C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\obj\\project.nuget.cache: Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

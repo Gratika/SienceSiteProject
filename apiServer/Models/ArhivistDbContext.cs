@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace apiServer.Models
 {
@@ -10,8 +11,8 @@ namespace apiServer.Models
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string mySqlConnectionString = $"server=mysql_db;port=3306;database=archivist;user=arch;password=g@o3LwoCtvHU_.SJ;";
-            optionsBuilder.UseMySQL(mySqlConnectionString);
+            string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+            optionsBuilder.UseMySQL(connectionString);
         }
 
     }
