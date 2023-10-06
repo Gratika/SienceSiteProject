@@ -33,7 +33,6 @@
           <v-text-field
               clearable
               v-model="form.login"
-              :rules="rules"
               label="Логін"
               prepend-inner-icon="mdi-account"
               variant="solo"
@@ -41,7 +40,6 @@
           <v-text-field
               clearable
               v-model="form.email"
-              :rules="rules"
               label="Електронна пошта"
               prepend-inner-icon="mdi-email"
               variant="solo"
@@ -50,7 +48,6 @@
               type="password"
               clearable
               v-model="form.password"
-              :rules="rules"
               label="Пароль"
               prepend-inner-icon="mdi-key"
               variant="solo"
