@@ -29,7 +29,7 @@
         Вхід
       </v-card-title>
       <v-card-item>
-        <v-form @submit.prevent="submitLogin">
+        <v-form @submit.prevent="submitLogin" >
           <v-text-field
               clearable
               v-model="form.login"
@@ -58,7 +58,7 @@
               color="red"
               hide-details
           ></v-checkbox>
-          <v-btn type="submit" block class="mt-2" color="red">Submit</v-btn>
+          <v-btn type="submit" block class="mt-2" color="red" >Submit</v-btn>
         </v-form>
       </v-card-item>
       <v-card-actions>
