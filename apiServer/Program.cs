@@ -1,6 +1,5 @@
 using apiServer.Models;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,10 +12,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IConnectionMultiplexer>(x =>
-{
-    return ConnectionMultiplexer.Connect("redis:6379");
-});
 
 builder.Services.AddDbContext<ArhivistDbContext>();
 builder.Services.AddCors(options =>

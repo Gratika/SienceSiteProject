@@ -8,8 +8,6 @@
         public string email { get; set; }
         public string? firstname { get; set; }
         public string? name { get; set; }
-        public string access_token { get; set; }
-        public string refresh_token { get; set; }
         public DateTime? birthday { get; set; }
         public DateTime date_create { get; set; }
         public DateTime modified_date { get; set; }
