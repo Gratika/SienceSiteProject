@@ -29,7 +29,7 @@ export interface ILoginInput {
 export interface ISignUpInput {
     email: string;
     password: string;
-    passwordConfirm: string;
+
 }
 
 export interface ILoginResponse {
