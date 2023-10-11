@@ -10,7 +10,7 @@ import {useAuthStore} from "@/stores/authStore";
 const userRegister: Ref<ISignUpInput>  = ref({
   email:'',
   password:'',
-  passwordConfirm:''
+  //passwordConfirm:''
 });
 const isLoading=ref(false);
 const authStore = useAuthStore();
@@ -45,9 +45,9 @@ const submitRegister = handleSubmit(values => {
   if (typeof password.value.value === "string") {
     userRegister.value.password = password.value.value;
   }
-  if (typeof passwordConfirm.value.value === "string") {
+  /*if (typeof passwordConfirm.value.value === "string") {
     userRegister.value.passwordConfirm = passwordConfirm.value.value;
-  }
+  }*/
   authStore.onRegistration(userRegister.value)
   //alert(JSON.stringify(userRegister.value));
 })
