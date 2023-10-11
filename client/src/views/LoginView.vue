@@ -1,17 +1,41 @@
 <script setup lang="ts">
   import {ref} from "vue";
+  import { useField, useForm } from "vee-validate"
+  import type { Ref } from "vue";
+  import type {ILoginInput}  from "@/api/type";
 
-  const form = ref({
-    login:'',
+  const form: Ref<ILoginInput> = ref({
     email:'',
     password:'',
-    remember:false
   })
-  const rules={}
+  /*валідація форм*/
+  const { handleSubmit, handleReset } = useForm({
+    validationSchema: {
+      email (value:string) {
+        if (/^.+@[a-z.-]+\.[a-z]+$/i.test(value)) return true
+
+        return 'Введіть валідну електронну адресу'
+      },
+      password (value:string) {
+        if (value?.length > 0) return true
+
+        return 'Введіть пароль'
+      },
+    },
+  })
+  const email= useField('email');
+  const  password = useField('password');
+
   const isLoading=ref(false)
-  function submitLogin(){
+  const submitLogin= handleSubmit(()=>{
+    if (typeof email.value.value === "string") {
+      form.value.email = email.value.value;
+    }
+    if (typeof password.value.value === "string") {
+      form.value.password = password.value.value;
+    }
     alert(JSON.stringify(form.value));
-  }
+  })
 </script>
 
 <template>
@@ -30,34 +54,27 @@
       </v-card-title>
       <v-card-item>
         <v-form @submit.prevent="submitLogin" >
+
           <v-text-field
               clearable
-              v-model="form.login"
-              label="Логін"
-              prepend-inner-icon="mdi-account"
-              variant="solo"
-          ></v-text-field>
-          <v-text-field
-              clearable
-              v-model="form.email"
+              v-model="email.value.value"
               label="Електронна пошта"
               prepend-inner-icon="mdi-email"
               variant="solo"
-          ></v-text-field>
+              id="email"
+              :error-messages="email.errorMessage.value"
+          />
           <v-text-field
               type="password"
               clearable
-              v-model="form.password"
+              v-model="password.value.value"
               label="Пароль"
               prepend-inner-icon="mdi-key"
               variant="solo"
-          ></v-text-field>
-          <v-checkbox
-              v-model="form.remember"
-              label="Запам'ятати мене"
-              color="red"
-              hide-details
-          ></v-checkbox>
+              id="password"
+              :error-messages="password.errorMessage.value"
+          />
+
           <v-btn type="submit" block class="mt-2" color="red" >Submit</v-btn>
         </v-form>
       </v-card-item>

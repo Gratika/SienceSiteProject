@@ -1,68 +1,55 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import { ref} from "vue";
 import type { Ref } from "vue";
-import { useVuelidate } from '@vuelidate/core'
-import { required, email, minLength } from '@vuelidate/validators'
+//валідація
+import { useField, useForm } from 'vee-validate'
+//типи користувача
+import type {ISignUpInput} from "@/api/type";
 
-
-// Оголосимо типи для об'єкту форми та правил
-interface Form {
-  email: string;
-  password: string;
-}
-
-const form: Ref<Form>  = ref({
+const form: Ref<ISignUpInput>  = ref({
   email:'',
   password:'',
+  passwordConfirm:''
 });
 const isLoading=ref(false);
 
-const rules = {
-  email: { required, email },
-  password: { required, minLength: minLength(8) },
-};
+/*валідація форм*/
+const { handleSubmit, handleReset } = useForm({
+  validationSchema: {
+    email (value:string) {
+      if (/^.+@[a-z.-]+\.[a-z]+$/i.test(value)) return true
 
-const $v = useVuelidate(rules, form);
-//опис помилок невалідних полів
-const emailErrors = computed(() => {
-  console.log('computed email' );
-  const errors:string[] = [];
-  // Перевірка, чи був введений текст в поле
- /* if (!$v.value.email.$dirty) {
-    return errors;
-  }
-  // Перевірка наявності помилок та додавання їх до масиву errors
-  if (!$v.value.email.email) {
-    errors.push('Неправильна електронна адреса');
-  }
-  if (!$v.value.email.required) {
-    errors.push('Електронна адреса є обов\'язковим полем.');
-  }*/
-  if ($v.value.email?.$pending) return errors;  // Return if validation is pending
-  if (!$v.value.email?.$model) {
-    errors.push('Електронна адреса обов\'язкова.');
-  } else if (!$v.value.email?.$valid) {
-    errors.push('Неправильна електронна адреса.');
-  }
-  console.log(errors)
-  return errors;
-});
-const passwordErrors = computed(() => {
-  const errors:string[] = [];
-  if (!$v.value.password.$dirty) return errors;
-  !$v.value.password.required && errors.push('Пароль є обов\'язковим полем.');
-  !$v.value.password.minLength &&  errors.push('Мінімальна довжина пароля 8 символів');
-  return errors;
-});
-function submitLogin(){
-  console.log('Form submitted!');
-    // Якщо форма є валідною, відправляємо дані
-  $v.value.$touch();
-  if (!$v.value.$pending && !$v.value.$invalid)
-    alert(JSON.stringify(form.value));
+      return 'Введіть валідну електронну адресу'
+    },
+    password (value:string) {
+      if (value?.length >= 8) return true
 
+      return 'Пароль повинен містити не менше 8 символів.'
+    },
+    passwordConfirm (value:string) {
+      if (value === password.value.value) return true
+      return 'Паролі не співпадають'
+    }
+  },
+})
+const email= useField('email');
+const  password = useField('password');
+const passwordConfirm = useField('passwordConfirm');
 
-}
+const submitRegister = handleSubmit(values => {
+  console.log("method submit form")
+  if (typeof email.value.value === "string") {
+    form.value.email = email.value.value;
+  }
+  if (typeof password.value.value === "string") {
+    form.value.password = password.value.value;
+  }
+  if (typeof passwordConfirm.value.value === "string") {
+    form.value.passwordConfirm = passwordConfirm.value.value;
+  }
+  alert(JSON.stringify(form.value));
+})
+
 </script>
 
 <template>
@@ -80,28 +67,41 @@ function submitLogin(){
           Реєстрація нового користувача
         </v-card-title>
         <v-card-item>
-          <v-form @submit.prevent="submitLogin">
+          <v-form @submit.prevent="submitRegister">
+
             <v-text-field
                 clearable
-                v-model="form.email"
+                v-model.trim="email.value.value"
                 label="Електронна пошта"
                 prepend-inner-icon="mdi-email"
                 variant="solo"
-                :error-messages="emailErrors"
-                @input="$v.email.$touch()"
-            ></v-text-field>
+                id="email"
+                :error-messages="email.errorMessage.value"
+
+            />
+
             <v-text-field
                 type="password"
                 clearable
-                v-model="form.password"
+                v-model="password.value.value"
                 label="Пароль"
                 prepend-inner-icon="mdi-key"
                 variant="solo"
-                :error-messages="passwordErrors"
-                @input="$v.password.$touch()"
-                @blur="$v.password.$touch()"
-
-            ></v-text-field>
+                :counter="8"
+                id="password"
+                :error-messages="password.errorMessage.value"
+            />
+            <v-text-field
+                type="password"
+                clearable
+                v-model="passwordConfirm.value.value"
+                label="Повторіть пароль"
+                prepend-inner-icon="mdi-key"
+                variant="solo"
+                :counter="8"
+                id="passwordConfirm"
+                :error-messages="passwordConfirm.errorMessage.value"
+            />
 
             <v-btn type="submit" block class="mt-2" color="red" >Submit</v-btn>
           </v-form>
