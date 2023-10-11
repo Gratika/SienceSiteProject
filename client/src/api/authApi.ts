@@ -11,7 +11,7 @@ import type {
 import { createToast } from 'mosha-vue-toastify'
 
 
-const BASE_URL = `api/`;
+const BASE_URL = `/api/`;
 
 //Створюємо новий екземпляр axios, задавши у ньому потрібну нам конфігурацію (див https://axios-http.com/docs/req_config)
 //базовий URL та withCredentials: true - для відправки файлів cookie разом з запитами
@@ -76,7 +76,7 @@ authApi.interceptors.request.use(
 
 //створюємо(реєструємо нового користувача)
 export const signUpUserFn = async (user: ISignUpInput) => {
-    const response = await authApi.post<GenericResponse>('/auth/singup', user);
+    const response = await authApi.post<GenericResponse>('/User/CreateUser', user);
     return response.data;
 };
 

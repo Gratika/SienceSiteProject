@@ -3,11 +3,14 @@
   import { useField, useForm } from "vee-validate"
   import type { Ref } from "vue";
   import type {ILoginInput}  from "@/api/type";
+  import {useAuthStore} from "@/stores/authStore";
 
-  const form: Ref<ILoginInput> = ref({
+  const userLogin: Ref<ILoginInput> = ref({
     email:'',
     password:'',
   })
+  const authStore = useAuthStore();;
+
   /*валідація форм*/
   const { handleSubmit, handleReset } = useForm({
     validationSchema: {
@@ -27,14 +30,16 @@
   const  password = useField('password');
 
   const isLoading=ref(false)
+
   const submitLogin= handleSubmit(()=>{
     if (typeof email.value.value === "string") {
-      form.value.email = email.value.value;
+      userLogin.value.email = email.value.value;
     }
     if (typeof password.value.value === "string") {
-      form.value.password = password.value.value;
+      userLogin.value.password = password.value.value;
     }
-    alert(JSON.stringify(form.value));
+    authStore.onLogin(userLogin.value);
+    //alert(JSON.stringify(userLogin.value));
   })
 </script>
 
