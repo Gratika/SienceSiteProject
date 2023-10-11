@@ -81,3 +81,14 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 10s
       retries: 3
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - network1
+
