@@ -37,12 +37,12 @@ namespace apiServer.Controllers
             }
             return 1;          
         }
-        [HttpGet("CreateUser")]
-        public async Task<String> CreateUser(string email,string password)
+        [HttpPost("CreateUser")]
+        public async Task<String> CreateUser(UserRequest userRequest)
         {
                 Users FirstEx = new Users();
-                FirstEx.password = password;
-                FirstEx.email = email;
+                FirstEx.password = userRequest.password;
+                FirstEx.email = userRequest.email;
                 FirstEx.date_create = DateTime.Now;
                 FirstEx.modified_date = DateTime.Now;
                 FirstEx.role_id = 1;
