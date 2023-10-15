@@ -17,7 +17,7 @@ namespace apiServer.Controllers
             _logger = logger;
         }
         [HttpGet(Name = "GetArticles")]
-        public async Task<ActionResult<IEnumerable<Articles>>> Articles()
+        public async Task<IEnumerable<Articles>> GetArticles()
         {
             return await _context.Articles.ToListAsync();
         }
