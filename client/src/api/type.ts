@@ -49,8 +49,8 @@ export interface IUser{
     role_id:bigint;
     roles:Array<IRole>;
 }
-export interface IArticles {
-    id: bigint;
+export interface IArticle {
+    id: number;
     DOI: string;
     author_id: bigint;
     title: string;
@@ -63,7 +63,7 @@ export interface IArticles {
     path_file: string;
     author: IUser;
 }
-export interface IComments {
+export interface IComment {
     id: bigint;
     parent_id: bigint;
     user_id: bigint;
@@ -72,12 +72,12 @@ export interface IComments {
     date_create: Date;
     modified_date: Date;
 }
-export interface  IEmotions{
+export interface  IEmotion{
     id: bigint;
     Name: string;
     Emoji: string
 }
-export interface IReactions
+export interface IReaction
 {
     id: bigint;
     user_id: bigint;
@@ -87,19 +87,19 @@ export interface IReactions
     modified_date: Date;
 }
 
-export interface ISciences {
+export interface IScience {
     id: bigint;
     name: string;
     note: string;
 }
-export interface IScientificTheories {
+export interface IScientificTheory {
     id: bigint;
     science_id: bigint;
     name: string;
     note: string;
 
 }
-export interface ISelectedArticles{
+export interface ISelectedArticle{
     id: bigint;
     user_id: bigint;
     article_id: bigint;
