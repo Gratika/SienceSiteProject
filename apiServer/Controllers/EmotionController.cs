@@ -1,4 +1,5 @@
-﻿using apiServer.Models;
+﻿using apiServer.Controllers.Redis;
+using apiServer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,15 @@ namespace apiServer.Controllers
     {
        private readonly ArhivistDbContext _context; // Замість YourDbContext вставте назву вашого контексту бази даних
         private readonly ILogger<EmotionController> _logger;
-        private readonly IConnectionMultiplexer _redisConnection;
-        private readonly RedisRepository _redisRepository;
+        private readonly RedisEmotionController _redisRepository;
+        private readonly TokensController _tokens;
 
-        public EmotionController(ArhivistDbContext context, ILogger<EmotionController> logger, IConnectionMultiplexer redisConnection)
+        public EmotionController(ArhivistDbContext context, ILogger<EmotionController> logger, TokensController tokens)
         {
             _context = context;
             _logger = logger;
-            _redisConnection = redisConnection;
-            _redisRepository = new RedisRepository("redis:6379,abortConnect=false");
+            _tokens = tokens;
+            _redisRepository = new RedisEmotionController("redis:6379,abortConnect=false");
         }
         // GET: api/Emotions
          [HttpGet(Name = "All")]

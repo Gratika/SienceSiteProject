@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string? DOI { get; set; }
         public int author_id { get; set; }
+        public Users author_ { get; set; }
         public string title { get; set; }
         public string tag { get; set; }
         public string? text { get; set; }

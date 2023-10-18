@@ -6,36 +6,17 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.Redis
 {
-    public class RedisRepository : Controller
+    public class RedisUserController : Controller
     {
         private readonly ConnectionMultiplexer _redis;
         private readonly IDatabase _database;
 
-        public RedisRepository(string connectionString)
+        public RedisUserController(string connectionString)
         {
             _redis = ConnectionMultiplexer.Connect(connectionString);
             _database = _redis.GetDatabase();
-        }
-
-        public void AddEmotion(int emotionId, string name, string Emoji)
-        {
-            var userKey = $"emotions:{emotionId}";
-            var userFields = new HashEntry[]
-            {
-            new HashEntry("Name", name),
-            new HashEntry("Value", Emoji),
-            //new HashEntry("CreatedAt", DateTime.UtcNow.ToString()),
-            };
-
-            _database.HashSet(userKey, userFields);
-        }
-        public HashEntry[] GetEmotion(string key)
-        {
-            var db = _redis.GetDatabase();
-            var hashEntries = db.HashGetAll(key);
-            return hashEntries;
         }
         public void AddUser(Users user)
         {
@@ -53,7 +34,7 @@ namespace apiServer.Controllers
             new HashEntry("refresh_token", user.refresh_token),
             new HashEntry("email_is_checked", user.email_is_checked)
             };
-            if(user.firstname != null)
+            if (user.firstname != null)
             {
                 int currentSize = userFields.Length;
                 Array.Resize(ref userFields, currentSize + 1);
@@ -97,16 +78,16 @@ namespace apiServer.Controllers
                     }
                     if (hashEntry.Name.ToString() == "email" && hashEntry.Value == myemail)
                     {
-                        return false;                      
+                        return false;
                     }
                 }
             }
-                return false;
+            return false;
         }
         public void DeleteKey(string key)
         {
-            var db = _redis.GetDatabase();           
-            bool result = db.KeyDelete(key);           
+            var db = _redis.GetDatabase();
+            bool result = db.KeyDelete(key);
         }
         public Users GetUsersRedis(string refreshToken)
         {
