@@ -12,7 +12,6 @@ const userRegister: Ref<ISignUpInput>  = ref({
   password:'',
   //passwordConfirm:''
 });
-const isLoading=ref(false);
 const authStore = useAuthStore();
 /*валідація форм*/
 const { handleSubmit, handleReset } = useForm({
@@ -48,6 +47,7 @@ const submitRegister = handleSubmit(values => {
   /*if (typeof passwordConfirm.value.value === "string") {
     userRegister.value.passwordConfirm = passwordConfirm.value.value;
   }*/
+  console.log("userRegister", userRegister)
   authStore.onRegistration(userRegister.value)
   //alert(JSON.stringify(userRegister.value));
 })
@@ -56,8 +56,8 @@ const submitRegister = handleSubmit(values => {
 
 <template>
   <v-row class="justify-center">
-    <v-col cols="4">
-      <v-overlay :model-value="isLoading"
+    <v-col cols="12" xl="4" md="6" sm="8" xs="12">
+      <v-overlay :model-value="authStore.isLoading"
                  class="align-center justify-center">
         <v-progress-circular
             indeterminate

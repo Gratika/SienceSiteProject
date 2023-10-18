@@ -15,6 +15,7 @@ export type AuthStoreState ={
     token:string|'';
     username:string;
     isLogin:boolean;
+    isLoading:boolean;
 }
 
 export const useAuthStore = defineStore({
@@ -25,7 +26,7 @@ export const useAuthStore = defineStore({
         token:'',// MyLocalStorage.getItem('token') || '',
         isLogin:false, //MyLocalStorage.getItem('isLogin'),
         username:'',// MyLocalStorage.getItem('username'),
-
+        isLoading:false,
     } ),
 
     actions: {
@@ -34,15 +35,19 @@ export const useAuthStore = defineStore({
             this.authUser = user;
         },
         onRegistration(user:ISignUpInput){
+            this.isLoading=true;
             signUpUserFn(user).then(
                 res=>{
+                    this.isLoading = false;
                     createToast(res, {
                         position: 'top-right',
                     });
-                    router.push('/login');
+                    router.push('/verify_email');
                 }
             ).catch(error => {
+                this.isLoading = false;
                 console.log(error);
+
                 //showErrorMessage(error);
             })
         },
