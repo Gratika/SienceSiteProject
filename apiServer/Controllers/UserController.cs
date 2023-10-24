@@ -2,6 +2,10 @@
 using apiServer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System;
+using System.Net.Http;
+using System.Security.Policy;
 
 namespace apiServer.Controllers
 {
@@ -13,61 +17,76 @@ namespace apiServer.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly RedisUserController _redisRepository;
         private readonly TokensController _tokens;
-        public UserController(ArhivistDbContext context, ILogger<UserController> logger, TokensController tokens)
+        private readonly EmailController _em;
+        public UserController(ArhivistDbContext context, ILogger<UserController> logger, TokensController tokens, IHttpClientFactory httpClientFactory, EmailController em)
         {
             _context = context;
             _logger = logger;
             _tokens = tokens;
             _redisRepository = new RedisUserController("redis:6379,abortConnect=false");
+            _em = em;
         }
         [HttpGet("IsUserUnique")]
-        public async Task<int> IsUserUnique(string password, string email)
+        public async Task<int> IsUserUnique(/*Users Person*/ string password, string email)
         {
-            // проверка данных в редис
-            if (_redisRepository.IsUserUnique(password, email) == true)
+            // проверка данных в редис  
+            if (_redisRepository.IsUserUnique(/*Person.password, Person.email*/ password, email) == true)
             {
                 return 1;
-            }
+            }             
             List<Users> users = await _context.Users.ToListAsync();
             foreach (Users user in users)
             {
-                if (string.Equals(user.password, password, StringComparison.Ordinal) == true || string.Equals(user.email, email, StringComparison.Ordinal) == true)
+                if (string.Equals(/*user.password, Person.password*/user.password, password, StringComparison.Ordinal) == true || string.Equals(/*user.email, Person.email,*/user.email, email, StringComparison.Ordinal) == true)
                 {
                     return 0;
                 }
             }
             return 1;
         }
-
         [HttpPost("CreateUser")]
-
-        public async Task<String> CreateUser(/*string pas, string email*/UserRequest userRequest) //Регистрация
+        public async Task<ActionResult> CreateUser(string pas, string email/*UserRequest userRequest*/) //Регистрация
         {
+            //userRequest.email = "sacas";
+            //userRequest.password = "ascasca";
             Users FirstEx = new Users();
-            FirstEx.login = userRequest.password;
-            FirstEx.password = /* pas;*/ userRequest.password;
-            FirstEx.email = /* email;*/ userRequest.email;
+            FirstEx.login = email/*userRequest.email*/;
+            FirstEx.password = pas;/*userRequest.password*/;
+            FirstEx.email = email;/*userRequest.email*/;
             FirstEx.date_create = DateTime.Now;
             FirstEx.modified_date = DateTime.Now;
             FirstEx.role_id = 1;
-            //Проверка уникальности пользователя по паролю, логину и email
-            if (await IsUserUnique(FirstEx.password, FirstEx.email) == 0)
+            //Проверка уникальности пользователя по паролю и email
+            if (await IsUserUnique(/*FirstEx */FirstEx.password, FirstEx.email) == 0)
             {
-                return "Пользователь с таким логином, паролем или email уже существует.";
+                return Ok("Пользователь с таким логином, паролем или email уже существует.");
             }
             else
             {
-                //генерируем токены
-                FirstEx.access_token = _tokens.GenerateAccessToken();
-                FirstEx.refresh_token = _tokens.GenerateRefreshToken();
-                // Сохранение пользователя в базе данных
-                _context.Users.Add(FirstEx);
-                _context.SaveChanges();
-                //Добавляем в редис
-                _redisRepository.AddUser(FirstEx);
-                return "Вы успешно зарегистрировались";
+                var response = await _em.SentCode(email); //Отправляем письмо пользователю для проверки почты
+                // Обработка ответа от микросервиса для проверки почты
+                if (response == "1")
+                {
+                    //// Почта прошла проверку, продолжаем регистрацию
+                    ////генерируем токены
+                    FirstEx.access_token = _tokens.GenerateAccessToken();
+                    FirstEx.refresh_token = _tokens.GenerateRefreshToken();
+                    //// Сохранение пользователя в базе данных
+                    _context.Users.Add(FirstEx);
+                    _context.SaveChanges();
+                    ////Добавляем в редис               
+                    _redisRepository.AddUser(FirstEx);                    
+                    return Ok(new { Message = "Регистрация прошла успешно" });
+                }
+                else
+                {
+                    // Почта не прошла проверку, возвращаем ошибку
+                    return BadRequest(new { Error = "Ошибка при проверке почты" });
+                }
+
+                //return Ok("Вы успешно зарегистрировались");
             }
-        }
+        }       
 
         [HttpGet("CheckTokens")]
         public string CheckTokens(string accessToken,string refreshToken)
@@ -106,6 +125,7 @@ namespace apiServer.Controllers
             {
                 return "Пользователь не найден";
             }
-        }              
+        }
+        
     }
 }
