@@ -4,3 +4,4 @@
 /.vs/slnx.sqlite
 *.vsidx
 *.json
+*.sqlite~change
