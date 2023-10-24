@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService\\EmailService.csproj": {}
+    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService\\EmailService.csproj": {
+    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService\\EmailService.csproj",
+        "projectUniqueName": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService.csproj",
         "projectName": "EmailService",
-        "projectPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService\\EmailService.csproj",
+        "projectPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService.csproj",
         "packagesPath": "C:\\Users\\Gratika\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\EmailService\\obj\\",
+        "outputPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\emailService\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Gratika\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -47,6 +47,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.5.0, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.5, )"
             }
           },
           "imports": [

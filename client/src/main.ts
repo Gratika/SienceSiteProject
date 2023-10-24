@@ -1,4 +1,4 @@
-//import './assets/main.css'
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
@@ -13,6 +13,7 @@ import {createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import type {ThemeDefinition} from 'vuetify'
+//VueQuill
 
 const myCustomLightTheme: ThemeDefinition = {
     dark: false,
@@ -27,6 +28,8 @@ const myCustomLightTheme: ThemeDefinition = {
         info: '#2196F3',
         success: '#4CAF50',
         warning: '#FB8C00',
+        'my-dark':'#607D8B',
+        'my-accent':'#F44336'
     },
 }
 const vuetify = createVuetify({
@@ -38,7 +41,7 @@ const vuetify = createVuetify({
     theme: {
         defaultTheme: 'myCustomLightTheme',
         themes: {
-            myCustomLightTheme,
+            myCustomLightTheme
         },
     },
 })

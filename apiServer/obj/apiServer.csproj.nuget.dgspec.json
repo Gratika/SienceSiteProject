@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj": {}
+    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj": {
+    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj",
+        "projectUniqueName": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj",
         "projectName": "apiServer",
-        "projectPath": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj",
-        "packagesPath": "C:\\Users\\Evgen\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\obj\\",
+        "projectPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj",
+        "packagesPath": "C:\\Users\\Gratika\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Evgen\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Gratika\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -88,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }

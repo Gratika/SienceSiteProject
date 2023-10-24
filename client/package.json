@@ -10,6 +10,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
+    "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.5.1",
     "mosha-vue-toastify": "^1.0.23",
     "pinia": "^2.1.6",

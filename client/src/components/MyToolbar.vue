@@ -4,10 +4,11 @@ function onSearch(){}
 
 <template>
       <v-toolbar
+          color="my-dark"
           class="pa-2"
           density="compact">
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
-        <RouterLink to="/">
+        <RouterLink to="/" >
           <v-toolbar-title>Доцент</v-toolbar-title>
         </RouterLink>
 
@@ -32,6 +33,7 @@ function onSearch(){}
         </v-btn>
         <v-btn
             class="mx-1"
+            to="/my_article"
             variant="outlined"
             size="small">
           Мої статті
@@ -42,7 +44,6 @@ function onSearch(){}
             to="/login"
             variant="outlined"
             size="small"
-            color="red"
         >
           Вхід
         </v-btn>

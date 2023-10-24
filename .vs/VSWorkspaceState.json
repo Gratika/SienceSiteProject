@@ -1,10 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\apiServer",
-    "\\apiServer\\Controllers",
-    "\\apiServer\\Models"
+    ""
   ],
-  "SelectedNode": "\\apiServer\\apiServer.sln",
+  "SelectedNode": "\\apiServer.sln",
   "PreviewInSolutionExplorer": false
 }

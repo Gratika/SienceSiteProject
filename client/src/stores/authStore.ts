@@ -28,6 +28,11 @@ export const useAuthStore = defineStore({
         username:'',// MyLocalStorage.getItem('username'),
         isLoading:false,
     } ),
+    getters:{
+        getUserId():number|undefined{
+            return this.authUser?.id;
+        }
+    },
 
     actions: {
 
@@ -42,7 +47,7 @@ export const useAuthStore = defineStore({
                     createToast(res, {
                         position: 'top-right',
                     });
-                    router.push('/verify_email');
+                   router.push('/verify_email');
                 }
             ).catch(error => {
                 this.isLoading = false;

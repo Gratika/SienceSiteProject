@@ -1,6 +1,6 @@
 
 export interface GenericResponse {
-    status: string;
+    //status: string;
     message: string;
 }
 
@@ -30,12 +30,12 @@ export interface IUserResponse {
 
 }
 export interface IRole{
-    id:bigint;
+    id:number;
     role_name:string;
     modified_date: Date;
 }
 export interface IUser{
-    id:bigint;
+    id:number;
     login:string;
     password:string;
     email:string;
@@ -46,63 +46,63 @@ export interface IUser{
     birthday:Date;
     date_create: Date;
     modified_date: Date;
-    role_id:bigint;
+    role_id:number;
     roles:Array<IRole>;
 }
 export interface IArticle {
-    id: number;
+    id: number|undefined;
     DOI: string;
-    author_id: bigint;
+    author_id: number|undefined;
     title: string;
     tag: string;
     text: string;
     views: number;
     date_create: Date;
     modified_date: Date;
-    theory_id: bigint;
+    theory_id: number|undefined;
     path_file: string;
-    author: IUser;
+    author_: IUser|null;
 }
 export interface IComment {
-    id: bigint;
-    parent_id: bigint;
-    user_id: bigint;
-    article_id: bigint;
+    id: number;
+    parent_id: number;
+    user_id: number;
+    article_id: number;
     text: string;
     date_create: Date;
     modified_date: Date;
 }
 export interface  IEmotion{
-    id: bigint;
+    id: number;
     Name: string;
     Emoji: string
 }
 export interface IReaction
 {
-    id: bigint;
-    user_id: bigint;
-    article_id: bigint;
-    reaction_id: bigint;
+    id: number;
+    user_id: number;
+    article_id: number;
+    reaction_id: number;
     date_create: Date;
     modified_date: Date;
 }
 
 export interface IScience {
-    id: bigint;
+    id: number;
     name: string;
     note: string;
 }
 export interface IScientificTheory {
-    id: bigint;
-    science_id: bigint;
+    id: number;
+    science_id: number;
     name: string;
     note: string;
 
 }
 export interface ISelectedArticle{
-    id: bigint;
-    user_id: bigint;
-    article_id: bigint;
-    Date_view: Date;
+    id: number|null;
+    user_id: number;
+    article_id: number;
+    Date_view: Date|null;
 
 }

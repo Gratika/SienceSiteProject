@@ -56,7 +56,7 @@ const submitRegister = handleSubmit(values => {
 
 <template>
   <v-row class="justify-center">
-    <v-col cols="12" xl="4" md="6" sm="8" xs="12">
+    <v-col cols="12" md="4" sm="8" xs="12">
       <v-overlay :model-value="authStore.isLoading"
                  class="align-center justify-center">
         <v-progress-circular
@@ -66,7 +66,7 @@ const submitRegister = handleSubmit(values => {
       </v-overlay>
       <v-card class="my-8">
         <v-card-title class="text-center">
-          Реєстрація нового користувача
+          Реєстрація
         </v-card-title>
         <v-card-item>
           <v-form @submit.prevent="submitRegister">
@@ -105,7 +105,7 @@ const submitRegister = handleSubmit(values => {
                 :error-messages="passwordConfirm.errorMessage.value"
             />
 
-            <v-btn type="submit" block class="mt-2" color="red" >Submit</v-btn>
+            <v-btn type="submit" block class="mt-2" color="my-accent" >Submit</v-btn>
           </v-form>
         </v-card-item>
         <v-card-actions>
