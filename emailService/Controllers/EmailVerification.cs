@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using System.Net;
 using System.Data.SqlClient;
+using Newtonsoft.Json.Linq;
 
 namespace EmailService.Controllers
 {
@@ -11,43 +12,43 @@ namespace EmailService.Controllers
     {
 
         [HttpGet("VerifyEmail")]
-        public IActionResult VerifyEmail(/*string email*/)
+        public /*IActionResult*/async Task<string> VerifyEmail(string email, string code /*[FromBody] string email*/)
         {
-            string email = "zapaspas99@gmail.com";
-            // Генерация уникальной ссылки для подтверждения
+            //string email = "zapaspas99@gmail.com";
+            //Генерация уникальной ссылки для подтверждения
             string verificationLink = GenerateVerificationLink();
 
             // Отправка электронного письма с ссылкой для подтверждения
-            bool isEmailSent = SendVerificationEmail(email, verificationLink);
+            bool isEmailSent = SendVerificationEmail(email, code);
 
             if (isEmailSent)
             {
-                return Ok("Письмо с подтверждением отправлено");
+                return "1";
             }
             else
             {
-                return BadRequest("Не удалось отправить письмо с подтверждением");
+                return "Не удалось отправить письмо с подтверждением";
             }
         }
 
-        [HttpGet("ConfirmEmail")]
-        public IActionResult ConfirmEmail(string email, string verificationCode)
-        {
-            // Проверка ссылки подтверждения
-            bool isEmailConfirmed = VerifyEmailConfirmation(email, verificationCode);
+        //[HttpGet("ConfirmEmail")]
+        //public IActionResult ConfirmEmail( string email, string verificationCode)
+        //{
+        //    // Проверка ссылки подтверждения
+        //    bool isEmailConfirmed = VerifyEmailConfirmation(email, verificationCode);
 
-            if (isEmailConfirmed)
-            {
-                // Обновление статуса проверки почты в базе данных
-                UpdateEmailVerificationStatus(email);
+        //    if (isEmailConfirmed)
+        //    {
+        //        // Обновление статуса проверки почты в базе данных
+        //        UpdateEmailVerificationStatus(email);
 
-                return Ok("Адрес электронной почты успешно подтвержден");
-            }
-            else
-            {
-                return BadRequest("Недействительная ссылка подтверждения");
-            }
-        }
+        //        return Ok("Адрес электронной почты успешно подтвержден");
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Недействительная ссылка подтверждения");
+        //    }
+        //}
         [HttpGet("GenerateVerificationLink")]
         private string GenerateVerificationLink()
         {
@@ -72,7 +73,7 @@ namespace EmailService.Controllers
                 mail.From = new MailAddress("karaskaras3278@gmail.com");
                 mail.To.Add(email);
                 mail.Subject = "Подтверждение адреса электронной почты";
-                mail.Body = "Пожалуйста, перейдите по ссылке для подтверждения вашего адреса электронной почты: " + verificationLink;
+                mail.Body = "Пожалуйста, введите этот код для подтверждения вашего адреса электронной почты: " + verificationLink;
 
                 smtpClient.Credentials = new NetworkCredential("karaskaras3278@gmail.com", "iqtr jxri jkna puru");
                 smtpClient.EnableSsl = true;
@@ -101,26 +102,26 @@ namespace EmailService.Controllers
                 return false;
             }
         }
-        [HttpGet("UpdateEmailVerificationStatus")]
-        private void UpdateEmailVerificationStatus(string email)
-        {
-            // Подключение к базе данных
-            using (var connection = new SqlConnection($"server=mysql_db;port=3306;database=archivist;user=root;password=root_password;"))
-            {
-                connection.Open();
+        //[HttpGet("UpdateEmailVerificationStatus")]
+        //private void UpdateEmailVerificationStatus(string email)
+        //{
+        //    // Подключение к базе данных
+        //    using (var connection = new SqlConnection($"server=mysql_db;port=3306;database=archivist;user=root;password=root_password;"))
+        //    {
+        //        connection.Open();
 
-                // Создание SQL-запроса для обновления статуса проверки почты
-                string query = "UPDATE Users SET email_is_checked = 1 WHERE email = @email";
+        //        // Создание SQL-запроса для обновления статуса проверки почты
+        //        string query = "UPDATE Users SET email_is_checked = 1 WHERE email = @email";
 
-                // Создание команды с параметром
-                using (var command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@email", email);
+        //        // Создание команды с параметром
+        //        using (var command = new SqlCommand(query, connection))
+        //        {
+        //            command.Parameters.AddWithValue("@email", email);
 
-                    // Выполнение команды обновления
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
+        //            // Выполнение команды обновления
+        //            command.ExecuteNonQuery();
+        //        }
+        //    }
+        //}
     }
 }

@@ -14,7 +14,7 @@ namespace apiServer.Controllers
     [ApiController]
     public class EmotionController : ControllerBase
     {
-       private readonly ArhivistDbContext _context; // Замість YourDbContext вставте назву вашого контексту бази даних
+        private readonly ArhivistDbContext _context;
         private readonly ILogger<EmotionController> _logger;
         private readonly RedisEmotionController _redisRepository;
         private readonly TokensController _tokens;
