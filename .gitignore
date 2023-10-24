@@ -3,3 +3,4 @@
 /mysql-data
 /.vs/slnx.sqlite
 *.vsidx
+*.json
