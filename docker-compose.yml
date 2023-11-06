@@ -18,6 +18,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - NAME=apiserver
+    volumes:
+         - /c/Users/Evgen/source/repos/SienceSiteProject/apiServer/Uploads:/app/Uploads
     networks:
       - network1
 
@@ -107,3 +109,18 @@ services:
     networks:
       - network1
 
+  minio:
+    image: quay.io/minio/minio
+    ports:    
+      - 9090:9090
+    container_name: minio1
+    environment:
+      - MINIO_ROOT_USER=ROOTUSER
+      - MINIO_ROOT_PASSWORD=CHANGEME123
+    volumes:
+      - D:\data:/data
+    command: server /data --console-address ":9090"
+    networks:
+      - network1
+ 
+  

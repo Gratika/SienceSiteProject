@@ -42,26 +42,33 @@ namespace apiServer.Controllers
         [HttpGet("RedisGetEmotion")]
         public async Task<string> RedisFullFuncion(int emotionId)
         {
-            // Проверка наличия данных в кэше
-            HashEntry[] userFields = _redisRepository.GetEmotion("emotions:" + emotionId);
-            if (userFields.Length != 0)
+            try
             {
-                StringBuilder sb = new StringBuilder();
-                foreach (var hashEntry in userFields)
+                // Проверка наличия данных в кэше
+                HashEntry[] userFields = _redisRepository.GetEmotion("emotions:" + emotionId);
+                if (userFields.Length != 0)
                 {
-                    string fieldName = hashEntry.Name;
-                    string fieldValue = hashEntry.Value;
+                    StringBuilder sb = new StringBuilder();
+                    foreach (var hashEntry in userFields)
+                    {
+                        string fieldName = hashEntry.Name;
+                        string fieldValue = hashEntry.Value;
 
-                    sb.AppendLine($"{fieldName}: {fieldValue}");
+                        sb.AppendLine($"{fieldName}: {fieldValue}");
+                    }
+                    return sb.ToString();
                 }
-                return sb.ToString();
+                // Данные отсутствуют в кэше, выполняем запрос к источнику данных
+                Emotions data = new Emotions();
+                data = await GetEmotion(emotionId);
+                // Сохранение данных в кэше на 10 минут
+                _redisRepository.AddEmotion(data.Id, data.Name, data.Emoji);
+                return data.Name + " " + data.Emoji;
             }
-            // Данные отсутствуют в кэше, выполняем запрос к источнику данных
-            Emotions data = new Emotions();
-            data = await GetEmotion(emotionId);
-            // Сохранение данных в кэше на 10 минут
-            _redisRepository.AddEmotion(data.Id,data.Name,data.Emoji);
-            return data.Name + " " + data.Emoji;
+            catch (Exception ex) 
+            { 
+                return ex.Message;
+            }
         }
     }
 }

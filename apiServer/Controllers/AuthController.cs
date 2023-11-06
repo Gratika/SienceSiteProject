@@ -23,7 +23,7 @@ namespace apiServer.Controllers
         }
 
         [HttpGet("AuthUser")]
-        public async Task<AuthResponse> AuthUser(string pas, string email/*UserRequest userRequest*/) //авторизация
+        public async Task<ActionResult> AuthUser(string pas, string email/*UserRequest userRequest*/) //авторизация
         {
             AuthResponse Response = new AuthResponse();
             try
@@ -33,22 +33,23 @@ namespace apiServer.Controllers
                 if (Response.user != null)
                 {
                     Response.answer = "Вы вошли";
-                    return Response;
+                    return Ok(new { Message = Response });
                 }
+                // проверка данных в базе данных
                 Response.user = await CheckUserDatabase(pas, email);
                 if (Response.user != null)
                 {
                     Response.answer = "Вы вошли";
-                    return Response;
+                    return Ok(new { Message = Response });
                 }
             }
             catch
             {
                 Response.answer = "Вы не вошли";
-                return Response;
+                return Ok(new { Message = Response });
             }
             Response.answer = "Вы не вошли";
-            return Response;
+            return Ok(new { Message = Response });
         }
         [HttpGet("CheckUserDatabase")]
         public async Task<Users> CheckUserDatabase(string pas, string email /*Users Person*/ )
