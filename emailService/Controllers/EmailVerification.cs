@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using System.Net;
 using System.Data.SqlClient;
+//using Newtonsoft.Json.Linq;
 
 namespace EmailService.Controllers
 {
@@ -29,25 +30,6 @@ namespace EmailService.Controllers
                 return "Не удалось отправить письмо с подтверждением";
             }
         }
-
-        //[HttpGet("ConfirmEmail")]
-        //public IActionResult ConfirmEmail( string email, string verificationCode)
-        //{
-        //    // Проверка ссылки подтверждения
-        //    bool isEmailConfirmed = VerifyEmailConfirmation(email, verificationCode);
-
-        //    if (isEmailConfirmed)
-        //    {
-        //        // Обновление статуса проверки почты в базе данных
-        //        UpdateEmailVerificationStatus(email);
-
-        //        return Ok("Адрес электронной почты успешно подтвержден");
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("Недействительная ссылка подтверждения");
-        //    }
-        //}
         [HttpGet("GenerateVerificationLink")]
         private string GenerateVerificationLink()
         {
@@ -101,26 +83,5 @@ namespace EmailService.Controllers
                 return false;
             }
         }
-        //[HttpGet("UpdateEmailVerificationStatus")]
-        //private void UpdateEmailVerificationStatus(string email)
-        //{
-        //    // Подключение к базе данных
-        //    using (var connection = new SqlConnection($"server=mysql_db;port=3306;database=archivist;user=root;password=root_password;"))
-        //    {
-        //        connection.Open();
-
-        //        // Создание SQL-запроса для обновления статуса проверки почты
-        //        string query = "UPDATE Users SET email_is_checked = 1 WHERE email = @email";
-
-        //        // Создание команды с параметром
-        //        using (var command = new SqlCommand(query, connection))
-        //        {
-        //            command.Parameters.AddWithValue("@email", email);
-
-        //            // Выполнение команды обновления
-        //            command.ExecuteNonQuery();
-        //        }
-        //    }
-        //}
     }
 }

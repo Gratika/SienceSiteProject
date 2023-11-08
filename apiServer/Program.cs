@@ -1,6 +1,7 @@
 using apiServer.Controllers;
 using apiServer.Models;
 using Microsoft.EntityFrameworkCore;
+using Minio;
 using StackExchange.Redis;
 using System.Configuration;
 
@@ -14,6 +15,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddScoped<EmailController>();
 builder.Services.AddScoped<TokensController>();
+builder.Services.AddScoped<GenerateRandomStringControlle>();
+builder.Services.AddScoped<MinioController>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,6 +35,13 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowCredentials());
 });
+//builder.Services.MakeBucket.Run(minioClient, bucketName).Wait();
+
+//builder.Services.AddMinio(options =>
+//{
+//    options.WithEndpoint("localhost");
+//    options.WithCredentials("ROOTUSER", "CHANGEME123");
+//});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
