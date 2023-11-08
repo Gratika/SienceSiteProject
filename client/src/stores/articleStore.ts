@@ -34,7 +34,7 @@ export const useArticleStore = defineStore({
         //отримати список статтей
         async getArticleList() {
             this.isLoading=true;
-            sendRequest<Array<IArticle>>('GET', 'article')
+            sendRequest<Array<IArticle>>('GET', 'article/GetArticles')
                 .then((res) =>{
                     this.articles=res;
                     this.isLoading =false;

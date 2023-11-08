@@ -22,20 +22,20 @@ namespace apiServer.Controllers
             _redisRepository = new RedisAuthController("redis:6379,abortConnect=false");
         }
 
-        [HttpGet("AuthUser")]
-        public async Task<AuthResponse> AuthUser(string pas, string email/*UserRequest userRequest*/) //авторизация
+        [HttpPost("AuthUser")]
+        public async Task<AuthResponse> AuthUser(UserRequest userRequest) //авторизация
         {
             AuthResponse Response = new AuthResponse();
             try
             {               
-                Response.user = _redisRepository.IsUserUnique(pas, email /*password, email*/);
+                Response.user = _redisRepository.IsUserUnique(userRequest.password, userRequest.email);
                 // проверка данных в редис  
                 if (Response.user != null)
                 {
                     Response.answer = "Вы вошли";
                     return Response;
                 }
-                Response.user = await CheckUserDatabase(pas, email);
+                Response.user = await CheckUserDatabase(userRequest.password, userRequest.email);
                 if (Response.user != null)
                 {
                     Response.answer = "Вы вошли";

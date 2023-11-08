@@ -45,14 +45,14 @@ namespace apiServer.Controllers
             return 1;
         }
         [HttpPost("CreateUser")]
-        public async Task<ActionResult> CreateUser(string pas, string email/*UserRequest userRequest*/) //Регистрация
+        public async Task<ActionResult> CreateUser(/*string pas, string email*/UserRequest userRequest) //Регистрация
         {
             //userRequest.email = "sacas";
             //userRequest.password = "ascasca";
             Users FirstEx = new Users();
-            FirstEx.login = email/*userRequest.email*/;
-            FirstEx.password = pas;/*userRequest.password*/;
-            FirstEx.email = email;/*userRequest.email*/;
+            FirstEx.login = userRequest.email;
+            FirstEx.password =userRequest.password;
+            FirstEx.email = userRequest.email;
             FirstEx.date_create = DateTime.Now;
             FirstEx.modified_date = DateTime.Now;
             FirstEx.role_id = 1;
@@ -63,7 +63,7 @@ namespace apiServer.Controllers
             }
             else
             {
-                var response = await _em.SentCode(email); //Отправляем письмо пользователю для проверки почты
+                var response = await _em.SentCode(userRequest.email); //Отправляем письмо пользователю для проверки почты
                 // Обработка ответа от микросервиса для проверки почты
                 if (response == "1")
                 {

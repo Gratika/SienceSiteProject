@@ -2,7 +2,6 @@
 using System.Net.Mail;
 using System.Net;
 using System.Data.SqlClient;
-using Newtonsoft.Json.Linq;
 
 namespace EmailService.Controllers
 {

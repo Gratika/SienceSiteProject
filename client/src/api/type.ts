@@ -16,8 +16,8 @@ export interface ISignUpInput {
 }
 
 export interface ILoginResponse {
-    login:string;
-    token: string;
+    answer:string;
+    user: IUser;
 }
 
 export interface ISignUpResponse {
@@ -48,6 +48,7 @@ export interface IUser{
     modified_date: Date;
     role_id:number;
     roles:Array<IRole>;
+    email_is_checked:number;
 }
 export interface IArticle {
     id: number|undefined;

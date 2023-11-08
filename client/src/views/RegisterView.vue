@@ -37,7 +37,6 @@ const  password = useField('password');
 const passwordConfirm = useField('passwordConfirm');
 
 const submitRegister = handleSubmit(values => {
-  console.log("method submit form")
   if (typeof email.value.value === "string") {
     userRegister.value.email = email.value.value;
   }
@@ -47,9 +46,8 @@ const submitRegister = handleSubmit(values => {
   /*if (typeof passwordConfirm.value.value === "string") {
     userRegister.value.passwordConfirm = passwordConfirm.value.value;
   }*/
-  console.log("userRegister", userRegister)
   authStore.onRegistration(userRegister.value)
-  //alert(JSON.stringify(userRegister.value));
+
 })
 
 </script>

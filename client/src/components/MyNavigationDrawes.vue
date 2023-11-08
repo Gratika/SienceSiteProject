@@ -4,8 +4,10 @@
   import router from "@/router";
 
   const props = defineProps<{
-    user:IUser|null
+    user:IUser|null,
+    drawer:boolean
   }>();
+
   const userName=():string|undefined =>{
     if(props.user!=null){
       if (props.user.firstname!=''){
@@ -36,10 +38,7 @@
 <template>
   <!--v-card>
     <v-layout-->
-      <v-navigation-drawer
-          expand-on-hover
-          rail
-      >
+      <v-navigation-drawer v-model="drawer">
         <v-list>
           <v-list-item
               prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"

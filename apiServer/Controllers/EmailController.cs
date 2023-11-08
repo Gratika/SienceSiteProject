@@ -3,7 +3,6 @@ using apiServer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using NRediSearch.QueryBuilder;
 using StackExchange.Redis;
 using System.Net.Http;
 using System.Reflection.Emit;

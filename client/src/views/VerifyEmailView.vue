@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import {useField, useForm} from "vee-validate";
-import {verifyEmailFn} from "@/api/authApi";
-import {ref} from "vue";
-import router from "@/router";
+import {useAuthStore} from "@/stores/authStore";
 
-const isLoading = ref(false);
+
+const authStore = useAuthStore();
 const { handleSubmit, handleReset } = useForm({
   validationSchema: {
     code (value:string) {
@@ -16,22 +15,19 @@ const { handleSubmit, handleReset } = useForm({
 })
 const code= useField('code');
 const submitCode = handleSubmit(()=>{
-  isLoading.value=true;
   let code_:string = '0';
   if (typeof code.value.value === 'string') code_ = code.value.value;
-
-  verifyEmailFn(code_).then(
-      res=>{
-        isLoading.value=false;
-        router.push('/login')
-      })
+  authStore.onVerifEmail(code_);
 })
+function getRepeatCode(){
+  authStore.onRepeatVerificationCode();
+}
 </script>
 
 <template>
  <v-row class="justify-center">
-   <v-col cols="5">
-     <v-overlay :model-value="isLoading"
+   <v-col cols="12" md="4" sm="8" xs="12">
+     <v-overlay :model-value="authStore.isLoading"
                 class="align-center justify-center">
        <v-progress-circular
            indeterminate
@@ -40,7 +36,7 @@ const submitCode = handleSubmit(()=>{
      </v-overlay>
      <v-card class="my-8">
      <v-card-title class="text-center">
-       Підтвердження електронної адреси
+       Підтвердити електронну адресу
      </v-card-title>
      <v-card-item>
      <v-form @submit.prevent="submitCode">
@@ -50,9 +46,12 @@ const submitCode = handleSubmit(()=>{
            id="code"
            :error-messages="code.errorMessage.value"
        ></v-text-field>
-       <v-btn type="submit" block class="mt-2">Submit</v-btn>
+         <v-btn color="my-accent" type="submit" block class="mt-2">Submit</v-btn>
      </v-form>
      </v-card-item>
+       <v-card-actions>
+         <v-btn block @click="getRepeatCode">Отримати знову</v-btn>
+       </v-card-actions>
      </v-card>
    </v-col>
  </v-row>

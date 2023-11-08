@@ -1,5 +1,13 @@
 <script setup lang="ts">
+import {ref} from "vue";
+
+const emits = defineEmits(['show'])
 function onSearch(){}
+const drawer = ref(false)
+function showSideBar(){
+  drawer.value=!drawer.value;
+  emits('show', drawer.value);
+}
 </script>
 
 <template>
@@ -7,9 +15,11 @@ function onSearch(){}
           color="my-dark"
           class="pa-2"
           density="compact">
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="showSideBar"></v-app-bar-nav-icon>
         <RouterLink to="/" >
-          <v-toolbar-title>Доцент</v-toolbar-title>
+          <v-toolbar-title class="text-decoration-underline">
+            Доцент
+          </v-toolbar-title>
         </RouterLink>
 
         <v-spacer></v-spacer>
@@ -24,7 +34,13 @@ function onSearch(){}
             hide-details
             @click:append-inner="onSearch"
         ></v-text-field>
-
+        <v-btn
+            class="mx-1"
+            to="/new_article"
+            variant="outlined"
+            size="small">
+          new_article
+        </v-btn>
         <v-btn
             class="mx-1"
             variant="outlined"

@@ -1,65 +1,70 @@
 <script setup lang="ts">
-import type {IArticle} from "@/api/type";
- import type {Ref} from "vue";
 import {onMounted, ref} from "vue";
 import {useArticleStore} from "@/stores/articleStore";
 import RichTextEditor from "@/components/RichTextEditor.vue";
 
- /*const newArticle:Ref<IArticle>=ref({
-   id:undefined,
-   DOI: '',
-   author_id: undefined,
-   title: '',
-   tag: '',
-   text: '',
-   views: 0,
-   date_create: Date.now(),
-   modified_date: Date.now(),
-   theory_id: undefined,
-   path_file: '',
-   author_: null
- })*/
  const articleStore = useArticleStore();
- const isUpdating = ref(true);
+ const isUpdating = ref(false);
  onMounted(()=>{
    articleStore.getScienceList();
    articleStore.getScienceSectionList();
 })
+function getScienceSection(){
+   articleStore.selectedScienceId=parseInt(search.value,10);
+   //зробити запит на сервер чи відфільтрувати список?
+}
 
 const search = ref('')
+const search2 = ref('')
 </script>
 
 <template>
   <v-row class="justify-center">
-    <v-col cols="5" class="justify-center align-center">
- <v-form >
-   <span>{{search}}</span>
-   <v-autocomplete
-       label="Наукова сфера"
-       :items="articleStore.sciences"
-       :disabled = "isUpdating"
-       variant="solo-filled"
-       v-model="search"
-       item-title="name"
-       item-value="id"
-   >
-     <!--template v-slot:item="{  props, item }">
-       {{item.raw.name}}
-       <v-list-item
-           v-bind="props"
-           :title="item.raw.name"
-       ></v-list-item>
-     </template-->
-   </v-autocomplete>
-   <!--v-autocomplete
-       label="Розділ"
-       :items="articleStore.filteredScientificSections"
-       variant="solo-filled"
-   ></v-autocomplete-->
- </v-form>
-    </v-col>
-    <v-col cols="7">
+    <v-col cols="8" class="justify-center align-center">
       <RichTextEditor/>
+    </v-col>
+    <v-col cols="3">
+ <v-form >
+       <v-autocomplete
+           label="Наукова сфера"
+           :items="articleStore.sciences"
+           :disabled = "isUpdating"
+           variant="solo-inverted"
+           v-model="search"
+           item-title="name"
+           item-value="id"
+           @change="getScienceSection"
+       > </v-autocomplete>
+       <v-autocomplete
+           label="Розділ"
+           :items="articleStore.scientificSections"
+           variant="solo-filled"
+           :disabled = "isUpdating"
+           v-model="search2"
+           item-title="name"
+           item-value="id"
+       ></v-autocomplete>
+   <v-text-field
+       clearable
+       label="DOI"
+       variant="solo"
+       id="DOI_article"
+   />
+   <v-textarea
+       clearable
+       label="Назва статті"
+       variant="solo"
+       id="title_article"
+   />
+   <v-textarea
+       clearable
+       label="Теги"
+       variant="solo"
+       id="teg_article"
+   />
+
+
+ </v-form>
     </v-col>
   </v-row>
 
