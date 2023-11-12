@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj": {}
+    "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj": {
+    "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj",
+        "projectUniqueName": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj",
         "projectName": "apiServer",
-        "projectPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\apiServer.csproj",
+        "projectPath": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj",
         "packagesPath": "C:\\Users\\Gratika\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Gratika\\Desktop\\SienceSiteProject\\apiServer\\obj\\",
+        "outputPath": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Gratika\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -47,6 +47,10 @@
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.19.4, )"
+            },
+            "Minio": {
+              "target": "Package",
+              "version": "[6.0.1, )"
             },
             "MySql.EntityFrameworkCore": {
               "target": "Package",
