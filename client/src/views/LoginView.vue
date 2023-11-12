@@ -45,7 +45,7 @@
 
 <template>
 <v-row class="justify-center">
-  <v-col cols="4">
+  <v-col cols="12"  md="4" sm="8" xs="12">
     <v-overlay :model-value="isLoading"
     class="align-center justify-center">
       <v-progress-circular
@@ -80,7 +80,7 @@
               :error-messages="password.errorMessage.value"
           />
 
-          <v-btn type="submit" block class="mt-2" color="red" >Submit</v-btn>
+          <v-btn type="submit" block class="mt-2" color="my-accent" >Submit</v-btn>
         </v-form>
       </v-card-item>
       <v-card-actions>

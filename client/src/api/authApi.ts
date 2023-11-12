@@ -38,8 +38,8 @@ authApi.interceptors.request.use(
     (config) => {
         // Проверяем, есть ли токен в localStorage
         const token = localStorage.getItem('token');
-        console.log("token:");
-        console.log(token);
+        //console.log("token:");
+       // console.log(token);
         if (token) {
             // Если есть, добавляем его в заголовок Authorization
             config.headers['Authorization'] = `Bearer ${token}`;
@@ -82,16 +82,25 @@ export const signUpUserFn = async (user: ISignUpInput) => {
 
 //авторизація, вхід в систему
 export const loginUserFn = async (user: ILoginInput) => {
-    console.log(user);
-    const response = await authApi.post<ILoginResponse>('auth/login', user);
+    const response = await authApi.post<ILoginResponse>('auth/AuthUser', user);
     return response.data;
 };
 
 
 export const verifyEmailFn = async (verificationCode: string) => {
-    const response = await authApi.get<GenericResponse>(
-        `auth/verifyemail/${verificationCode}`
-    );
+    const response = await authApi.get<string>('email/checkcode', {
+        params: {
+            code: verificationCode
+        }
+    });
+    return response.data;
+};
+export const getRepeatCodeFn = async (email: string) => {
+    const response = await authApi.get<string>('email/SentCode', {
+        params: {
+            email : email
+        }
+    });
     return response.data;
 };
 
@@ -101,11 +110,6 @@ export const logoutUserFn = async () => {
     return response.data;
 };
 
-//інформація про користувача(профіль)
-export const getUserFn = async () => {
-    const response = await authApi.get<IUserResponse>('auth/currentUser');
-    return response.data;
-};
 // Универсальная функция для отправки запроса
 export const sendRequest = async <T>( method: string,  url: string,  data?: any): Promise<T> => {
 
@@ -137,4 +141,10 @@ export const sendRequest = async <T>( method: string,  url: string,  data?: any)
             });
         }
     }
-}*/
+}
+//інформація про користувача(профіль)
+export const getUserFn = async () => {
+    const response = await authApi.get<IUserResponse>('auth/currentUser');
+    return response.data;
+};
+*/

@@ -1,13 +1,28 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { ref } from 'vue'
+import MyNavigationDrawes from "@/components/MyNavigationDrawes.vue";
+import {useAuthStore} from "@/stores/authStore";
 import MyToolbar from "@/components/MyToolbar.vue";
-</script>
 
+const authStore = useAuthStore();
+const drawer = ref(false)
+function showSideBar(show:boolean){
+  drawer.value=show;
+}
+</script>
 <template>
-  <v-app>
+  <v-app id="inspire">
+    <MyNavigationDrawes
+        :user="authStore.authUser"
+        :drawer="drawer"
+    />
+
     <v-app-bar>
-      <MyToolbar/>
+      <MyToolbar
+      @show="showSideBar"
+      />
     </v-app-bar>
+
     <v-main>
       <v-container fluid>
         <v-fade-transition>
@@ -19,6 +34,6 @@ import MyToolbar from "@/components/MyToolbar.vue";
   </v-app>
 </template>
 
-<style scoped>
 
-</style>
+
+
