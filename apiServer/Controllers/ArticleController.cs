@@ -10,6 +10,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using apiServer.Controllers.Redis;
+using apiServer.Controllers.Search;
 
 namespace apiServer.Controllers
 {
@@ -22,14 +23,17 @@ namespace apiServer.Controllers
         private readonly HttpClient _httpClient;
         private readonly MinioController _minioController;
         private readonly RedisArticleController _redisArticleController;
+        private readonly SearchController _searchController;
 
-        public ArticleController(ArhivistDbContext context, GenerateRandomStringControlle genericString, MinioController minioController)
+        public ArticleController(ArhivistDbContext context, GenerateRandomStringControlle genericString, MinioController minioController, SearchController searchController)
         {
-            _context = context;            
+            _context = context;
             _genericString = genericString;
             _httpClient = new HttpClient();
             _minioController = minioController;
             _redisArticleController = new RedisArticleController("redis:6379,abortConnect=false");
+            _searchController = searchController;
+
         }
         [HttpPost("GetArticlesForUser")]
         public async Task<ActionResult<IEnumerable<Articles>>> GetArticlesForUser(Users user) // Возвращение статей конкретного пользователя
@@ -84,14 +88,14 @@ namespace apiServer.Controllers
         {
             try
             {
-                ArticleWithUserTokenModel articlesWithUserTokens;                
+                ArticleWithUserTokenModel articlesWithUserTokens;
                 articlesWithUserTokens = _redisArticleController.GetArticle(id);//выгрузка из редис
                 if (articlesWithUserTokens == null)
                 {
                     articlesWithUserTokens = GetArticlesFromDb(id); // Выгружаем статью из бд
-                }             
+                }
 
-                return await _minioController.GetArchivWithFiles(articlesWithUserTokens);                
+                return await _minioController.GetArchivWithFiles(articlesWithUserTokens);
             }
             catch (Exception ex)
             {
@@ -99,8 +103,20 @@ namespace apiServer.Controllers
             }
         }
         [HttpPost("CreateArticle")]
-        public async Task<ActionResult> CreateArticle(Articles article, List<IFormFile>? files) // Создание статьи
+        public async Task<ActionResult> CreateArticle(/*Articles article, IFormFile[]? files*/ IFormFile? file1, IFormFile? file2, IFormFile? file3) // Создание статьи
         {
+ Articles article = new Articles(); // создание примера(удалится потом)
+            article.Id = 77;
+            article.author_id = 94;
+ article.title = "Example2";
+ article.tag = "Example2";
+ article.text = "Example2";
+ article.views = 0;
+ article.theory_id = 1;
+ article.date_created = DateTime.Now;
+ article.modified_date = DateTime.Now;
+ IFormFile? file4 = file2;
+        var files = new List<IFormFile> { file1, file2, file3 };
             try
             {
                
@@ -115,8 +131,10 @@ namespace apiServer.Controllers
                 _context.SaveChanges();
 
                 //добавление данных в Redis
-                ArticleWithUserTokenModel articlesWithUserTokens = GetArticlesFromDb(96);
-                _redisArticleController.AddArticle(articlesWithUserTokens);
+               // ArticleWithUserTokenModel articlesWithUserTokens = GetArticlesFromDb(96);
+                //_redisArticleController.AddArticle(articlesWithUserTokens);
+
+                _searchController.AddArticle(article.title,article.text,article.tag,"имя автора");
              
                 return Ok(new { Message = "Вы успешно добавили статью " });
             }
