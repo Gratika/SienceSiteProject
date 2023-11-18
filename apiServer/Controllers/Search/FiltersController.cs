@@ -18,18 +18,18 @@ namespace apiServer.Controllers.Search
         {
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
 
-            // ПРИМЕР
+            // ПРИМЕР                   
             // Поиск с учетом релевантности
-            var options = new QueryOptions
-            {
-                Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "DOI", "score" }, // Возвращаемые поля
-                OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
-            };
+            //var options = new QueryOptions
+            //{
+            //    Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "DOI", "score" }, // Возвращаемые поля
+            //    OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
+            //};
 
-            // Выполняем запрос
-            var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
+            //// Выполняем запрос
+            //var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
 
-            articles = results;
+            //articles = results;
             //ПРИМЕР
 
             var filteredModels = articles.Where(m => !string.IsNullOrEmpty(m.DOI)).ToArray();
@@ -43,16 +43,16 @@ namespace apiServer.Controllers.Search
 
             // ПРИМЕР
             // Поиск с учетом релевантности
-            var options = new QueryOptions
-            {
-                Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "DOI", "score" }, // Возвращаемые поля
-                OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
-            };
+            //var options = new QueryOptions
+            //{
+            //    Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "DOI", "score" }, // Возвращаемые поля
+            //    OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
+            //};
 
-            // Выполняем запрос
-            var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
+            //// Выполняем запрос
+            //var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
 
-            articles = results;
+            //articles = results;
             //ПРИМЕР
 
             var filteredModels = articles.Where(m => string.IsNullOrEmpty(m.DOI)).ToArray();

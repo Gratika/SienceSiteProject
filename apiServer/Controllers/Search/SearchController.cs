@@ -34,19 +34,19 @@ namespace apiServer.Controllers.Search
             
         }
         [HttpPost("AddArticle")]
-        public ActionResult AddArticle(/*int id*/ string title, string text, string tag, string author, int views, string? DOI) // возвращение конкретной статьи
+        public ActionResult AddArticle(Articles article /*string title, string text, string tag, string author, int views, string? DOI*/) // возвращение конкретной статьи
         {
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
-            DateTime DataCreate = DateTime.Now;
+            //DateTime DataCreate = DateTime.Now;
             Example ex = new Example();
-            ex.Id = Guid.NewGuid().ToString();
-            ex.title = title;
-            ex.text = text;
-            ex.tag = tag;
-            ex.views = views;
-            ex.author = author;
-            ex.dataCreate = DataCreate;
-            ex.DOI = DOI;
+            ex.Id = article.Id;
+            ex.title = article.title;
+            ex.text = article.text;
+            ex.tag = article.tag;
+            ex.views = article.views;
+            ex.author = article.author_id;
+            ex.dataCreate = article.date_created;
+            ex.DOI = article.DOI;
 
             solr.Add(ex);
             solr.Commit();

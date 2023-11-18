@@ -114,7 +114,7 @@ namespace apiServer.Controllers
                 //добавление данных в Redis
                 _redisArticleController.AddArticle(article);
 
-                _searchController.AddArticle(article.title,article.text,article.tag,"имя автора",article.views,article.DOI);
+                _searchController.AddArticle( article /*article.title,article.text,article.tag,"имя автора",article.views,article.DOI*/);
              
                 return Ok(new { Message = "Вы успешно добавили статью " });
             }

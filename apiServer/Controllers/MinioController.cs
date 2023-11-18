@@ -172,7 +172,7 @@ namespace apiServer.Controllers
                 .WithSSL(false)
                 .Build();
 
-            await minio.RemoveObjectAsync("название-ведра", "путь/к/файлу.jpg");
+            //await minio.RemoveObjectAsync("название-ведра", "путь/к/файлу.jpg");
             
         }
     }
