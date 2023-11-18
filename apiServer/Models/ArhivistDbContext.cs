@@ -8,6 +8,8 @@ namespace apiServer.Models
         public DbSet<Emotions> Emotions { get; set; }
         public DbSet<Users> Users { get; set; }
         public DbSet<Articles> Articles { get; set; }
+        public DbSet<People> people { get; set; }
+        //public DbSet<User_roles> user_Roles { get; set; }
         public ArhivistDbContext(DbContextOptions<ArhivistDbContext> options) : base(options)
         {
         }

@@ -66,7 +66,7 @@ namespace apiServer.Controllers.Redis
                     switch (fieldName)
                     {
                         case "id":
-                            user.Id = Convert.ToInt32(fieldValue);
+                            user.Id = fieldValue;
                             break;
                         case "login":
                             user.login = fieldValue;
@@ -84,7 +84,7 @@ namespace apiServer.Controllers.Redis
                             user.modified_date = Convert.ToDateTime(fieldValue);
                             break;
                         case "role_id":
-                            user.role_id = Convert.ToInt32(fieldValue);
+                            user.role_id = fieldValue;
                             break;
                         case "access_token":
                             user.access_token = fieldValue;
@@ -96,13 +96,13 @@ namespace apiServer.Controllers.Redis
                             user.email_is_checked = Convert.ToInt32(fieldValue);
                             break;
                         case "firstname":
-                            user.firstname = fieldValue;
+                            //user.firstname = fieldValue;
                             break;
                         case "name":
-                            user.name = fieldValue;
+                           // user.name = fieldValue;
                             break;
                         case "birthday":
-                            user.birthday = Convert.ToDateTime(fieldValue);
+                           // user.birthday = Convert.ToDateTime(fieldValue);
                             break;
                         default:
                             // Обработка неизвестных полей, если необходимо

@@ -23,12 +23,12 @@ namespace apiServer.Controllers
         }
 
         [HttpGet("AuthUser")]
-        public async Task<ActionResult> AuthUser(string pas, string email/*UserRequest userRequest*/) //авторизация
+        public async Task<ActionResult> AuthUser(/*string pas, string email*/UserRequest userRequest) //авторизация
         {
             AuthResponse Response = new AuthResponse();
             try
             {               
-                Response.user = _redisRepository.IsUserUnique(pas, email /*password, email*/);
+                Response.user = _redisRepository.IsUserUnique(userRequest.password, userRequest.email );
                 // проверка данных в редис  
                 if (Response.user != null)
                 {
@@ -36,7 +36,7 @@ namespace apiServer.Controllers
                     return Ok(new { Message = Response });
                 }
                 // проверка данных в базе данных
-                Response.user = await CheckUserDatabase(pas, email);
+                Response.user = await CheckUserDatabase(userRequest);
                 if (Response.user != null)
                 {
                     Response.answer = "Вы вошли";
@@ -52,12 +52,12 @@ namespace apiServer.Controllers
             return Ok(new { Message = Response });
         }
         [HttpGet("CheckUserDatabase")]
-        public async Task<Users> CheckUserDatabase(string pas, string email /*Users Person*/ )
+        public async Task<Users> CheckUserDatabase(/*string pas, string email*/ UserRequest Person)
         {            
             List<Users> users = await _context.Users.ToListAsync();
             foreach (Users user in users)
             {
-                if (string.Equals(user.password, pas /*Person.password*/, StringComparison.Ordinal) == true && string.Equals(user.email, email, /*Person.email,*/ StringComparison.Ordinal) == true)
+                if (string.Equals(user.password, Person.password, StringComparison.Ordinal) == true && string.Equals(user.email,Person.email, StringComparison.Ordinal) == true)
                 {
                     return user;
                 }

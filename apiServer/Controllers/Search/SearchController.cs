@@ -34,15 +34,19 @@ namespace apiServer.Controllers.Search
             
         }
         [HttpPost("AddArticle")]
-        public ActionResult AddArticle(/*int id*/ string title, string text, string tag, string author) // возвращение конкретной статьи
+        public ActionResult AddArticle(/*int id*/ string title, string text, string tag, string author, int views, string? DOI) // возвращение конкретной статьи
         {
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
+            DateTime DataCreate = DateTime.Now;
             Example ex = new Example();
             ex.Id = Guid.NewGuid().ToString();
             ex.title = title;
             ex.text = text;
             ex.tag = tag;
+            ex.views = views;
             ex.author = author;
+            ex.dataCreate = DataCreate;
+            ex.DOI = DOI;
 
             solr.Add(ex);
             solr.Commit();
@@ -74,7 +78,7 @@ namespace apiServer.Controllers.Search
             // Обработка результатов
             foreach (var result in results)
             {
-                ResultForUser += "Title: " + result.title + " Text: " + result.text + " Tag: " + result.tag + " Author: " + result.author + "\n";
+                ResultForUser += "Title: " + result.title + " Text: " + result.text + " Tag: " + result.tag + " Author: " + result.author + " DOI: " + "\n";
             }
 
             return Ok("Finally result - " + ResultForUser);

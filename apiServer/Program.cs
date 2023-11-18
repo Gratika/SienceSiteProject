@@ -1,4 +1,5 @@
 using apiServer.Controllers;
+using apiServer.Controllers.Redis;
 using apiServer.Controllers.Search;
 using apiServer.Models;
 using apiServer.Models.Example;
@@ -21,6 +22,7 @@ builder.Services.AddScoped<TokensController>();
 builder.Services.AddScoped<GenerateRandomStringControlle>();
 builder.Services.AddScoped<MinioController>();
 builder.Services.AddScoped<SearchController>();
+builder.Services.AddScoped<PeopleController>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -39,13 +41,6 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowCredentials());
 });
-//builder.Services.MakeBucket.Run(minioClient, bucketName).Wait();
-
-//builder.Services.AddMinio(options =>
-//{
-//    options.WithEndpoint("localhost");
-//    options.WithCredentials("ROOTUSER", "CHANGEME123");
-//});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -58,6 +53,6 @@ Startup.Init<Example>("http://solr:8983/solr/new_core");
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseCors("CorsPolicy");
+app.UseCors("CorsPolicy"); //CorsPolicy AllowAll
 
 app.Run();

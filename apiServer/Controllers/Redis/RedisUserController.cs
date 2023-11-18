@@ -34,24 +34,24 @@ namespace apiServer.Controllers.Redis
             new HashEntry("refresh_token", user.refresh_token),
             new HashEntry("email_is_checked", user.email_is_checked)
             };
-            if (user.firstname != null)
-            {
-                int currentSize = userFields.Length;
-                Array.Resize(ref userFields, currentSize + 1);
-                userFields[currentSize] = new HashEntry("firstname", user.firstname);
-            }
-            if (user.name != null)
-            {
-                int currentSize = userFields.Length;
-                Array.Resize(ref userFields, currentSize + 1);
-                userFields[currentSize] = new HashEntry("name", user.name);
-            }
-            if (user.birthday != null)
-            {
-                int currentSize = userFields.Length;
-                Array.Resize(ref userFields, currentSize + 1);
-                userFields[currentSize] = new HashEntry("birthday", Convert.ToString(user.birthday));
-            }
+            //if (user.firstname != null)
+            //{
+            //    int currentSize = userFields.Length;
+            //    Array.Resize(ref userFields, currentSize + 1);
+            //    userFields[currentSize] = new HashEntry("firstname", user.firstname);
+            //}
+            //if (user.name != null)
+            //{
+            //    int currentSize = userFields.Length;
+            //    Array.Resize(ref userFields, currentSize + 1);
+            //    userFields[currentSize] = new HashEntry("name", user.name);
+            //}
+            //if (user.birthday != null)
+            //{
+            //    int currentSize = userFields.Length;
+            //    Array.Resize(ref userFields, currentSize + 1);
+            //    userFields[currentSize] = new HashEntry("birthday", Convert.ToString(user.birthday));
+            //}
 
             _database.HashSet(userKey, userFields);
         }
@@ -102,7 +102,7 @@ namespace apiServer.Controllers.Redis
                     switch (fieldName)
                     {
                         case "id":
-                            user.Id = Convert.ToInt32(fieldValue);
+                            user.Id = fieldValue;
                             break;
                         case "login":
                             user.login = fieldValue;
@@ -120,7 +120,7 @@ namespace apiServer.Controllers.Redis
                             user.modified_date = Convert.ToDateTime(fieldValue);
                             break;
                         case "role_id":
-                            user.role_id = Convert.ToInt32(fieldValue);
+                            user.role_id = fieldValue;
                             break;
                         case "access_token":
                             user.access_token = fieldValue;
@@ -132,13 +132,13 @@ namespace apiServer.Controllers.Redis
                             user.email_is_checked = Convert.ToInt32(fieldValue);
                             break;
                         case "firstname":
-                            user.firstname = fieldValue;
+                            //user.firstname = fieldValue;
                             break;
                         case "name":
-                            user.name = fieldValue;
+                            //user.name = fieldValue;
                             break;
                         case "birthday":
-                            user.birthday = Convert.ToDateTime(fieldValue);
+                           // user.birthday = Convert.ToDateTime(fieldValue);
                             break;
                         default:
                             // Обработка неизвестных полей, если необходимо

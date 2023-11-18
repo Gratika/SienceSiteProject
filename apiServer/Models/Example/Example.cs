@@ -15,5 +15,11 @@ namespace apiServer.Models.Example
         public string tag { get; set; }
         [SolrField("author")]
         public string author { get; set; }
+        [SolrField("dataCreate")]
+        public DateTime dataCreate { get; set; }
+        [SolrField("views")]
+        public int views { get; set; }
+        [SolrField("DOI")]
+        public string? DOI { get; set; }
     }
 }

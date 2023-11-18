@@ -92,7 +92,7 @@ namespace apiServer.Controllers
             }
         }
         [HttpPost("GetUrl")]
-        public async Task<List<string>> GetUrl(ArticleWithUserTokenModel articlesWithUserTokens) // обращаемся в minio для взятия url файлов
+        public async Task<List<string>> GetUrl(/*ArticleWithUserTokenModel articlesWithUserTokens*/string path_files,string path_bucket) // обращаемся в minio для взятия url файлов
         {
             var minio = new MinioClient()
                                    .WithEndpoint("minio1:9000") //localhost:9090
@@ -102,12 +102,12 @@ namespace apiServer.Controllers
 
             List<string> downloadUrl = new List<string>();
             //List<byte[]> Files = new List<byte[]>();
-            string[] path_to_file = articlesWithUserTokens.path_file.Split(',');
+            string[] path_to_file = path_files.Split(',');
 
             for (int i = 1; i < path_to_file.Length - 1; i++)
             {
                 PresignedGetObjectArgs args = new PresignedGetObjectArgs()
-                                                 .WithBucket(articlesWithUserTokens.login)
+                                                 .WithBucket(path_bucket)
                                                  .WithObject(path_to_file[0] + "/" + path_to_file[i])
                                                  .WithExpiry(3600);
 
@@ -117,10 +117,10 @@ namespace apiServer.Controllers
             return downloadUrl;
         }
         [HttpPost("GetArchivWithFiles")]
-        public async Task<ActionResult> GetArchivWithFiles(ArticleWithUserTokenModel articlesWithUserTokens) // создайом файлы из url и записываем в архив
+        public async Task<ActionResult> GetArchivWithFiles(string path_files, string path_bucket) // создаем файлы из url и записываем в архив
         {
             List<string> downloadUrl = new List<string>();
-            downloadUrl = await GetUrl(articlesWithUserTokens);
+            downloadUrl = await GetUrl(path_files,path_bucket);
 
             List<byte[]> fileContents = new List<byte[]>();
             List<string> fileTypes = new List<string>();
@@ -162,6 +162,18 @@ namespace apiServer.Controllers
                     FileDownloadName = zipFileName
                 };
             }
+        }
+        [HttpPost("DeleteFiles")]
+        public async void DeleteFiles(string path_files, string path_bucket) // создаем файлы из url и записываем в архив
+        {
+            var minio = new MinioClient()
+                .WithEndpoint("minio1:9000") //localhost:9090
+                .WithCredentials("ROOTUSER", "CHANGEME123")
+                .WithSSL(false)
+                .Build();
+
+            await minio.RemoveObjectAsync("название-ведра", "путь/к/файлу.jpg");
+            
         }
     }
 }
