@@ -1,74 +1,70 @@
 ﻿using apiServer.Models;
-using Google.Protobuf.WellKnownTypes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
 using StackExchange.Redis;
-using System;
-using System.Text;
+using System.Xml.Linq;
 
 namespace apiServer.Controllers.Redis
 {
-    public class RedisEmotionController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class RedisSciencesController : ControllerBase
     {
         private readonly ConnectionMultiplexer _redis;
         private readonly IDatabase _database;
 
-        public RedisEmotionController(string connectionString)
+        public RedisSciencesController(string connectionString)
         {
             _redis = ConnectionMultiplexer.Connect(connectionString);
             _database = _redis.GetDatabase();
         }
-        public void AddEmotion(List<Emotions> emotions)
+
+        [HttpPost("AddSciences")]
+        public void AddSciences(List<Sciences> model)
         {
-            foreach (Emotions emotion in emotions)
+            foreach (Sciences science in model)
             {
-                var userKey = $"Emotions:{emotion.Id}";
+                var userKey = $"Science:{science.Id}";
                 var userFields = new HashEntry[]
                 {
-                  new HashEntry("Id", emotion.Id),
-                  new HashEntry("Name", emotion.Name),
-                  new HashEntry("Emoji", emotion.Emoji),
+                new HashEntry("Id", science.Id),
+                new HashEntry("name", science.name),
+                new HashEntry("note", science.note ?? string.Empty),
                 };
-
                 _database.HashSet(userKey, userFields);
             }
         }
-        //public HashEntry[] GetEmotion(string key)
-        //{
-        //    var db = _redis.GetDatabase();
-        //    var hashEntries = db.HashGetAll(key);
-        //    return hashEntries;
-        //}
-        public Emotions GetEmotion(string id)
+        [HttpPost("GetScience")]
+        public Sciences GetScience(string Id)
         {
             // Получение хэша из Redis
-            HashEntry[] hashFields = _database.HashGetAll($"Emotions:{id}");
+            HashEntry[] hashFields = _database.HashGetAll($"Science:{Id}");
 
-            Emotions emotion = new Emotions();
+            Sciences science = new Sciences();
             foreach (var hashField in hashFields)
             {
                 if (hashFields.Length != 0)
                     switch (hashField.Name.ToString())
                     {
-                        //выгрузка people
+                        //выгрузка Sciences
                         case "Id":
-                            emotion.Id = hashField.Value;
+                            science.Id = hashField.Value;
                             break;
-                        case "Name":
-                            emotion.Name = hashField.Value;
+                        case "name":
+                            science.name = hashField.Value;
                             break;
-                        case "Emoji":
-                            emotion.Emoji = hashField.Value;
-                            break;
+                        case "note":
+                            science.note = hashField.Value;
+                            break;                    
                     }
             }
-            return emotion;
+
+            return science;
         }
         [HttpPost("GetAllSciences")]
-        public List<Emotions> GetAllEmotions()
+        public List<Sciences> GetAllSciences()
         {
-            List<Emotions> emotions = new List<Emotions>();
+            List<Sciences> sciences = new List<Sciences>();
             var keys = _redis.GetServer("redis", 6379).Keys();
 
             // Итерация по всем ключам и получение данных
@@ -82,14 +78,15 @@ namespace apiServer.Controllers.Redis
                     if (string.Equals(hashEntry.Name.ToString(), "Id"))
                     {
                         IdForGetArticle = hashEntry.Value;
-                    }
+                    }                    
                 }
-                if (key == $"Emotions:{IdForGetArticle}")
+                if (key == $"Science:{IdForGetArticle}")
                 {
-                    emotions.Add(GetEmotion(IdForGetArticle));
+                    sciences.Add(GetScience(IdForGetArticle));
                 }
             }
-            return emotions;
+            return sciences;
         }
+
     }
 }

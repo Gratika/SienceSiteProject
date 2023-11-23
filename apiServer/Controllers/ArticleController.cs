@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using apiServer.Controllers.Redis;
 using apiServer.Controllers.Search;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Net;
 
 namespace apiServer.Controllers
 {
@@ -37,7 +38,7 @@ namespace apiServer.Controllers
             _searchController = searchController;
             _redisPeopleController = new RedisPeopleController("redis:6379,abortConnect=false");
         }
-        [HttpPost("GetArticlesForUser")]
+        [HttpGet("GetArticlesForUser")]
         public async Task<ActionResult<ArticleAndPeople>> GetArticlesForUser(/*Users user*/string id_people) // Возвращение статей конкретного пользователя
         {
             try
@@ -67,10 +68,8 @@ namespace apiServer.Controllers
 
 
                     // Преобразуем результат в список объектов Article, объект User и объект People             
-                    articleAndPeople.article = new List<Articles>
-                {
-                articlesQuery.Select(a => a.Article).FirstOrDefault() //добавляем одну найденную статью
-                };
+                    articleAndPeople.article = articlesQuery.Select(a => a.Article).ToList();
+
                     articleAndPeople.people = articlesQuery.Select(a => a.People).FirstOrDefault();
 
                     // Возвращаем результат в представление или обрабатываем дальше
@@ -88,26 +87,29 @@ namespace apiServer.Controllers
         public async Task<ActionResult> CreateArticle(Articles article, List<IFormFile>? files /*IFormFile? file1, IFormFile? file2, IFormFile? file3, string id_people*/) // Создание статьи
         {
             //Articles article = new Articles(); // создание примера(удалится потом)
-            //article.Id = Guid.NewGuid().ToString();
-            //article.author_id = id_people;
+            article.Id = Guid.NewGuid().ToString();
+           // article.author_id = id_people;
             //article.title = "Example2";
             //article.tag = "Example2";
             //article.text = "Example2";
-            //article.views = 0;
-            //article.theory_id = 1;
-            //article.date_created = DateTime.Now;
-            //article.modified_date = DateTime.Now;
-            //IFormFile? file4 = file2;
+            //article.views = 150;
+            //article.theory_id = "2";
+            article.date_created = DateTime.Now;
+            article.modified_date = DateTime.Now;
             //var files = new List<IFormFile> { file1, file2, file3 };
             try
             {
+                if(CheckDoiValidity(article.DOI) == false)
+                {
+                    article.DOI = null;
+                }
                 // добавить возможность выгрузки из редис
                 People people = _context.people.FirstOrDefault(p => article.author_id == p.Id); // Выгружаем данные о авторе статьи из бд для взятия bucket_path               
                 //people.path_bucket = _genericString.GenerateRandomString(7);
-                List<string> FieldsDb = await _minioController.AddFiles(files, article, people.path_bucket);
+                //List<string> FieldsDb = await _minioController.AddFiles(article.path_file, people.path_bucket , files);
 
-                people.path_bucket = FieldsDb[0];
-                article.path_file = FieldsDb[1];
+                //people.path_bucket = FieldsDb[0];
+                //article.path_file = FieldsDb[1];
                 _context.Articles.Add(article);
                 _context.SaveChanges();
 
@@ -116,7 +118,12 @@ namespace apiServer.Controllers
 
                 _searchController.AddArticle( article /*article.title,article.text,article.tag,"имя автора",article.views,article.DOI*/);
              
-                return Ok(new { Message = "Вы успешно добавили статью " });
+                if(article.DOI != null)
+                {
+                    return Ok(new { Message = "Вы успешно добавили статью " });
+                }
+
+                return Ok(new { Message = "Вы успешно добавили статью, но DOI-идентификатор не прошел проверку" });
             }
             catch (Exception ex)
             {
@@ -165,42 +172,88 @@ namespace apiServer.Controllers
             return articleAndPeople;
         }
         [HttpPost("RedactArticle")]
-        public async Task<ActionResult> RedactArticle(Articles? article)
+        public async Task<ActionResult> RedactArticle(IFormFile? file1, IFormFile? file2, /*Articles? article,*/ string id, string title, string pathFile, string pathBucket)
         {
-            article.Id = "e35f9795-e8c0-4ac2-b294-f81c16e6157d";
+            Articles article = new Articles();
+            article.Id = id;
             article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
-            article.title = "ReadactExample2";
+            article.title = title;
             article.tag = "Example2";
             article.text = "Example2";
             article.views = 0;
-            article.theory_id = 1;
+            article.theory_id = "1";
+            article.path_file = pathFile;
             article.date_created = new DateTime(2023, 11, 17, 17, 16, 16); //ПРИМЕР
-
+            var files = new List<IFormFile> { file1, file2 };
             article.modified_date = DateTime.Now;
+
+            _redisArticleController.AddArticle(article);
+            _searchController.RedactArticle(article);
+            
+            List<string> FieldsDb = await _minioController.RedactFiles(article.path_file, pathBucket, files);
+
+            article.path_file = FieldsDb[1];
             _context.Articles.Update(article);
             _context.SaveChanges();
 
             return Ok("Статья удачно сохраненна");
         }
         [HttpPost("DeleteArticle")]
-        public async Task<ActionResult> DeleteArticle(Articles? article)
+        public async Task<ActionResult> DeleteArticle(Articles? article,/*string? pathFile,*/string? pathBucket/*, string id*/)
         {
-            article.Id = "e35f9795-e8c0-4ac2-b294-f81c16e6157d";
-            article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
-            article.title = "ReadactExample2";
-            article.tag = "Example2";
-            article.text = "Example2";
-            article.views = 0;
-            article.theory_id = 1;
+            //article.Id = id;
+            //article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
+            //article.title = "ReadactExample2";
+            //article.tag = "Example2";
+            //article.text = "Example2";
+            //article.views = 0;
+            //article.theory_id = "1";
+            //article.path_file = pathFile;
            // article.date_created = new DateTime(2023, 11, 17, 17, 16, 16); //ПРИМЕР
             //article.modified_date = DateTime.Now;
 
             _context.Articles.Remove(article);
             _context.SaveChanges();
+
             _searchController.DeleteDocumentsWithInvalidTitle(article.Id);
+            _redisArticleController.DeleteArticle(article.Id);
+            if(string.Equals(pathBucket, "") == false || string.Equals(/*pathFile*/article.path_file, "") == false)
+            {
+                _minioController.DeleteFiles(article.path_file, pathBucket);
+            }           
 
 
             return Ok("Статья удачно удаленна");
+        }
+        [HttpGet("CheckDoiValidity")]
+        public bool CheckDoiValidity(string doi)
+        {
+            try
+            {
+                // Формирование URL-адреса запроса к базе данных <link>CrossRef</link>
+                string url = $"https://api.crossref.org/works/{doi}";
+
+                // Создание объекта WebClient для выполнения запроса
+                using (WebClient client = new WebClient())
+                {
+                    // Отправка GET-запроса и получение ответа в виде JSON
+                    string response = client.DownloadString(url);
+
+                    // Проверка наличия поля "status" со значением "ok" в ответе
+                    if (response.Contains("\"status\":\"ok\""))
+                    {
+                        return true; // DOI идентификатор действителен
+                    }
+                    else
+                    {
+                        return false; // DOI идентификатор недействителен
+                    }
+                }
+            }
+            catch (Exception ex)
+            {               
+                return false; // Произошла ошибка при проверке DOI
+            }
         }
 
     }

@@ -20,7 +20,7 @@ namespace apiServer.Controllers.Redis
         }
         public void AddUser(Users user)
         {
-            var userKey = $"users:{user.refresh_token}";
+            var userKey = $"users:{user.Id}";
             var userFields = new HashEntry[]
             {
             new HashEntry("id", Convert.ToString(user.Id)),
@@ -34,24 +34,6 @@ namespace apiServer.Controllers.Redis
             new HashEntry("refresh_token", user.refresh_token),
             new HashEntry("email_is_checked", user.email_is_checked)
             };
-            //if (user.firstname != null)
-            //{
-            //    int currentSize = userFields.Length;
-            //    Array.Resize(ref userFields, currentSize + 1);
-            //    userFields[currentSize] = new HashEntry("firstname", user.firstname);
-            //}
-            //if (user.name != null)
-            //{
-            //    int currentSize = userFields.Length;
-            //    Array.Resize(ref userFields, currentSize + 1);
-            //    userFields[currentSize] = new HashEntry("name", user.name);
-            //}
-            //if (user.birthday != null)
-            //{
-            //    int currentSize = userFields.Length;
-            //    Array.Resize(ref userFields, currentSize + 1);
-            //    userFields[currentSize] = new HashEntry("birthday", Convert.ToString(user.birthday));
-            //}
 
             _database.HashSet(userKey, userFields);
         }
@@ -89,10 +71,10 @@ namespace apiServer.Controllers.Redis
             var db = _redis.GetDatabase();
             bool result = db.KeyDelete(key);
         }
-        public Users GetUsersRedis(string refreshToken)
+        public Users GetUsersRedis(string id)
         {
             Users user = new Users();
-            HashEntry[] userFields = GetUser("users:" + refreshToken);
+            HashEntry[] userFields = GetUser("users:" + id);
             if (userFields.Length != 0)
             {
                 foreach (var hashEntry in userFields)
@@ -130,18 +112,6 @@ namespace apiServer.Controllers.Redis
                             break;
                         case "email_is_checked":
                             user.email_is_checked = Convert.ToInt32(fieldValue);
-                            break;
-                        case "firstname":
-                            //user.firstname = fieldValue;
-                            break;
-                        case "name":
-                            //user.name = fieldValue;
-                            break;
-                        case "birthday":
-                           // user.birthday = Convert.ToDateTime(fieldValue);
-                            break;
-                        default:
-                            // Обработка неизвестных полей, если необходимо
                             break;
                     }
                 };

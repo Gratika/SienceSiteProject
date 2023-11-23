@@ -14,6 +14,7 @@ using SolrNet.Impl;
 using Google.Protobuf.WellKnownTypes;
 using StackExchange.Redis;
 using System.Text;
+using System.Collections.Generic;
 
 namespace apiServer.Controllers.Search
 {
@@ -26,13 +27,7 @@ namespace apiServer.Controllers.Search
        {
             // Инициализация <link>SolrNet</link>
             
-        }
-        [HttpPost("StartSolr")]
-        public void StartSolr(/*int id*/) // возвращение конкретной статьи
-        {
-            
-            
-        }
+       }
         [HttpPost("AddArticle")]
         public ActionResult AddArticle(Articles article /*string title, string text, string tag, string author, int views, string? DOI*/) // возвращение конкретной статьи
         {
@@ -47,6 +42,7 @@ namespace apiServer.Controllers.Search
             ex.author = article.author_id;
             ex.dataCreate = article.date_created;
             ex.DOI = article.DOI;
+            ex.theory_id = article.theory_id;
 
             solr.Add(ex);
             solr.Commit();
@@ -72,16 +68,35 @@ namespace apiServer.Controllers.Search
                 }
             };
 
-            var results = solr.Query(new SolrQuery(/*"task example~"*/SearchString + "~"), queryOptions);  // Укажите ваш запрос поиска
+            List<Example> articles = solr.Query(new SolrQuery(/*"task example~"*/SearchString + "~"), queryOptions);  // Укажите ваш запрос поиска
 
-            string ResultForUser = "";
+            //string ResultForUser = "";
             // Обработка результатов
-            foreach (var result in results)
-            {
-                ResultForUser += "Title: " + result.title + " Text: " + result.text + " Tag: " + result.tag + " Author: " + result.author + " DOI: " + "\n";
-            }
+            //foreach (var result in results)
+            //{
+            //    ResultForUser += "Title: " + result.title + " Text: " + result.text + " Tag: " + result.tag + " Author: " + result.author + " DOI: " + "\n";
+            //}
 
-            return Ok("Finally result - " + ResultForUser);
+            return Ok(articles);
+        }
+
+        [HttpPost("RedactArticle")]
+        public void RedactArticle(Articles article)
+        {
+            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
+            
+            Example ex = new Example();
+            ex.Id = article.Id;
+            ex.title = article.title;
+            ex.text = article.text;
+            ex.tag = article.tag;
+            ex.views = article.views;
+            ex.author = article.author_id;
+            ex.dataCreate = article.date_created;
+            ex.DOI = article.DOI;
+
+            solr.Add(ex, new AddParameters { Overwrite = true });
+            solr.Commit();
         }
         [HttpPost("DeleteDocumentsWithInvalidTitle")]
         public void DeleteDocumentsWithInvalidTitle(string Id)

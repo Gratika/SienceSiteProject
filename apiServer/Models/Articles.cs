@@ -12,7 +12,7 @@
         public int views { get; set; }
         public DateTime date_created { get; set; }
         public DateTime modified_date { get; set; }
-        public int theory_id { get; set; }
+        public string theory_id { get; set; }
         public string? path_file { get; set; }
 
     }

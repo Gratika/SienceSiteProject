@@ -39,35 +39,26 @@ namespace apiServer.Controllers
             var emotion = await _context.Emotions.FindAsync(key);
             return emotion;
         }       
-        [HttpGet("RedisGetEmotion")]
-        public async Task<string> RedisFullFuncion(int emotionId)
+        [HttpPost("RedisGetEmotion")]
+        public async Task<ActionResult<Emotions>> RedisFullFuncion()
         {
             try
             {
                 // Проверка наличия данных в кэше
-                HashEntry[] userFields = _redisRepository.GetEmotion("emotions:" + emotionId);
-                if (userFields.Length != 0)
-                {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (var hashEntry in userFields)
-                    {
-                        string fieldName = hashEntry.Name;
-                        string fieldValue = hashEntry.Value;
-
-                        sb.AppendLine($"{fieldName}: {fieldValue}");
-                    }
-                    return sb.ToString();
-                }
+                List<Emotions> data = _redisRepository.GetAllEmotions();
                 // Данные отсутствуют в кэше, выполняем запрос к источнику данных
-                Emotions data = new Emotions();
-                data = await GetEmotion(emotionId);
-                // Сохранение данных в кэше на 10 минут
-                _redisRepository.AddEmotion(data.Id, data.Name, data.Emoji);
-                return data.Name + " " + data.Emoji;
+                if(data.Count == 0)
+                {
+                    data = await _context.Emotions.ToListAsync();
+                    // Сохранение данных в кэше на 10 минут
+                    _redisRepository.AddEmotion(data);
+                    return Ok(data);
+                }
+                return Ok(data);
             }
             catch (Exception ex) 
             { 
-                return ex.Message;
+                return BadRequest(ex.Message);
             }
         }
     }

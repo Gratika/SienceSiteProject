@@ -27,8 +27,8 @@ namespace apiServer.Controllers
         {
             AuthResponse Response = new AuthResponse();
             try
-            {               
-                Response.user = _redisRepository.IsUserUnique(userRequest.password, userRequest.email );
+            {
+                Response.user = _redisRepository.IsUserUnique(userRequest.password, userRequest.email);
                 // проверка данных в редис  
                 if (Response.user != null)
                 {
@@ -39,6 +39,7 @@ namespace apiServer.Controllers
                 Response.user = await CheckUserDatabase(userRequest);
                 if (Response.user != null)
                 {
+                    _redisRepository.AddUser(Response.user);
                     Response.answer = "Вы вошли";
                     return Ok(new { Message = Response });
                 }
