@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Security.Policy;
 
@@ -33,8 +34,6 @@ namespace apiServer.Controllers
         {
             try
             {
-
-
                 // проверка данных в редис  
                 if (_redisRepository.IsUserUnique(Person.password, Person.email /*password, email*/) == true)
                 {
@@ -58,8 +57,8 @@ namespace apiServer.Controllers
         [HttpPost("CreateUser")]
         public async Task<ActionResult> CreateUser(/*string pas, string email*/UserRequest userRequest) //Регистрация
         {
-            //try
-            //{
+            try
+            {
                 People people = _people.CreatePeople();
                 
                 Users FirstEx = new Users();
@@ -102,21 +101,19 @@ namespace apiServer.Controllers
 
                     //return Ok("Вы успешно зарегистрировались");
                 }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest(ex.Message);
-            //}
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }       
-
         [HttpGet("CheckTokens")]
-        public ActionResult CheckTokens(string accessToken,string refreshToken)
+        public ActionResult CheckTokens(string id,string accessToken,string refreshToken)
         {
             try
             {
-
                 Users user = new Users();
-                user = _redisRepository.GetUsersRedis(refreshToken);// Проверка наличия данных в кэше
+                user = _redisRepository.GetUsersRedis(id);// Проверка наличия данных в кэше
                 if (user.email == "0") // Данные отсутствуют в кэше, выполняем запрос к базе данных
                 {
                     user = _context.Users.FirstOrDefault(u => u.access_token == accessToken);
@@ -155,29 +152,5 @@ namespace apiServer.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
-        //[HttpGet("CreateRole")]
-        //public ActionResult CreateRole()
-        //{
-        //    People people = new People();
-        //    people.Id = Guid.NewGuid().ToString();
-        //    people.date_create = DateTime.Now;
-        //    people.modified_date = DateTime.Now;
-
-        //    Users FirstEx = new Users();
-        //    FirstEx.Id = Guid.NewGuid().ToString();
-        //    FirstEx.login = FirstEx.email/*userRequest.email*/;
-        //    FirstEx.password = "NewPassword";/*userRequest.password*/;
-        //    FirstEx.email = "zapaspas99@gmail.com";/*userRequest.email*/;
-        //    FirstEx.date_create = DateTime.Now;
-        //    FirstEx.modified_date = DateTime.Now;
-        //    FirstEx.role_id = "1";
-        //    FirstEx.people_id = people.Id;
-
-        //    _context.people.Add(people);
-        //    _context.SaveChanges();
-        //    _context.Users.Add(FirstEx);
-        //    _context.SaveChanges();
-        //    return Ok("Роль удачно добавленна в базу данных");
-        //}
     }
 }

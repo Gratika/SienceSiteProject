@@ -21,5 +21,7 @@ namespace apiServer.Models.Example
         public int views { get; set; }
         [SolrField("DOI")]
         public string? DOI { get; set; }
+        [SolrField("theory_id")]
+        public string theory_id { get; set; }
     }
 }

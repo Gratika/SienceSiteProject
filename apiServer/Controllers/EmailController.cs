@@ -77,27 +77,5 @@ namespace apiServer.Controllers
             }
             return BadRequest();
         }
-        //[HttpGet("GenerateRandomString")]
-        //public string GenerateRandomString() // генерация случайной строки
-        //{
-        //    try
-        //    {
-        //        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        //        string randomString = "";
-
-        //        Random random = new Random();
-
-        //        for (int i = 0; i < 4; i++)
-        //        {
-        //            randomString += chars[random.Next(chars.Length)];
-        //        }
-
-        //        return randomString;
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        throw new Exception();
-        //    }
-        //}
     }
 }

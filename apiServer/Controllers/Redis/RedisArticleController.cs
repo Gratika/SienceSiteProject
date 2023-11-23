@@ -79,7 +79,7 @@ namespace apiServer.Controllers.Redis
                             article.modified_date = DateTime.Parse(hashField.Value);
                             break;
                         case "theory_id":
-                            article.theory_id = (int)hashField.Value;
+                            article.theory_id = hashField.Value;
                             break;
                         case "path_file":
                             article.path_file = hashField.Value;
@@ -115,5 +115,12 @@ namespace apiServer.Controllers.Redis
             }
             return articles;
         }
+        [HttpPost("DeleteArticle")]
+        public void DeleteArticle(string id) // id автора
+        {
+            var keyToDelete = "Article:" + id;
+            _database.KeyDelete(keyToDelete);
+        }
+
     }
 }
