@@ -10,7 +10,7 @@ namespace apiServer.Models.Example
         [SolrField("title")]
         public string title { get; set; }
         [SolrField("text")]
-        public string text { get; set; }
+        public string? text { get; set; }
         [SolrField("tag")]
         public string tag { get; set; }
         [SolrField("author")]

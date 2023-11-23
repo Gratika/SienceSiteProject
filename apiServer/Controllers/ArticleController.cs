@@ -37,7 +37,7 @@ namespace apiServer.Controllers
             _searchController = searchController;
             _redisPeopleController = new RedisPeopleController("redis:6379,abortConnect=false");
         }
-        [HttpPost("GetArticlesForUser")]
+        [HttpGet("GetArticlesForUser")]
         public async Task<ActionResult<ArticleAndPeople>> GetArticlesForUser(/*Users user*/string id_people) // Возвращение статей конкретного пользователя
         {
             try
@@ -67,10 +67,7 @@ namespace apiServer.Controllers
 
 
                     // Преобразуем результат в список объектов Article, объект User и объект People             
-                    articleAndPeople.article = new List<Articles>
-                {
-                articlesQuery.Select(a => a.Article).FirstOrDefault() //добавляем одну найденную статью
-                };
+                    articleAndPeople.article = articlesQuery.Select(a => a.Article).ToList();
                     articleAndPeople.people = articlesQuery.Select(a => a.People).FirstOrDefault();
 
                     // Возвращаем результат в представление или обрабатываем дальше
@@ -85,29 +82,15 @@ namespace apiServer.Controllers
         }
         
         [HttpPost("CreateArticle")]
-        public async Task<ActionResult> CreateArticle(Articles article, List<IFormFile>? files /*IFormFile? file1, IFormFile? file2, IFormFile? file3, string id_people*/) // Создание статьи
-        {
-            //Articles article = new Articles(); // создание примера(удалится потом)
-            //article.Id = Guid.NewGuid().ToString();
-            //article.author_id = id_people;
-            //article.title = "Example2";
-            //article.tag = "Example2";
-            //article.text = "Example2";
-            //article.views = 0;
-            //article.theory_id = 1;
-            //article.date_created = DateTime.Now;
-            //article.modified_date = DateTime.Now;
-            //IFormFile? file4 = file2;
-            //var files = new List<IFormFile> { file1, file2, file3 };
-            try
-            {
-                // добавить возможность выгрузки из редис
+        public async Task<ActionResult> CreateArticle(Articles article) // Создание статьи
+        {            
+            article.Id = Guid.NewGuid().ToString();            
+            article.date_created = DateTime.Now;
+            article.modified_date = DateTime.Now;            
+            try            {
+                
                 People people = _context.people.FirstOrDefault(p => article.author_id == p.Id); // Выгружаем данные о авторе статьи из бд для взятия bucket_path               
-                //people.path_bucket = _genericString.GenerateRandomString(7);
-                List<string> FieldsDb = await _minioController.AddFiles(files, article, people.path_bucket);
-
-                people.path_bucket = FieldsDb[0];
-                article.path_file = FieldsDb[1];
+                
                 _context.Articles.Add(article);
                 _context.SaveChanges();
 

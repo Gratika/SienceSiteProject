@@ -16,8 +16,11 @@ export interface ISignUpInput {
 }
 
 export interface ILoginResponse {
-    answer:string;
     user: IUser;
+    answer:string;
+}
+export interface IAuthResponse {
+    message:ILoginResponse;
 }
 
 export interface ISignUpResponse {
@@ -30,80 +33,88 @@ export interface IUserResponse {
 
 }
 export interface IRole{
-    id:number;
+    id:string;
     role_name:string;
-    modified_date: Date;
+    modified_date: Date|number;
 }
+export interface IPeople{
+    id:string;
+    surname:string;
+    name:string;
+    birthday:Date;
+    file_bucket:string;
+    date_create: Date|number;
+    modified_date: Date|number;
+}
+
 export interface IUser{
-    id:number;
+    id:string;
     login:string;
     password:string;
     email:string;
-    firstname:string;
-    name:string;
     access_token:string;
     refresh_token:string;
-    birthday:Date;
-    date_create: Date;
-    modified_date: Date;
+    date_create: Date|number;
+    modified_date: Date|number;
     role_id:number;
-    roles:Array<IRole>;
     email_is_checked:number;
+    people_id: string;
+    people_:IPeople|null;
 }
 export interface IArticle {
-    id: number|undefined;
-    DOI: string;
-    author_id: number|undefined;
+    id: string;
+    DOI: string|null;
+    author_id: string|null;
     title: string;
     tag: string;
-    text: string;
+    text: string|null;
     views: number;
-    date_create: Date;
-    modified_date: Date;
-    theory_id: number|undefined;
+    date_create: Date|null;
+    modified_date: Date|null;
+    theory_id: string;
     path_file: string;
-    author_: IUser|null;
+    author_: IPeople|null;
 }
 export interface IComment {
-    id: number;
-    parent_id: number;
-    user_id: number;
-    article_id: number;
+    id: string;
+    parent_id: string;
+    user_id: string;
+    article_id: string;
     text: string;
-    date_create: Date;
-    modified_date: Date;
+    date_create: Date|number;
+    modified_date: Date|number;
 }
 export interface  IEmotion{
-    id: number;
+    id: string;
     Name: string;
     Emoji: string
 }
 export interface IReaction
 {
-    id: number;
-    user_id: number;
-    article_id: number;
-    reaction_id: number;
-    date_create: Date;
-    modified_date: Date;
+    id: string;
+    user_id: string;
+    article_id: string;
+    reaction_id: string;
+    date_create: Date|number;
+    modified_date: Date|number;
 }
 
 export interface IScience {
-    id: number;
+    id: string;
     name: string;
     note: string;
 }
 export interface IScientificTheory {
-    id: number;
-    science_id: number;
+    id: string;
+    science_id: string;
     name: string;
     note: string;
 
 }
 export interface ISelectedArticle{
-    id: number|null;
-    user_id: number;
-    article_id: number;
+    id: string;
+    user_id: string;
+    article_id: string;
     Date_view: Date|null;
 
 }

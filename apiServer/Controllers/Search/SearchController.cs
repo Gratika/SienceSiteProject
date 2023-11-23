@@ -53,7 +53,7 @@ namespace apiServer.Controllers.Search
 
             return Ok();
         }
-        [HttpPost("Search")]
+        [HttpGet("Search")]
         public ActionResult Search(string SearchString) // возвращение конкретной статьи
         {
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
@@ -72,16 +72,9 @@ namespace apiServer.Controllers.Search
                 }
             };
 
-            var results = solr.Query(new SolrQuery(/*"task example~"*/SearchString + "~"), queryOptions);  // Укажите ваш запрос поиска
+            List<Example> articles = solr.Query(new SolrQuery( SearchString + "~"), queryOptions);
 
-            string ResultForUser = "";
-            // Обработка результатов
-            foreach (var result in results)
-            {
-                ResultForUser += "Title: " + result.title + " Text: " + result.text + " Tag: " + result.tag + " Author: " + result.author + " DOI: " + "\n";
-            }
-
-            return Ok("Finally result - " + ResultForUser);
+            return Ok(articles);
         }
         [HttpPost("DeleteDocumentsWithInvalidTitle")]
         public void DeleteDocumentsWithInvalidTitle(string Id)

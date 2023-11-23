@@ -10,7 +10,7 @@ import RichTextEditor from "@/components/RichTextEditor.vue";
    articleStore.getScienceSectionList();
 })
 function getScienceSection(){
-   articleStore.selectedScienceId=parseInt(search.value,10);
+  // articleStore.selectedScienceId=parseInt(search.value,10);
    //зробити запит на сервер чи відфільтрувати список?
 }
 

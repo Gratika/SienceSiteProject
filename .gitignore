@@ -1,5 +1,6 @@
 /mysql-data/mysql.sock
 /client/node_modules
+/mysql-data
 /.vs/slnx.sqlite
 *.vsidx
 *.json

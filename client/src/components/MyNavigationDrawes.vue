@@ -10,11 +10,11 @@
 
   const userName=():string|undefined =>{
     if(props.user!=null){
-      if (props.user.firstname!=''){
-        return props.user.firstname;
+      if (props.user.people_?.surname!=''){
+        return props.user.people_?.surname;
       }else {
-        if (props.user.name != '') {
-          return props.user.name;
+        if (props.user.people_?.name != '') {
+          return props.user.people_?.name;
         }
       }
     }else return 'noname';

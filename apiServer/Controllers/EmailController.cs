@@ -48,7 +48,7 @@ namespace apiServer.Controllers
             }
             return "0";
         }
-        [HttpPost("CheckCode")]
+        [HttpGet("CheckCode")]
         public async Task<ActionResult> CheckCode(string code)
         {
             try

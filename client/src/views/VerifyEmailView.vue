@@ -15,8 +15,9 @@ const { handleSubmit, handleReset } = useForm({
 })
 const code= useField('code');
 const submitCode = handleSubmit(()=>{
-  let code_:string = '0';
+  let code_:string = '';
   if (typeof code.value.value === 'string') code_ = code.value.value;
+  console.log('code_ = ', code_);
   authStore.onVerifEmail(code_);
 })
 function getRepeatCode(){

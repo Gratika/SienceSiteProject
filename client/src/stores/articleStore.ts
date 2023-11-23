@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type {GenericResponse, IArticle, IScience, IScientificTheory, ISelectedArticle} from '@/api/type';
+import type {GenericResponse, IArticle, IPeople, IScience, IScientificTheory, ISelectedArticle} from '@/api/type';
 import { sendRequest} from '@/api/authApi';
 
 export type ArticleStoreState = {
@@ -8,7 +8,7 @@ export type ArticleStoreState = {
     isLoading: boolean;
     sciences: IScience[];
     scientificSections:IScientificTheory[];
-    selectedScienceId: number | null;
+    searchArticles: IArticle[] ;
 }
 
 export const useArticleStore = defineStore({
@@ -19,16 +19,10 @@ export const useArticleStore = defineStore({
         isLoading:false,
         sciences: [],
         scientificSections:[],
-        selectedScienceId: null,
+        searchArticles:[]
+
     }),
-    getters:{
-        //фільтруємо масив з окремими розділами наук
-        filteredScientificSections: (state) => {
-            return state.scientificSections?.filter((section) => {
-                return section.science_id === state.selectedScienceId;
-            });
-        }
-    },
+    getters:{},
 
     actions: {
         //отримати список статтей
@@ -46,12 +40,16 @@ export const useArticleStore = defineStore({
                 });
         },
         //отримати список моїх статей
-        async getMyArticleList(userId:number) {
+        async getMyArticleList(peopleId:string) {
             this.isLoading=true;
-            sendRequest<Array<IArticle>>('GET', 'article/'+userId)//уточнить адресу
+            sendRequest<{article:Array<IArticle>,people:IPeople}>('GET',
+                'article/GetArticlesForUser',
+                {id_people: peopleId}
+            )
                 .then((res) =>{
-                    this.myArticles=res;
+                    this.myArticles=res.article;
                     this.isLoading =false;
+                    this.myArticles.forEach(r=>r.author_=res.people)
                     console.log("myArticles", res);
                 },(error)=>{
                     this.isLoading =false;
@@ -61,7 +59,11 @@ export const useArticleStore = defineStore({
         },
         //додати статтю до Обране
         async addToFavorites(data:ISelectedArticle){
-            sendRequest<GenericResponse>('POST','add_favorites_article',data) //уточнить адресу
+            sendRequest<GenericResponse>(
+                'POST',
+                'add_favorites_article',
+                undefined,
+                data) //уточнить адресу
                 .then((res)=>{
                     console.log(res);
                 }, (error) =>{
@@ -71,9 +73,9 @@ export const useArticleStore = defineStore({
         //отримати перелік наукових сфер
         async getScienceList() {
             let science_:IScience[] = [];
-            science_.push({id:1, name:'Фізика', note:''});
-            science_.push({id:2, name:'Математика', note:''});
-            science_.push({id:3, name:'Хімія', note:''});
+            science_.push({id:'1', name:'Фізика', note:''});
+            science_.push({id:'2', name:'Математика', note:''});
+            science_.push({id:'3', name:'Хімія', note:''});
             this.sciences=science_;
             /*this.isLoading=true;
             sendRequest<Array<IScience>>('GET', 'science')
@@ -90,15 +92,15 @@ export const useArticleStore = defineStore({
         //отримати розділи наукових сфер
         async getScienceSectionList() {
             let section:IScientificTheory[]=[];
-            section.push({id:1,science_id:1, name:'Кінематика', note:''});
-            section.push({id:2,science_id:2, name:'Натуральні числа', note:''});
-            section.push({id:3,science_id:3, name:'Неорганічні сполуки', note:''});
-            section.push({id:4,science_id:1, name:'Динаміка', note:''});
-            section.push({id:5,science_id:2, name:'Дійсні числа', note:''});
-            section.push({id:6,science_id:3, name:'Органічні сполуки', note:''});
-            section.push({id:7,science_id:1, name:'Статика', note:''});
-            section.push({id:8,science_id:2, name:'Іраціональні числа', note:''});
-            section.push({id:9,science_id:3, name:'Мінерали', note:''});
+            section.push({id:'1',science_id:'1', name:'Кінематика', note:''});
+            section.push({id:'2',science_id:'2', name:'Натуральні числа', note:''});
+            section.push({id:'3',science_id:'3', name:'Неорганічні сполуки', note:''});
+            section.push({id:'4',science_id:'1', name:'Динаміка', note:''});
+            section.push({id:'5',science_id:'2', name:'Дійсні числа', note:''});
+            section.push({id:'6',science_id:'3', name:'Органічні сполуки', note:''});
+            section.push({id:'7',science_id:'1', name:'Статика', note:''});
+            section.push({id:'8',science_id:'2', name:'Іраціональні числа', note:''});
+            section.push({id:'9',science_id:'3', name:'Мінерали', note:''});
             this.scientificSections=section;
             /*this.isLoading=true;
             sendRequest<Array<IScientificTheory>>('GET', 'science_theory')
@@ -112,5 +114,42 @@ export const useArticleStore = defineStore({
                     //showErrorMessage(error)
                 });*/
         },
+        async saveArticle(newArticle:IArticle) {
+            this.isLoading=true;
+            sendRequest<GenericResponse>(
+                'POST',
+                'article/CreateArticle',
+                undefined,
+                  newArticle
+                )
+                .then((res) =>{
+                    this.isLoading =false;
+                    console.log("articles", res);
+                },(error)=>{
+                    this.isLoading =false;
+                    console.error(error);
+                    //showErrorMessage(error)
+                });
+        },
+        async searchArticlesByParam(searchStr:string) {
+            this.isLoading=true;
+            sendRequest<Array<IArticle>>(
+                'GET',
+                'search/search',
+                {SearchString: searchStr}
+
+            )
+                .then((res) =>{
+                    this.isLoading =false;
+                    console.log("search articles", res);
+                    this.searchArticles = res;
+                },(error)=>{
+                    this.isLoading =false;
+                    console.error(error);
+                    //showErrorMessage(error)
+                });
+        },
+
+
     }
 });
