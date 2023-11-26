@@ -12,6 +12,7 @@ namespace apiServer.Models
         public DbSet<People> people { get; set; }
         public DbSet<Sciences> Sciences { get; set; }
         public DbSet<Scientific_theories> Scientific_theories { get; set; }
+        public DbSet<Selected_articles> Selected_articles { get; set; }
         public ArhivistDbContext(DbContextOptions<ArhivistDbContext> options) : base(options)
         {
         }

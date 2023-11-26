@@ -3,7 +3,7 @@ using apiServer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.ForModels
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -19,7 +19,7 @@ namespace apiServer.Controllers
         [HttpPost("AddPeopleToDb")]
         public string AddPeopleToDb(People people)
         {
-            if(string.Equals(people.name, "") || string.Equals(people.surname, ""))              
+            if (string.Equals(people.name, "") || string.Equals(people.surname, ""))
             {
                 _context.people.Update(people);
                 _context.SaveChanges();
@@ -31,7 +31,7 @@ namespace apiServer.Controllers
                 _context.SaveChanges();
                 return "Add";
             }
-            
+
         }
         [HttpPost("CreatePeople")]
         public People CreatePeople()
@@ -48,7 +48,7 @@ namespace apiServer.Controllers
         public People GetPeopleFromRedis(string id)
         {
             People people = _redisPeopleController.GetPeople(id);
-            
+
             return people;
         }
     }

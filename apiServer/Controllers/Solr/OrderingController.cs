@@ -1,4 +1,4 @@
-﻿using apiServer.Models.Example;
+﻿using apiServer.Models;
 using CommonServiceLocator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +11,15 @@ namespace apiServer.Controllers.Search
     [ApiController]
     public class OrderingController : ControllerBase
     {
-        ISolrOperations<Example> solr;
+        ISolrOperations<Articles> solr;
 
-        [HttpPost("FromNewToOld")]
-        public ActionResult FromNewToOld(List<Example> articles) // возвращение статей от новых к старым
+        public OrderingController()
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
-
+            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
+        }
+        [HttpPost("FromNewToOld")]
+        public ActionResult FromNewToOld(List<Articles> articles) // возвращение статей от новых к старым
+        {           
             // ПРИМЕР
             // Поиск с учетом релевантности
             //var options = new QueryOptions
@@ -32,14 +34,12 @@ namespace apiServer.Controllers.Search
             //articles = results;
             //ПРИМЕР
 
-            articles.Sort((x, y) => y.dataCreate.CompareTo(x.dataCreate));
+            articles.Sort((x, y) => y.date_created.CompareTo(x.date_created));
             return Ok(articles);
         }
         [HttpPost("FromOldToNew")]
-        public ActionResult FromOldToNew(List<Example> articles) // возвращение статей от старых к новым
+        public ActionResult FromOldToNew(List<Articles> articles) // возвращение статей от старых к новым
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
-
             // ПРИМЕР
             // Поиск с учетом релевантности
             //var options = new QueryOptions
@@ -54,14 +54,12 @@ namespace apiServer.Controllers.Search
             //articles = results;
             //ПРИМЕР
 
-            articles.Sort((x, y) => x.dataCreate.CompareTo(y.dataCreate));
+            articles.Sort((x, y) => x.date_created.CompareTo(y.date_created));
             return Ok(articles);
         }
         [HttpPost("ForViews")]
-        public ActionResult ForViews(List<Example> articles) // возвращение по наибольшему числу просмотров
+        public ActionResult ForViews(List<Articles> articles) // возвращение по наибольшему числу просмотров
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
-
             // ПРИМЕР
             // Поиск с учетом релевантности
             //var options = new QueryOptions

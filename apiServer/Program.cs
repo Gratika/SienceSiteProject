@@ -1,8 +1,9 @@
 using apiServer.Controllers;
+using apiServer.Controllers.Authentication;
+using apiServer.Controllers.ForModels;
 using apiServer.Controllers.Redis;
 using apiServer.Controllers.Search;
 using apiServer.Models;
-using apiServer.Models.Example;
 using Microsoft.EntityFrameworkCore;
 using Minio;
 using SolrNet;
@@ -19,7 +20,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddScoped<EmailController>();
 builder.Services.AddScoped<TokensController>();
-builder.Services.AddScoped<GenerateRandomStringControlle>();
+builder.Services.AddScoped<GenerateRandomStringController>();
 builder.Services.AddScoped<MinioController>();
 builder.Services.AddScoped<SearchController>();
 builder.Services.AddScoped<PeopleController>();
@@ -49,7 +50,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-Startup.Init<Example>("http://solr:8983/solr/new_core");
+Startup.Init<Articles>("http://solr:8983/solr/new_core");
 app.UseAuthorization();
 
 app.MapControllers();

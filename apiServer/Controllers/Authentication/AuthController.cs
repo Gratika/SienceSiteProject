@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.Authentication
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -22,43 +22,37 @@ namespace apiServer.Controllers
             _redisRepository = new RedisAuthController("redis:6379,abortConnect=false");
         }
 
-        [HttpGet("AuthUser")]
+        [HttpPost("AuthUser")]
         public async Task<ActionResult> AuthUser(/*string pas, string email*/UserRequest userRequest) //авторизация
         {
             AuthResponse Response = new AuthResponse();
             try
             {
+                // проверка данных в редис 
                 Response.user = _redisRepository.IsUserUnique(userRequest.password, userRequest.email);
-                // проверка данных в редис  
-                if (Response.user != null)
+                // проверка данных в базе данных              
+                if (Response.user == null)
                 {
-                    Response.answer = "Вы вошли";
-                    return Ok(new { Message = Response });
-                }
-                // проверка данных в базе данных
-                Response.user = await CheckUserDatabase(userRequest);
-                if (Response.user != null)
-                {
+                    Response.user = await CheckUserDatabase(userRequest);
                     _redisRepository.AddUser(Response.user);
                     Response.answer = "Вы вошли";
-                    return Ok(new { Message = Response });
+                    return Ok(Response);
                 }
+                return Ok(Response);
             }
             catch
             {
                 Response.answer = "Вы не вошли";
                 return Ok(new { Message = Response });
             }
-            Response.answer = "Вы не вошли";
-            return Ok(new { Message = Response });
         }
         [HttpGet("CheckUserDatabase")]
         public async Task<Users> CheckUserDatabase(/*string pas, string email*/ UserRequest Person)
-        {            
+        {
             List<Users> users = await _context.Users.ToListAsync();
             foreach (Users user in users)
             {
-                if (string.Equals(user.password, Person.password, StringComparison.Ordinal) == true && string.Equals(user.email,Person.email, StringComparison.Ordinal) == true)
+                if (string.Equals(user.password, Person.password, StringComparison.Ordinal) == true && string.Equals(user.email, Person.email, StringComparison.Ordinal) == true)
                 {
                     return user;
                 }

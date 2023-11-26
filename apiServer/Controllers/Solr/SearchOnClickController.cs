@@ -1,9 +1,9 @@
-﻿using apiServer.Models.Example;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SolrNet.Commands.Parameters;
 using SolrNet;
 using CommonServiceLocator;
+using apiServer.Models;
 
 namespace apiServer.Controllers.Search
 {
@@ -11,19 +11,23 @@ namespace apiServer.Controllers.Search
     [ApiController]
     public class SearchOnClickController : ControllerBase
     {
-        ISolrOperations<Example> solr;
+        ISolrOperations<Articles> solr;
 
+        public SearchOnClickController()
+        {
+            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
+        }
         [HttpPost("ForScientificArticle")]
         public ActionResult ForScientificArticle(string theory_id ,int amount) // возвращение статей от новых к старым
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
+            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
 
             var options = new QueryOptions
             {
                 FilterQueries = new[] { new SolrQueryByField("theory_id", theory_id) },
                 Rows = amount // Количество записей, которые вы хотите получить
             };
-            List<Example> articles = solr.Query(SolrQuery.All, options);
+            List<Articles> articles = solr.Query(SolrQuery.All, options);
 
             return Ok(articles);
         }

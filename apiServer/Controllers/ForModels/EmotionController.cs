@@ -1,4 +1,5 @@
-﻿using apiServer.Controllers.Redis;
+﻿using apiServer.Controllers.Authentication;
+using apiServer.Controllers.Redis;
 using apiServer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ using System.Collections;
 using System.Text;
 using System.Xml.Linq;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.ForModels
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -27,18 +28,18 @@ namespace apiServer.Controllers
             _redisRepository = new RedisEmotionController("redis:6379,abortConnect=false");
         }
         // GET: api/Emotions
-         [HttpGet(Name = "All")]
-         public async Task<ActionResult<IEnumerable<Emotions>>> GetEmotions()
-         {
-             return await _context.Emotions.ToListAsync();
-         }             
+        [HttpGet(Name = "All")]
+        public async Task<ActionResult<IEnumerable<Emotions>>> GetEmotions()
+        {
+            return await _context.Emotions.ToListAsync();
+        }
         // GET: api/Emotions/5
         [HttpGet("{id}")]
         public async Task<Emotions> GetEmotion(int key)
         {
             var emotion = await _context.Emotions.FindAsync(key);
             return emotion;
-        }       
+        }
         [HttpPost("RedisGetEmotion")]
         public async Task<ActionResult<Emotions>> RedisFullFuncion()
         {
@@ -47,7 +48,7 @@ namespace apiServer.Controllers
                 // Проверка наличия данных в кэше
                 List<Emotions> data = _redisRepository.GetAllEmotions();
                 // Данные отсутствуют в кэше, выполняем запрос к источнику данных
-                if(data.Count == 0)
+                if (data.Count == 0)
                 {
                     data = await _context.Emotions.ToListAsync();
                     // Сохранение данных в кэше на 10 минут
@@ -56,8 +57,8 @@ namespace apiServer.Controllers
                 }
                 return Ok(data);
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
         }

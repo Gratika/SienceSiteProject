@@ -1,4 +1,5 @@
-﻿using apiServer.Controllers.Redis;
+﻿using apiServer.Controllers.ForModels;
+using apiServer.Controllers.Redis;
 using apiServer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Policy;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.Authentication
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -60,7 +61,7 @@ namespace apiServer.Controllers
             try
             {
                 People people = _people.CreatePeople();
-                
+
                 Users FirstEx = new Users();
                 FirstEx.Id = Guid.NewGuid().ToString();
                 FirstEx.login = /*email*/userRequest.email;
@@ -69,7 +70,7 @@ namespace apiServer.Controllers
                 FirstEx.date_create = DateTime.Now;
                 FirstEx.modified_date = DateTime.Now;
                 FirstEx.role_id = "1";
-                
+
                 FirstEx.people_id = people.Id;
                 //Проверка уникальности пользователя по паролю и email
                 if (await IsUserUnique(FirstEx /*FirstEx.password, FirstEx.email*/) == 0)
@@ -106,9 +107,9 @@ namespace apiServer.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }       
+        }
         [HttpGet("CheckTokens")]
-        public ActionResult CheckTokens(string id,string accessToken,string refreshToken)
+        public ActionResult CheckTokens(string id, string accessToken, string refreshToken)
         {
             try
             {
@@ -149,7 +150,7 @@ namespace apiServer.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return BadRequest(new { ex.Message });
             }
         }
     }
