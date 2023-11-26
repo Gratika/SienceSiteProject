@@ -15,7 +15,7 @@ namespace apiServer.Controllers.Search
     {
         ISolrOperations<Example> solr;
 
-        [HttpPost("NewArticle")]
+        [HttpGet("NewArticle")]
         public ActionResult NewArticle(int amount) // возвращение статей от новых к старым
         {
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
@@ -29,7 +29,7 @@ namespace apiServer.Controllers.Search
 
             return Ok(articles);
         }
-        [HttpPost("PopularArticle")]
+        [HttpGet("PopularArticle")]
         public ActionResult PopularArticle(int amount) // возвращение статей от новых к старым
         {
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();

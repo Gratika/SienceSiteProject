@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type {IArticle, ISelectedArticle} from "@/api/type";
 import {useAuthStore} from "@/stores/authStore";
-import router from "@/router";
+import {useRouter} from "vue-router";
 //пропси від батьківського елементу
 const props = defineProps<{
-  article:IArticle|null,
+  article:IArticle,
   showEdit:boolean
 }>()
+const router = useRouter();
 const authStore = useAuthStore();
 //функція для виводу автора
 const author_=():string|undefined=>{
-  if(props.article != null && props.article.author_ !=null){
+  if( props.article.author_ !=null){
       if(props.article.author_.surname!=null){
         return props.article.author_.surname +' '+ props.article.author_.name;
       }
@@ -26,12 +27,14 @@ function addArticleSelect(){
     id:'',
     article_id: props.article?.id as string,
     user_id: authStore.getUserId as string,
-    Date_view: null
+    Date_view: new Date(),
   };
   emits('add_selected', selectedArticle);
 }
+//для налаштування переходу на сторінку редагування статті
 function editArticle(){
-  router.push('/new_article')
+  router.push({ name: 'edit_article', params: { id: props.article.id } });
+
 }
 </script>
 
@@ -39,7 +42,7 @@ function editArticle(){
 
   <v-card class="ma-4 pa-5" >
     <v-card-title class="d-flex">
-      <span class="d-inline font-weight-bold">{{ props.article?.title }}</span>
+      <span class="d-inline font-weight-bold">{{ props.article.title }}</span>
       <v-spacer></v-spacer>
       <small class="d-inline ">
         <v-tooltip location="top center" origin="end center">
@@ -48,14 +51,14 @@ function editArticle(){
         </template>
           <div>Кількість переглядів</div>
         </v-tooltip>
-          <span class="subheading mr-2">{{ props.article?.views }}</span>
+          <span class="subheading mr-2">{{ props.article.views }}</span>
       </small>
 
 
     </v-card-title>
 
     <v-card-text class="headline">
-      {{ article?.text }}
+      {{ article.text }}
     </v-card-text>
 
     <v-card-actions>

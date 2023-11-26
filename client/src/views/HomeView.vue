@@ -8,7 +8,8 @@ import type {ISelectedArticle} from "@/api/type";
 const articleStore = useArticleStore();
 const showEditBtn = false;
 onMounted(() => {
-  articleStore.getArticleList();
+  articleStore.getNewArticleList();
+  //articleStore.getPopularArticleList();
 
 });
 function addArticleToFavorites(newFavorite:ISelectedArticle) {
@@ -28,7 +29,7 @@ function addArticleToFavorites(newFavorite:ISelectedArticle) {
       ></v-progress-circular>
     </v-overlay>
       <ArticleItem
-          v-for="article in articleStore.articles"
+          v-for="article in articleStore.newArticles"
           :key="article.id"
           :article="article"
           :show-edit="showEditBtn"

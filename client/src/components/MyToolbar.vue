@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {useArticleStore} from "@/stores/articleStore";
+import {useRoute, useRouter} from "vue-router";
 
 const articleStore = useArticleStore();
 const emits = defineEmits(['show'])
 const drawer = ref(false);
 const searchStr = ref('');
+const router = useRouter();
 function showSideBar(){
   drawer.value=!drawer.value;
   emits('show', drawer.value);
 }
 function onSearch(){
-  console.log('Search ',searchStr.value);
-  articleStore.searchArticlesByParam(searchStr.value);
+  router.push({ name: 'search_article', params: { search: searchStr.value } });
 }
 </script>
 

@@ -12,8 +12,9 @@ const props = defineProps<{
 const articleStore = useArticleStore();
 const emits = defineEmits(['close']);
 const dialogShow = ref(false);//відображення діалогового вікна
-const scienceId = ref('');
-
+const scienceId = ref('');//id обраної наукової сфери
+const  isEditing = ref(false); //autocomplete з розділами наукової сфери недоступний
+let scienceSectionList_: IScientificTheory[] //відфільтрований масив з розділами наукової сфери
 //нова стаття
 const article = ref<IArticle>({
   id: '',
@@ -21,7 +22,7 @@ const article = ref<IArticle>({
   author_id: getAuthorId(),
   title: '',
   tag: '',
-  text: "це тестова стаття",
+  text: null,
   views: 0,
   date_create:new Date(),
   modified_date: new Date(),
@@ -37,8 +38,11 @@ function  getAuthorId():string|null {
 }
 //фільтруємо список з розділами залежно від обраної науки
 watch(scienceId,(newValue)=>{
-
-  return props.scienceSectionList.filter(s=>s.science_id.trim()===newValue.trim())
+  console.log("scienceId=",scienceId,' newValue=',newValue);
+  if (newValue!=null && newValue!=''){
+    isEditing.value = true;
+    scienceSectionList_ = props.scienceSectionList.filter(s=>s.science_id.trim()===newValue.trim())
+  }
 })
 /*валідація форм*/
 const { handleSubmit, handleReset } = useForm({
@@ -63,6 +67,7 @@ const { handleSubmit, handleReset } = useForm({
 const title= useField('title');
 const  tag = useField('tag');
 const  theory_id = useField('theory_id');
+
 const submitArticle= handleSubmit(()=>{
   if (typeof title.value.value === "string") {
     article.value.title = title.value.value;
@@ -73,9 +78,6 @@ const submitArticle= handleSubmit(()=>{
   if (typeof theory_id.value.value === "string") {
     article.value.theory_id = theory_id.value.value;
   }
-  //article.value.author_id= peopleId
-
-  console.log(JSON.stringify(article.value));
   articleStore.saveArticle(article.value);
   emits('close', dialogShow.value);
 })
@@ -115,12 +117,13 @@ function closeDialog() {
                 item-value="id"
             > </v-autocomplete>
             <v-autocomplete
-                label="Розділ"
-                :items="scienceSectionList"
-                variant="solo-filled"
-                v-model="theory_id.value.value"
+                :disabled="!isEditing"
                 item-title="name"
                 item-value="id"
+                :items="scienceSectionList_"
+                label="Розділ"
+                variant="solo-filled"
+                v-model="theory_id.value.value"
                 :error-messages="theory_id.errorMessage.value"
             ></v-autocomplete>
           </v-col>

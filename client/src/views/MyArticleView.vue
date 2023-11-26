@@ -4,18 +4,18 @@
   import ArticleItem from "@/components/ArticleItem.vue";
   import NewArticleForm from "@/components/NewArticleForm.vue";
   import MyLocalStorage from "@/services/myLocalStorage";
+  import {useRouter} from "vue-router";
 
   const articleStore = useArticleStore();
   const showDialog = ref(false);
   const showEditBtn = true;
   const peopleId=MyLocalStorage.getItem('peopleId');
   onMounted(() => {
-
-    //articleStore.getMyArticleList();
-    articleStore.getMyArticleList(peopleId); //тимчасово для перевірки
+    articleStore.getMyArticleList(peopleId); //список моїх статей
     articleStore.getScienceList(); //отримуємо список наукових сфер
     articleStore.getScienceSectionList(); //отримуємо список підкатегорій
   });
+
   function handleButtonClick(){
 
   }

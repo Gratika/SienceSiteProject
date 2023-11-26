@@ -12,8 +12,8 @@ import 'vuetify/styles'
 import {createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import CKEditor from '@ckeditor/ckeditor5-vue';
 import type {ThemeDefinition} from 'vuetify'
-//VueQuill
 
 const myCustomLightTheme: ThemeDefinition = {
     dark: false,
@@ -50,5 +50,6 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)
+app.use( CKEditor )
 
 app.mount('#app')
