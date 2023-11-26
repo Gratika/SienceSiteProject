@@ -3,6 +3,8 @@ using StackExchange.Redis;
 
 namespace apiServer.Controllers.Redis
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class RedisEmailController : Controller
     {
         private readonly ConnectionMultiplexer _redis;
@@ -13,6 +15,7 @@ namespace apiServer.Controllers.Redis
             _redis = ConnectionMultiplexer.Connect(connectionString);
             _database = _redis.GetDatabase();
         }
+        [HttpPost("AddEmail")]
         public void AddEmail(string email, string code)
         {
             var userKey = $"Email:{code}";
@@ -22,6 +25,7 @@ namespace apiServer.Controllers.Redis
             };
             _database.HashSet(userKey, userFields);
         }
+        [HttpPost("GetEmail")]
         public HashEntry[] GetEmail(string key)
         {
             var db = _redis.GetDatabase();

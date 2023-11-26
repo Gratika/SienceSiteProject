@@ -8,6 +8,8 @@ using System;
 
 namespace apiServer.Controllers.Redis
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class RedisUserController : Controller
     {
         private readonly ConnectionMultiplexer _redis;
@@ -18,6 +20,7 @@ namespace apiServer.Controllers.Redis
             _redis = ConnectionMultiplexer.Connect(connectionString);
             _database = _redis.GetDatabase();
         }
+        [HttpPost("AddUser")]
         public void AddUser(Users user)
         {
             var userKey = $"users:{user.Id}";
@@ -37,12 +40,14 @@ namespace apiServer.Controllers.Redis
 
             _database.HashSet(userKey, userFields);
         }
+        [HttpPost("GetUser")]
         public HashEntry[] GetUser(string key)
         {
             var db = _redis.GetDatabase();
             var hashEntries = db.HashGetAll(key);
             return hashEntries;
         }
+        [HttpPost("IsUserUnique")]
         public bool IsUserUnique(string mypassword, string myemail)
         {
             var keys = _redis.GetServer("redis", 6379).Keys();
@@ -66,11 +71,13 @@ namespace apiServer.Controllers.Redis
             }
             return false;
         }
+        [HttpPost("DeleteKey")]
         public void DeleteKey(string key)
         {
             var db = _redis.GetDatabase();
             bool result = db.KeyDelete(key);
         }
+        [HttpPost("GetUsersRedis")]
         public Users GetUsersRedis(string id)
         {
             Users user = new Users();

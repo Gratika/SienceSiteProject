@@ -15,11 +15,11 @@ namespace apiServer.Controllers
     public class MinioController : Controller
     {
         private readonly ArhivistDbContext _context;
-        private readonly GenerateRandomStringControlle _genericString;
+        private readonly GenerateRandomStringController _genericString;
         private readonly HttpClient _httpClient;
         private readonly IMinioClient _minio;
 
-        public MinioController(ArhivistDbContext context, GenerateRandomStringControlle genericString)
+        public MinioController(ArhivistDbContext context, GenerateRandomStringController genericString)
         {
             _context = context;
             _genericString = genericString;

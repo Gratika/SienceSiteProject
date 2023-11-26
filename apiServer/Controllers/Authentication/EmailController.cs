@@ -9,7 +9,7 @@ using System.Net.Http;
 using System.Reflection.Emit;
 using System.Text;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.Authentication
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,9 +18,9 @@ namespace apiServer.Controllers
         private readonly HttpClient _httpClient;
         private readonly RedisEmailController _redisRepository;
         private readonly ArhivistDbContext _context;
-        private readonly GenerateRandomStringControlle _genericString;
-        public EmailController( IHttpClientFactory httpClientFactory, ArhivistDbContext context, GenerateRandomStringControlle genericString)
-        {            
+        private readonly GenerateRandomStringController _genericString;
+        public EmailController(IHttpClientFactory httpClientFactory, ArhivistDbContext context, GenerateRandomStringController genericString)
+        {
             _httpClient = new HttpClient();
             _redisRepository = new RedisEmailController("redis:6379,abortConnect=false");
             _context = context;
@@ -42,7 +42,7 @@ namespace apiServer.Controllers
                 }
                 return "0";
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 ex.ToString();
             }
@@ -73,7 +73,7 @@ namespace apiServer.Controllers
             }
             catch (Exception ex)
             {
-                BadRequest(new { Error = "Вы не вошли - " + ex.Message});
+                BadRequest(new { Error = "Вы не вошли - " + ex.Message });
             }
             return BadRequest();
         }

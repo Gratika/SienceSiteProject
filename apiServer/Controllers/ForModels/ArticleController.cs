@@ -13,22 +13,23 @@ using apiServer.Controllers.Redis;
 using apiServer.Controllers.Search;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Net;
+using apiServer.Controllers.Solr;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.ForModels
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ArticleController : ControllerBase
     {
         private readonly ArhivistDbContext _context;
-        private readonly GenerateRandomStringControlle _genericString;
+        private readonly GenerateRandomStringController _genericString;
         private readonly HttpClient _httpClient;
         private readonly MinioController _minioController;
         private readonly RedisArticleController _redisArticleController;
-        private readonly SearchController _searchController;
+        private readonly SolrArticleController _searchController;
         private readonly RedisPeopleController _redisPeopleController;
 
-        public ArticleController(ArhivistDbContext context, GenerateRandomStringControlle genericString, MinioController minioController, SearchController searchController)
+        public ArticleController(ArhivistDbContext context, GenerateRandomStringController genericString, MinioController minioController, SolrArticleController searchController)
         {
             _context = context;
             _genericString = genericString;
@@ -44,19 +45,19 @@ namespace apiServer.Controllers
             try
             {
                 ArticleAndPeople articleAndPeople = new ArticleAndPeople();
-                articleAndPeople.article = _redisArticleController.GetArticlesForUser(id_people);            
+                articleAndPeople.article = _redisArticleController.GetArticlesForUser(id_people);
                 if (articleAndPeople.article.Count != 0)
                 {
                     articleAndPeople.people = _redisPeopleController.GetPeople(articleAndPeople.article[0].author_id);
                     if (string.IsNullOrEmpty(articleAndPeople.people.Id) == false)
-                    {                    
+                    {
                         return Ok("Из редиса - " + articleAndPeople.article[0].title + articleAndPeople.people.Id);
-                    }       
-                    
+                    }
+
                 }
-                if(articleAndPeople.article.Count == 0 || string.IsNullOrEmpty(articleAndPeople.people.Id) == true)
+                if (articleAndPeople.article.Count == 0 || string.IsNullOrEmpty(articleAndPeople.people.Id) == true)
                 {
-                                                                        // Получаем статьи пользователя и соответствующие данные пользователя по его почте
+                    // Получаем статьи пользователя и соответствующие данные пользователя по его почте
                     var articlesQuery = from article in _context.Articles
                                         join people in _context.people on article.author_id equals people.Id
                                         where people.Id == id_people
@@ -82,24 +83,24 @@ namespace apiServer.Controllers
                 return BadRequest("Ошибка, статьи не были обнаруженны - " + ex.Message);
             }
         }
-        
+
         [HttpPost("CreateArticle")]
-        public async Task<ActionResult> CreateArticle(Articles article) // Создание статьи
+        public async Task<ActionResult> CreateArticle(Articles article/*, List<IFormFile>? files*/ /*IFormFile? file1, IFormFile? file2, IFormFile? file3, string id_people*/) // Создание статьи
         {
-           // Articles article = new Articles(); // создание примера(удалится потом)
+            //Articles article = new Articles(); // создание примера(удалится потом)
             article.Id = Guid.NewGuid().ToString();
-            //article.author_id = id_people;
-           // article.title = "Example2";
-           // article.tag = "Example2";
-           // article.text = null;
-           // article.views = 150;
-           // article.theory_id = "2";
+            // article.author_id = id_people;
+            //article.title = "Example2";
+            //article.tag = "Example2";
+            //article.text = "Example2";
+            //article.views = 150;
+            //article.theory_id = "2";
             article.date_created = DateTime.Now;
             article.modified_date = DateTime.Now;
             //var files = new List<IFormFile> { file1, file2, file3 };
             try
             {
-                if(CheckDoiValidity(article.DOI) == false)
+                if (CheckDoiValidity(article.DOI) == false)
                 {
                     article.DOI = null;
                 }
@@ -116,9 +117,9 @@ namespace apiServer.Controllers
                 //добавление данных в Redis
                 _redisArticleController.AddArticle(article);
 
-                _searchController.AddArticle( article /*article.title,article.text,article.tag,"имя автора",article.views,article.DOI*/);
-             
-                if(article.DOI != null)
+                _searchController.AddArticle( /*article*/ /*article.title,article.text,article.tag,"имя автора",article.views,article.DOI*/);
+
+                if (article.DOI != null)
                 {
                     return Ok(new { Message = "Вы успешно добавили статью " });
                 }
@@ -140,7 +141,7 @@ namespace apiServer.Controllers
             };
             if (articleAndPeople.article.Count != 0)
             {
-                articleAndPeople.people = _redisPeopleController.GetPeople(articleAndPeople.article[0].author_id);               
+                articleAndPeople.people = _redisPeopleController.GetPeople(articleAndPeople.article[0].author_id);
                 if (string.IsNullOrEmpty(articleAndPeople.people.Id) == false)
                 {
                     return articleAndPeople;
@@ -168,31 +169,31 @@ namespace apiServer.Controllers
                 };
                 articleAndPeople.people = articlesQuery.Select(a => a.People).FirstOrDefault();
             }
-            
+
             return articleAndPeople;
         }
         [HttpPost("RedactArticle")]
-        public async Task<ActionResult> RedactArticle(IFormFile? file1, IFormFile? file2, /*Articles? article,*/ string id, string title, string pathFile, string pathBucket)
+        public async Task<ActionResult> RedactArticle(/*IFormFile? file1, IFormFile? file2,*/ Articles article/*, string id, string title, string pathFile, string pathBucket*/)
         {
-            Articles article = new Articles();
-            article.Id = id;
-            article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
-            article.title = title;
-            article.tag = "Example2";
-            article.text = "Example2";
-            article.views = 0;
-            article.theory_id = "1";
-            article.path_file = pathFile;
-            article.date_created = new DateTime(2023, 11, 17, 17, 16, 16); //ПРИМЕР
-            var files = new List<IFormFile> { file1, file2 };
+            //Articles article = new Articles();
+            //article.Id = id;
+            //article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
+            //article.title = title;
+            //article.tag = "Example2";
+            //article.text = "Example2";
+            //article.views = 0;
+            //article.theory_id = "1";
+            //article.path_file = pathFile;
+            //article.date_created = new DateTime(2023, 11, 17, 17, 16, 16); //ПРИМЕР
+            //var files = new List<IFormFile> { file1, file2 };
             article.modified_date = DateTime.Now;
 
             _redisArticleController.AddArticle(article);
             _searchController.RedactArticle(article);
-            
-            List<string> FieldsDb = await _minioController.RedactFiles(article.path_file, pathBucket, files);
 
-            article.path_file = FieldsDb[1];
+            //List<string> FieldsDb = await _minioController.RedactFiles(article.path_file, pathBucket, files);
+
+            //article.path_file = FieldsDb[1];
             _context.Articles.Update(article);
             _context.SaveChanges();
 
@@ -209,18 +210,18 @@ namespace apiServer.Controllers
             //article.views = 0;
             //article.theory_id = "1";
             //article.path_file = pathFile;
-           // article.date_created = new DateTime(2023, 11, 17, 17, 16, 16); //ПРИМЕР
+            // article.date_created = new DateTime(2023, 11, 17, 17, 16, 16); //ПРИМЕР
             //article.modified_date = DateTime.Now;
 
             _context.Articles.Remove(article);
             _context.SaveChanges();
 
-            _searchController.DeleteDocumentsWithInvalidTitle(article.Id);
+            _searchController.DeleteArticle(article.Id);
             _redisArticleController.DeleteArticle(article.Id);
-            if(string.Equals(pathBucket, "") == false || string.Equals(/*pathFile*/article.path_file, "") == false)
+            if (string.Equals(pathBucket, "") == false || string.Equals(/*pathFile*/article.path_file, "") == false)
             {
                 _minioController.DeleteFiles(article.path_file, pathBucket);
-            }           
+            }
 
 
             return Ok("Статья удачно удаленна");
@@ -251,7 +252,7 @@ namespace apiServer.Controllers
                 }
             }
             catch (Exception ex)
-            {               
+            {
                 return false; // Произошла ошибка при проверке DOI
             }
         }

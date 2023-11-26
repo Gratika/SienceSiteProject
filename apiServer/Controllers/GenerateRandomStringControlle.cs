@@ -2,12 +2,11 @@
 
 namespace apiServer.Controllers
 {
-    public class GenerateRandomStringControlle : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class GenerateRandomStringController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        [HttpPost("GenerateRandomString")]
         public string GenerateRandomString(int leght) // генерация случайной строки
         {
             try

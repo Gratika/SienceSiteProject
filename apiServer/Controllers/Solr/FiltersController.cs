@@ -1,9 +1,9 @@
-﻿using apiServer.Models.Example;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SolrNet.Commands.Parameters;
 using SolrNet;
 using CommonServiceLocator;
+using apiServer.Models;
 
 namespace apiServer.Controllers.Search
 {
@@ -11,12 +11,16 @@ namespace apiServer.Controllers.Search
     [ApiController]
     public class FiltersController : ControllerBase
     {
-        ISolrOperations<Example> solr;
+        ISolrOperations<Articles> solr;
 
-        [HttpPost("OnlySciensceArticles")]
-        public ActionResult OnlySciensceArticles(List<Example> articles) // возвращение статей от новых к старым
+        public FiltersController()
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
+            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
+        }
+        [HttpPost("OnlySciensceArticles")]
+        public ActionResult OnlySciensceArticles(List<Articles> articles) // возвращение статей от новых к старым
+        {
+            
 
             // ПРИМЕР                   
             // Поиск с учетом релевантности
@@ -37,9 +41,9 @@ namespace apiServer.Controllers.Search
             return Ok(filteredModels);
         }
         [HttpPost("SimpleArticles")]
-        public ActionResult SimpleArticles(List<Example> articles) // возвращение статей от новых к старым
+        public ActionResult SimpleArticles(List<Articles> articles) // возвращение статей от новых к старым
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
+            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
 
             // ПРИМЕР
             // Поиск с учетом релевантности

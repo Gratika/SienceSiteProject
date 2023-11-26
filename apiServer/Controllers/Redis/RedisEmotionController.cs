@@ -9,6 +9,8 @@ using System.Text;
 
 namespace apiServer.Controllers.Redis
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class RedisEmotionController : Controller
     {
         private readonly ConnectionMultiplexer _redis;
@@ -19,6 +21,7 @@ namespace apiServer.Controllers.Redis
             _redis = ConnectionMultiplexer.Connect(connectionString);
             _database = _redis.GetDatabase();
         }
+        [HttpPost("AddEmotion")]
         public void AddEmotion(List<Emotions> emotions)
         {
             foreach (Emotions emotion in emotions)
@@ -34,12 +37,7 @@ namespace apiServer.Controllers.Redis
                 _database.HashSet(userKey, userFields);
             }
         }
-        //public HashEntry[] GetEmotion(string key)
-        //{
-        //    var db = _redis.GetDatabase();
-        //    var hashEntries = db.HashGetAll(key);
-        //    return hashEntries;
-        //}
+        [HttpPost("GetEmotion")]
         public Emotions GetEmotion(string id)
         {
             // Получение хэша из Redis
@@ -65,7 +63,7 @@ namespace apiServer.Controllers.Redis
             }
             return emotion;
         }
-        [HttpPost("GetAllSciences")]
+        [HttpPost("GetAllEmotions")]
         public List<Emotions> GetAllEmotions()
         {
             List<Emotions> emotions = new List<Emotions>();

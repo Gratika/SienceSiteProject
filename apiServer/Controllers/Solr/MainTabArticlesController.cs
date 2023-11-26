@@ -1,4 +1,4 @@
-﻿using apiServer.Models.Example;
+﻿using apiServer.Models;
 using CommonServiceLocator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,33 +13,35 @@ namespace apiServer.Controllers.Search
     [ApiController]
     public class MainTabArticlesController : ControllerBase
     {
-        ISolrOperations<Example> solr;
+        ISolrOperations<Articles> solr;
 
-        [HttpGet("NewArticle")]
-        public ActionResult NewArticle(int amount) // возвращение статей от новых к старым
+        public MainTabArticlesController()
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
-
+            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
+        }
+        [HttpGet("NewArticle")]
+        public async Task<ActionResult> NewArticle(int amount) // возвращение статей от новых к старым
+        {
+            
             var options = new QueryOptions
             {
-                OrderBy = new[] { new SortOrder("dataCreate", Order.DESC) },
+                OrderBy = new[] { new SortOrder("date_created", Order.DESC) },
                 Rows = amount // Количество записей, которые вы хотите получить
             };
-            List<Example> articles = solr.Query(SolrQuery.All, options);
+            List<Articles> articles = await solr.QueryAsync(SolrQuery.All, options);
 
             return Ok(articles);
         }
         [HttpGet("PopularArticle")]
-        public ActionResult PopularArticle(int amount) // возвращение статей от новых к старым
+        public async Task<ActionResult> PopularArticle(int amount) // возвращение статей от новых к старым
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Example>>();
 
             var options = new QueryOptions
             {
                 OrderBy = new[] { new SortOrder("views", Order.DESC) },
                 Rows = amount // Количество записей, которые вы хотите получить
             };
-            List<Example> articles = solr.Query(SolrQuery.All, options);
+            List<Articles> articles = await solr.QueryAsync(SolrQuery.All, options);
 
             return Ok(articles);
         }

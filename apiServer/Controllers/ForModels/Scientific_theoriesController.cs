@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.ForModels
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -6,14 +6,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.Authentication
 {
     [Route("api/[controller]")]
     [ApiController]
     public class TokensController : Controller
     {
         public readonly IConfiguration _configuration; // необходим для доступа к jwt ключу
-        public TokensController( IConfiguration configuration)
+        public TokensController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -64,8 +64,8 @@ namespace apiServer.Controllers
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 return tokenHandler.WriteToken(token);
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
                 throw new Exception();
             }
         }
