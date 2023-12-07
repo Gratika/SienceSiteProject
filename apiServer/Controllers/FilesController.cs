@@ -10,7 +10,6 @@ using System.ComponentModel;
 using System.Data;
 using Microsoft.AspNetCore.WebUtilities;
 using static System.Net.Mime.MediaTypeNames;
-using SixLabors.ImageSharp.Formats.Webp;
 using Org.BouncyCastle.Utilities;
 using ImageMagick;
 

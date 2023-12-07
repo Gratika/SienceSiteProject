@@ -2,6 +2,15 @@
   "version": 3,
   "targets": {
     "net6.0": {
+      "CommonServiceLocator/2.0.7": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/CommonServiceLocator.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/CommonServiceLocator.dll": {}
+        }
+      },
       "CommunityToolkit.HighPerformance/8.2.2": {
         "type": "package",
         "compile": {
@@ -68,6 +77,72 @@
         },
         "runtime": {
           "lib/net6.0/K4os.Hash.xxHash.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Magick.NET-Q16-AnyCPU/13.5.0": {
+        "type": "package",
+        "dependencies": {
+          "Magick.NET.Core": "13.5.0"
+        },
+        "compile": {
+          "lib/netstandard21/Magick.NET-Q16-AnyCPU.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard21/Magick.NET-Q16-AnyCPU.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/netstandard20/Magick.NET-Q16-AnyCPU.targets": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-arm64/native/Magick.Native-Q16-arm64.dll.so": {
+            "assetType": "native",
+            "rid": "linux-arm64"
+          },
+          "runtimes/linux-musl-x64/native/Magick.Native-Q16-x64.dll.so": {
+            "assetType": "native",
+            "rid": "linux-musl-x64"
+          },
+          "runtimes/linux-x64/native/Magick.Native-Q16-x64.dll.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx-arm64/native/Magick.Native-Q16-arm64.dll.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          },
+          "runtimes/osx-x64/native/Magick.Native-Q16-x64.dll.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-arm64/native/Magick.Native-Q16-arm64.dll": {
+            "assetType": "native",
+            "rid": "win-arm64"
+          },
+          "runtimes/win-x64/native/Magick.Native-Q16-x64.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/Magick.Native-Q16-x86.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      },
+      "Magick.NET.Core/13.5.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard21/Magick.NET.Core.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard21/Magick.NET.Core.dll": {
             "related": ".xml"
           }
         }
@@ -566,6 +641,39 @@
         "runtime": {
           "lib/netstandard2.0/BouncyCastle.Crypto.dll": {
             "related": ".xml"
+          }
+        }
+      },
+      "SolrNet/1.1.1": {
+        "type": "package",
+        "dependencies": {
+          "CommonServiceLocator": "2.0.2",
+          "SolrNet.Core": "1.1.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/CommonServiceLocator.SolrNet.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/CommonServiceLocator.SolrNet.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "SolrNet.Core/1.1.1": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "10.0.3"
+        },
+        "compile": {
+          "lib/netstandard2.0/SolrNet.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/SolrNet.dll": {
+            "related": ".pdb;.xml"
           }
         }
       },
@@ -1081,6 +1189,29 @@
     }
   },
   "libraries": {
+    "CommonServiceLocator/2.0.7": {
+      "sha512": "deByA+/7hfPSMqaqcITTkeZhGw41qiIon5F6Q5n5EcMPeYc5hXlifIrVpPKsur4g/PuxYU6umjTx8kQMog4npw==",
+      "type": "package",
+      "path": "commonservicelocator/2.0.7",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "commonservicelocator.2.0.7.nupkg.sha512",
+        "commonservicelocator.nuspec",
+        "lib/net46/CommonServiceLocator.dll",
+        "lib/net47/CommonServiceLocator.dll",
+        "lib/net48/CommonServiceLocator.dll",
+        "lib/net5.0/CommonServiceLocator.dll",
+        "lib/net6.0/CommonServiceLocator.dll",
+        "lib/net7.0/CommonServiceLocator.dll",
+        "lib/netcoreapp1.0/CommonServiceLocator.dll",
+        "lib/netcoreapp2.0/CommonServiceLocator.dll",
+        "lib/netcoreapp3.0/CommonServiceLocator.dll",
+        "lib/netstandard1.0/CommonServiceLocator.dll",
+        "lib/netstandard2.0/CommonServiceLocator.dll",
+        "lib/netstandard2.1/CommonServiceLocator.dll"
+      ]
+    },
     "CommunityToolkit.HighPerformance/8.2.2": {
       "sha512": "+zIp8d3sbtYaRbM6hqDs4Ui/z34j7DcUmleruZlYLE4CVxXq+MO8XJyIs42vzeTYFX+k0Iq1dEbBUnQ4z/Gnrw==",
       "type": "package",
@@ -1191,6 +1322,54 @@
         "lib/netstandard2.0/K4os.Hash.xxHash.xml",
         "lib/netstandard2.1/K4os.Hash.xxHash.dll",
         "lib/netstandard2.1/K4os.Hash.xxHash.xml"
+      ]
+    },
+    "Magick.NET-Q16-AnyCPU/13.5.0": {
+      "sha512": "Kl3uDaaQkK9LVM9CUexnerlTOGFxA0CQHDU9be960W2VZVD45KtE5Yvtq3Mg0rUq7LlwXGCNr1FxEw/hhS2D/Q==",
+      "type": "package",
+      "path": "magick.net-q16-anycpu/13.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Magick.NET.icon.png",
+        "Notice.linux-musl.txt",
+        "Notice.linux.txt",
+        "Notice.osx.txt",
+        "Notice.win.txt",
+        "build/netstandard20/Magick.NET-Q16-AnyCPU.targets",
+        "docs/Readme.md",
+        "lib/netstandard20/Magick.NET-Q16-AnyCPU.dll",
+        "lib/netstandard20/Magick.NET-Q16-AnyCPU.xml",
+        "lib/netstandard21/Magick.NET-Q16-AnyCPU.dll",
+        "lib/netstandard21/Magick.NET-Q16-AnyCPU.xml",
+        "magick.net-q16-anycpu.13.5.0.nupkg.sha512",
+        "magick.net-q16-anycpu.nuspec",
+        "runtimes/linux-arm64/native/Magick.Native-Q16-arm64.dll.so",
+        "runtimes/linux-musl-x64/native/Magick.Native-Q16-x64.dll.so",
+        "runtimes/linux-x64/native/Magick.Native-Q16-x64.dll.so",
+        "runtimes/osx-arm64/native/Magick.Native-Q16-arm64.dll.dylib",
+        "runtimes/osx-x64/native/Magick.Native-Q16-x64.dll.dylib",
+        "runtimes/win-arm64/native/Magick.Native-Q16-arm64.dll",
+        "runtimes/win-x64/native/Magick.Native-Q16-x64.dll",
+        "runtimes/win-x86/native/Magick.Native-Q16-x86.dll"
+      ]
+    },
+    "Magick.NET.Core/13.5.0": {
+      "sha512": "/jKqfhbLvaVqxsV+DkOA5TjfrbO/Q3LdN3OL/xuewdC2EVBN4pTnAekAetn3CsbHOolfvc1xQLxY0MUN3nfwsg==",
+      "type": "package",
+      "path": "magick.net.core/13.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Copyright.txt",
+        "Magick.NET.icon.png",
+        "docs/Readme.md",
+        "lib/netstandard20/Magick.NET.Core.dll",
+        "lib/netstandard20/Magick.NET.Core.xml",
+        "lib/netstandard21/Magick.NET.Core.dll",
+        "lib/netstandard21/Magick.NET.Core.xml",
+        "magick.net.core.13.5.0.nupkg.sha512",
+        "magick.net.core.nuspec"
       ]
     },
     "Microsoft.EntityFrameworkCore/7.0.11": {
@@ -2159,6 +2338,38 @@
         "lib/netstandard2.0/BouncyCastle.Crypto.xml",
         "portable.bouncycastle.1.9.0.nupkg.sha512",
         "portable.bouncycastle.nuspec"
+      ]
+    },
+    "SolrNet/1.1.1": {
+      "sha512": "RyTMsBEDKto9p1wJKcQQ5o1E984RSvNSOxLJoFo0aBI25rUgI1hana3H+bZKKHpseHt2TKSlStGRjZE19uBHTQ==",
+      "type": "package",
+      "path": "solrnet/1.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net46/CommonServiceLocator.SolrNet.dll",
+        "lib/net46/CommonServiceLocator.SolrNet.pdb",
+        "lib/netstandard2.0/CommonServiceLocator.SolrNet.dll",
+        "lib/netstandard2.0/CommonServiceLocator.SolrNet.pdb",
+        "solrnet.1.1.1.nupkg.sha512",
+        "solrnet.nuspec"
+      ]
+    },
+    "SolrNet.Core/1.1.1": {
+      "sha512": "MlitQHkLWUeZdN8Aw3nic/eYATLwGEbesVo69g2Zox4As9Rp7ptAxcl9nBzP+a0wyBX1ECmsiHtrrw1M/tiqkg==",
+      "type": "package",
+      "path": "solrnet.core/1.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net46/SolrNet.dll",
+        "lib/net46/SolrNet.pdb",
+        "lib/net46/SolrNet.xml",
+        "lib/netstandard2.0/SolrNet.dll",
+        "lib/netstandard2.0/SolrNet.pdb",
+        "lib/netstandard2.0/SolrNet.xml",
+        "solrnet.core.1.1.1.nupkg.sha512",
+        "solrnet.core.nuspec"
       ]
     },
     "StackExchange.Redis/2.6.122": {
@@ -3394,30 +3605,34 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "CommonServiceLocator >= 2.0.7",
+      "Magick.NET-Q16-AnyCPU >= 13.5.0",
       "Microsoft.EntityFrameworkCore >= 7.0.11",
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets >= 1.19.4",
       "Minio >= 6.0.1",
       "MySql.EntityFrameworkCore >= 7.0.5",
       "Newtonsoft.Json >= 13.0.3",
+      "SolrNet >= 1.1.1",
+      "SolrNet.Core >= 1.1.1",
       "StackExchange.Redis >= 2.6.122",
       "Swashbuckle.AspNetCore >= 6.5.0",
       "System.IdentityModel.Tokens.Jwt >= 7.0.2"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Gratika\\.nuget\\packages\\": {}
+    "C:\\Users\\Evgen\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj",
+      "projectUniqueName": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj",
       "projectName": "apiServer",
-      "projectPath": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj",
-      "packagesPath": "C:\\Users\\Gratika\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\obj\\",
+      "projectPath": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj",
+      "packagesPath": "C:\\Users\\Evgen\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Gratika\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Evgen\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -3443,6 +3658,14 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
+          "CommonServiceLocator": {
+            "target": "Package",
+            "version": "[2.0.7, )"
+          },
+          "Magick.NET-Q16-AnyCPU": {
+            "target": "Package",
+            "version": "[13.5.0, )"
+          },
           "Microsoft.EntityFrameworkCore": {
             "target": "Package",
             "version": "[7.0.11, )"
@@ -3462,6 +3685,14 @@
           "Newtonsoft.Json": {
             "target": "Package",
             "version": "[13.0.3, )"
+          },
+          "SolrNet": {
+            "target": "Package",
+            "version": "[1.1.1, )"
+          },
+          "SolrNet.Core": {
+            "target": "Package",
+            "version": "[1.1.1, )"
           },
           "StackExchange.Redis": {
             "target": "Package",
@@ -3495,7 +3726,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
       }
     }
   }
