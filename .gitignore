@@ -1,6 +1,5 @@
 /mysql-data/mysql.sock
 /client/node_modules
-/.vs/slnx.sqlite
 *.vsidx
 *.json
 *.sqlite~change
@@ -9,6 +8,5 @@
 /mysql-data
 /solr/data/gettingstarted/data
 /.vs/SienceSiteProject/v17
-/.vs/slnx.sqlite
 /solr/logs
 /client/src/views
