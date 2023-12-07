@@ -11,24 +11,31 @@ namespace apiServer.Controllers.ForModels
     public class SciencesController : ControllerBase
     {
         private readonly ArhivistDbContext _context;
-        private readonly RedisSciencesController _redisSciences;
+        private readonly RedisController _redisSciences;
 
         public SciencesController(ArhivistDbContext context)
         {
             _context = context;
-            _redisSciences = new RedisSciencesController("redis:6379,abortConnect=false");
+            _redisSciences = new RedisController("redis:6379,abortConnect=false");
         }
         [HttpGet("GetSiences")]
         public async Task<ActionResult<IEnumerable<Sciences>>> GetSiences()
         {
-            List<Sciences> sciences = _redisSciences.GetAllSciences();
-            if (sciences.Count == 0)
+            try
             {
-                sciences = await _context.Sciences.ToListAsync();
-                _redisSciences.AddSciences(sciences);
-                return sciences;
+                List<Sciences> sciences = _redisSciences.GetAllData<Sciences>();
+                if (sciences.Count == 0)
+                {
+                    sciences = await _context.Sciences.ToListAsync();
+                    _redisSciences.AddData(sciences);
+                    return Ok(sciences);
+                }
+                return Ok(sciences);
             }
-            return sciences;
+            catch (Exception ex)
+            {
+                return BadRequest("Ошибка, науки не были найденны - " + ex.Message);
+            }
         }
     }
 }

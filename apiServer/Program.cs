@@ -3,6 +3,7 @@ using apiServer.Controllers.Authentication;
 using apiServer.Controllers.ForModels;
 using apiServer.Controllers.Redis;
 using apiServer.Controllers.Search;
+using apiServer.Controllers.Solr;
 using apiServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Minio;
@@ -21,9 +22,10 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<EmailController>();
 builder.Services.AddScoped<TokensController>();
 builder.Services.AddScoped<GenerateRandomStringController>();
-builder.Services.AddScoped<MinioController>();
+builder.Services.AddScoped<FilesController>();
 builder.Services.AddScoped<SearchController>();
 builder.Services.AddScoped<PeopleController>();
+builder.Services.AddScoped<SolrArticleController>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -51,6 +53,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 Startup.Init<Articles>("http://solr:8983/solr/new_core");
+Startup.Init<People>("http://solr:8983/solr/new_core");
+Startup.Init<Scientific_theories>("http://solr:8983/solr/new_core");
 app.UseAuthorization();
 
 app.MapControllers();

@@ -12,70 +12,56 @@ namespace apiServer.Controllers.Search
     public class OrderingController : ControllerBase
     {
         ISolrOperations<Articles> solr;
+        SearchController searchController;
 
-        public OrderingController()
+        public OrderingController(SearchController searchControllerN)
         {
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
+            searchController = searchControllerN;
         }
-        [HttpPost("FromNewToOld")]
-        public ActionResult FromNewToOld(List<Articles> articles) // возвращение статей от новых к старым
-        {           
-            // ПРИМЕР
-            // Поиск с учетом релевантности
-            //var options = new QueryOptions
-            //{
-            //    Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "score" }, // Возвращаемые поля
-            //    OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
-            //};
-
-            //// Выполняем запрос
-            //var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
-
-            //articles = results;
-            //ПРИМЕР
-
-            articles.Sort((x, y) => y.date_created.CompareTo(x.date_created));
-            return Ok(articles);
-        }
-        [HttpPost("FromOldToNew")]
-        public ActionResult FromOldToNew(List<Articles> articles) // возвращение статей от старых к новым
+        [HttpGet("FromNewToOld")]
+        public ActionResult FromNewToOld(string SearchString) // возвращение статей от новых к старым
         {
-            // ПРИМЕР
-            // Поиск с учетом релевантности
-            //var options = new QueryOptions
-            //{
-            //    Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "score" }, // Возвращаемые поля
-            //    OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
-            //};
+            try
+            {
+                List<Articles> articles = searchController.Search(SearchString);
+                articles.Sort((x, y) => y.date_created.CompareTo(x.date_created));
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
 
-            //// Выполняем запрос
-            //var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
-
-            //articles = results;
-            //ПРИМЕР
-
-            articles.Sort((x, y) => x.date_created.CompareTo(y.date_created));
-            return Ok(articles);
+                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+            }
+            
         }
-        [HttpPost("ForViews")]
-        public ActionResult ForViews(List<Articles> articles) // возвращение по наибольшему числу просмотров
+        [HttpGet("FromOldToNew")]
+        public ActionResult FromOldToNew(string SearchString) // возвращение статей от старых к новым
         {
-            // ПРИМЕР
-            // Поиск с учетом релевантности
-            //var options = new QueryOptions
-            //{
-            //    Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "score" }, // Возвращаемые поля
-            //    OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
-            //};
-
-            //// Выполняем запрос
-            //var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
-
-            //articles = results;
-            //ПРИМЕР
-
-            articles.Sort((x, y) => y.views.CompareTo(x.views));
-            return Ok(articles);
+            try
+            {
+                List<Articles> articles = searchController.Search(SearchString);
+                articles.Sort((x, y) => x.date_created.CompareTo(y.date_created));
+                return Ok(articles);
+            }
+           catch(Exception ex)
+            {
+                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+            }
+        }
+        [HttpGet("ForViews")]
+        public ActionResult ForViews(string SearchString) // возвращение по наибольшему числу просмотров
+        {
+            try
+            {
+                List<Articles> articles = searchController.Search(SearchString);
+                articles.Sort((x, y) => y.views.CompareTo(x.views));
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+            }
         }
     }
 }

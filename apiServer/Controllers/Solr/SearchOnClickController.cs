@@ -4,6 +4,7 @@ using SolrNet.Commands.Parameters;
 using SolrNet;
 using CommonServiceLocator;
 using apiServer.Models;
+using apiServer.Controllers.Solr;
 
 namespace apiServer.Controllers.Search
 {
@@ -11,25 +12,30 @@ namespace apiServer.Controllers.Search
     [ApiController]
     public class SearchOnClickController : ControllerBase
     {
-        ISolrOperations<Articles> solr;
+        SolrArticleController solrArticleController;
 
-        public SearchOnClickController()
+        public SearchOnClickController( SolrArticleController solrArticleControllerNew)
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
+            solrArticleController = solrArticleControllerNew;
         }
-        [HttpPost("ForScientificArticle")]
+        [HttpGet("ForScientificArticle")]
         public ActionResult ForScientificArticle(string theory_id ,int amount) // возвращение статей от новых к старым
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
-
-            var options = new QueryOptions
+            try
             {
-                FilterQueries = new[] { new SolrQueryByField("theory_id", theory_id) },
-                Rows = amount // Количество записей, которые вы хотите получить
-            };
-            List<Articles> articles = solr.Query(SolrQuery.All, options);
-
-            return Ok(articles);
+                var options = new QueryOptions
+                {
+                    FilterQueries = new[] { new SolrQueryByField("theory_id", theory_id) },
+                    Rows = amount // Количество записей, которые вы хотите получить
+                };
+                List<Articles> articles = solrArticleController.GetArticle("*:*", options);
+               
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+            }
         }
     }
 }

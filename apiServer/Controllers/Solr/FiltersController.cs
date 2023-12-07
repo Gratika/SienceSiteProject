@@ -4,6 +4,7 @@ using SolrNet.Commands.Parameters;
 using SolrNet;
 using CommonServiceLocator;
 using apiServer.Models;
+using apiServer.Controllers.Solr;
 
 namespace apiServer.Controllers.Search
 {
@@ -12,56 +13,41 @@ namespace apiServer.Controllers.Search
     public class FiltersController : ControllerBase
     {
         ISolrOperations<Articles> solr;
+        private readonly SearchController solrController;
+        SearchController searchController;
 
-        public FiltersController()
+        public FiltersController(SearchController searchControllerN)
         {
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
+            searchController = searchControllerN;
         }
-        [HttpPost("OnlySciensceArticles")]
-        public ActionResult OnlySciensceArticles(List<Articles> articles) // возвращение статей от новых к старым
+        [HttpGet("OnlySciensceArticles")]
+        public ActionResult OnlySciensceArticles(string SearchString) // возвращение статей от новых к старым
         {
-            
-
-            // ПРИМЕР                   
-            // Поиск с учетом релевантности
-            //var options = new QueryOptions
-            //{
-            //    Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "DOI", "score" }, // Возвращаемые поля
-            //    OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
-            //};
-
-            //// Выполняем запрос
-            //var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
-
-            //articles = results;
-            //ПРИМЕР
-
-            var filteredModels = articles.Where(m => !string.IsNullOrEmpty(m.DOI)).ToArray();
-
-            return Ok(filteredModels);
+            try
+            {
+                List<Articles> articles = searchController.Search(SearchString);
+                var filteredModels = articles.Where(m => !string.IsNullOrEmpty(m.DOI)).ToArray();
+                return Ok(filteredModels);
+            }   
+            catch (Exception ex)
+            {
+                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+            }      
         }
-        [HttpPost("SimpleArticles")]
-        public ActionResult SimpleArticles(List<Articles> articles) // возвращение статей от новых к старым
+        [HttpGet("SimpleArticles")]
+        public ActionResult SimpleArticles(string SearchString) // возвращение статей от новых к старым
         {
-            solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
-
-            // ПРИМЕР
-            // Поиск с учетом релевантности
-            //var options = new QueryOptions
-            //{
-            //    Fields = new[] { "id", "title", "text", "tag", "author", "dataCreate", "views", "DOI", "score" }, // Возвращаемые поля
-            //    OrderBy = new[] { new SortOrder("score", SolrNet.Order.DESC) } // Сортировка по релевантности
-            //};
-
-            //// Выполняем запрос
-            //var results = solr.Query("*:*", options); // Ищем по строке "<link>example</link>"
-
-            //articles = results;
-            //ПРИМЕР
-
-            var filteredModels = articles.Where(m => string.IsNullOrEmpty(m.DOI)).ToArray();
-
-            return Ok(filteredModels);
+            try
+            {
+                List<Articles> articles = searchController.Search(SearchString);
+                var filteredModels = articles.Where(m => string.IsNullOrEmpty(m.DOI)).ToArray();
+                return Ok(filteredModels);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+            }          
         }
     }
 }

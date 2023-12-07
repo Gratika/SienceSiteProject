@@ -17,7 +17,7 @@ namespace apiServer.Controllers.Authentication
     {
         private readonly ArhivistDbContext _context;
         private readonly ILogger<UserController> _logger;
-        private readonly RedisUserController _redisRepository;
+        private readonly RedisController _redisRepository;
         private readonly TokensController _tokens;
         private readonly EmailController _em;
         private readonly PeopleController _people;
@@ -26,27 +26,24 @@ namespace apiServer.Controllers.Authentication
             _context = context;
             _logger = logger;
             _tokens = tokens;
-            _redisRepository = new RedisUserController("redis:6379,abortConnect=false");
+            _redisRepository = new RedisController("redis:6379,abortConnect=false");
             _em = em;
             _people = people;
         }
         [HttpGet("IsUserUnique")]
-        public async Task<int> IsUserUnique(Users Person /*string password, string email*/)
+        public async Task<int> IsUserUnique(Users Person/* string password, string email*/)
         {
             try
             {
+                List<Users> users = _redisRepository.GetAllData<Users>();
                 // проверка данных в редис  
-                if (_redisRepository.IsUserUnique(Person.password, Person.email /*password, email*/) == true)
+                for ( int i = 0;i < 2; i++)
                 {
-                    return 1;
-                }
-                List<Users> users = await _context.Users.ToListAsync();
-                foreach (Users user in users)
-                {
-                    if (string.Equals(/*user.password, Person.password*/user.password, Person.password, StringComparison.Ordinal) == true || string.Equals(/*user.email, Person.email,*/user.email, Person.email, StringComparison.Ordinal) == true)
+                    if (CheckPasswordAndEmail(users, Person.password,Person.email) == false)
                     {
                         return 0;
                     }
+                    users = await _context.Users.ToListAsync();
                 }
                 return 1;
             }
@@ -59,7 +56,8 @@ namespace apiServer.Controllers.Authentication
         public async Task<ActionResult> CreateUser(/*string pas, string email*/UserRequest userRequest) //Регистрация
         {
             try
-            {
+            {                
+
                 People people = _people.CreatePeople();
 
                 Users FirstEx = new Users();
@@ -73,7 +71,7 @@ namespace apiServer.Controllers.Authentication
 
                 FirstEx.people_id = people.Id;
                 //Проверка уникальности пользователя по паролю и email
-                if (await IsUserUnique(FirstEx /*FirstEx.password, FirstEx.email*/) == 0)
+                if (await IsUserUnique(FirstEx) == 0)
                 {
                     return Ok("Пользователь с таким логином, паролем или email уже существует.");
                 }
@@ -91,7 +89,7 @@ namespace apiServer.Controllers.Authentication
                         _context.Users.Add(FirstEx);
                         _context.SaveChanges();
                         ////Добавляем в редис               
-                        _redisRepository.AddUser(FirstEx);
+                        _redisRepository.AddOneModel(FirstEx);
                         return Ok(new { Message = "Регистрация прошла успешно" });
                     }
                     else
@@ -114,7 +112,7 @@ namespace apiServer.Controllers.Authentication
             try
             {
                 Users user = new Users();
-                user = _redisRepository.GetUsersRedis(id);// Проверка наличия данных в кэше
+                user = _redisRepository.GetData<Users>(id);// Проверка наличия данных в кэше
                 if (user.email == "0") // Данные отсутствуют в кэше, выполняем запрос к базе данных
                 {
                     user = _context.Users.FirstOrDefault(u => u.access_token == accessToken);
@@ -129,13 +127,13 @@ namespace apiServer.Controllers.Authentication
                     else
                     {
                         _context.Users.Remove(user);
-                        _redisRepository.DeleteKey("users:" + refreshToken);
+                        _redisRepository.DeleteData("users:" + refreshToken);
                         user.access_token = accessToken = _tokens.GenerateAccessToken();
                         user.refresh_token = refreshToken = _tokens.GenerateRefreshToken();
                         _context.Users.Update(user);
                         _context.SaveChanges();
                         // Сохранение/обновление данных в кэше на 10 минут                  
-                        _redisRepository.AddUser(user);
+                        _redisRepository.AddOneModel(user);
                         return Ok(new { Message = "Токены обновлены" });
                     }
                 }
@@ -152,6 +150,18 @@ namespace apiServer.Controllers.Authentication
             {
                 return BadRequest(new { ex.Message });
             }
+        }
+        [HttpGet("CheckPasswordAndEmail")]
+        public bool CheckPasswordAndEmail(List<Users> users,string password, string email)
+        {
+            foreach (Users user in users)
+            {
+                if (string.Equals(user.password, password, StringComparison.Ordinal) == true || string.Equals(user.email, email, StringComparison.Ordinal) == true)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

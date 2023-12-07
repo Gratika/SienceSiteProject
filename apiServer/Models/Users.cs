@@ -13,6 +13,6 @@
         public string role_id { get; set; }
         public int email_is_checked { get; set; }
         public string people_id { get; set; }
-        //public People People { get; set; }
+        public People? people_ { get; set; }
     }
 }
