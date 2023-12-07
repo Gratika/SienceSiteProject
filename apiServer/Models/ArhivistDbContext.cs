@@ -22,6 +22,12 @@ namespace apiServer.Models
             string connectionString = $"server=mysql_db;port=3306;database=archivist;user=root;password=root_password;";
             optionsBuilder.UseMySQL(connectionString);
         }
-
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Articles>().Ignore(a => a.author_);
+            modelBuilder.Entity<Articles>().Ignore(a => a.theory_);
+            modelBuilder.Entity<Selected_articles>().Ignore(a => a.article_);
+            modelBuilder.Entity<Selected_articles>().Ignore(a => a.user_);
+        }
     }
 }

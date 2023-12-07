@@ -16,13 +16,13 @@ namespace apiServer.Controllers.Authentication
     public class EmailController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly RedisEmailController _redisRepository;
+        private readonly RedisController _redisRepository;
         private readonly ArhivistDbContext _context;
         private readonly GenerateRandomStringController _genericString;
         public EmailController(IHttpClientFactory httpClientFactory, ArhivistDbContext context, GenerateRandomStringController genericString)
         {
             _httpClient = new HttpClient();
-            _redisRepository = new RedisEmailController("redis:6379,abortConnect=false");
+            _redisRepository = new RedisController("redis:6379,abortConnect=false");
             _context = context;
             _genericString = genericString;
         }
@@ -31,13 +31,15 @@ namespace apiServer.Controllers.Authentication
         {
             try
             {
-                string code = _genericString.GenerateRandomString(4);
-                var emailServiceUrl = $"http://emailservice:80/api/EmailVerification/VerifyEmail?email={email}&code={code}";
+                Email EmailAndCode = new Email();
+                EmailAndCode.Emaill = email;
+                EmailAndCode.Id = _genericString.GenerateRandomString(4);
+                var emailServiceUrl = $"http://emailservice:80/api/EmailVerification/VerifyEmail?email={email}&code={EmailAndCode.Id}";
                 HttpResponseMessage response = await _httpClient.GetAsync(emailServiceUrl);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 if (responseContent == "1")
                 {
-                    _redisRepository.AddEmail(email, code);
+                    _redisRepository.AddOneModel(EmailAndCode);
                     return responseContent;
                 }
                 return "0";
@@ -53,12 +55,11 @@ namespace apiServer.Controllers.Authentication
         {
             try
             {
-                HashEntry[] userFields = _redisRepository.GetEmail("Email:" + code);
-                if (userFields.Length != 0)
+                Email EmailAndCode = _redisRepository.GetData<Email>(code);
+                if (EmailAndCode.Id.Length != 0)
                 {
-                    string email = userFields[0].Value;
                     // обновление значения в бд check_email
-                    var recordToUpdate = _context.Users.FirstOrDefault(t => t.email == email);
+                    var recordToUpdate = _context.Users.FirstOrDefault(t => t.email == EmailAndCode.Emaill);
                     if (recordToUpdate != null)
                     {
                         // Изменение значения свойства
@@ -75,7 +76,7 @@ namespace apiServer.Controllers.Authentication
             {
                 BadRequest(new { Error = "Вы не вошли - " + ex.Message });
             }
-            return BadRequest();
+            return BadRequest("Вы не вошли");
         }
     }
 }

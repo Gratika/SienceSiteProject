@@ -22,7 +22,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<EmailController>();
 builder.Services.AddScoped<TokensController>();
 builder.Services.AddScoped<GenerateRandomStringController>();
-builder.Services.AddScoped<MinioController>();
+builder.Services.AddScoped<FilesController>();
 builder.Services.AddScoped<SearchController>();
 builder.Services.AddScoped<PeopleController>();
 builder.Services.AddScoped<SolrArticleController>();
@@ -53,6 +53,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 Startup.Init<Articles>("http://solr:8983/solr/new_core");
+Startup.Init<People>("http://solr:8983/solr/new_core");
+Startup.Init<Scientific_theories>("http://solr:8983/solr/new_core");
 app.UseAuthorization();
 
 app.MapControllers();

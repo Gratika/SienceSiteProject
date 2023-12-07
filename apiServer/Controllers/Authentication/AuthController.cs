@@ -12,33 +12,40 @@ namespace apiServer.Controllers.Authentication
     public class AuthController : ControllerBase // вход в аккаунт
     {
         private readonly ArhivistDbContext _context;
-        private readonly RedisAuthController _redisRepository;
+        private readonly RedisController _redisRepository;
         private readonly TokensController _tokens;
 
         public AuthController(ArhivistDbContext context, TokensController tokens)
         {
             _context = context;
             _tokens = tokens;
-            _redisRepository = new RedisAuthController("redis:6379,abortConnect=false");
+            _redisRepository = new RedisController("redis:6379,abortConnect=false");
         }
 
-        [HttpPost("AuthUser")]
+        [HttpGet("AuthUser")]
         public async Task<ActionResult> AuthUser(/*string pas, string email*/UserRequest userRequest) //авторизация
         {
             AuthResponse Response = new AuthResponse();
             try
             {
-                // проверка данных в редис 
-                Response.user = _redisRepository.IsUserUnique(userRequest.password, userRequest.email);
-                // проверка данных в базе данных              
-                if (Response.user == null)
+                //UserRequest userRequest = new UserRequest();
+                //userRequest.email = email;
+                //userRequest.password = pas;           
+
+                List<Users> users = _redisRepository.GetAllData<Users>();
+                // проверка данных в редис  
+                for (int i = 0; i < 2; i++)
                 {
-                    Response.user = await CheckUserDatabase(userRequest);
-                    _redisRepository.AddUser(Response.user);
-                    Response.answer = "Вы вошли";
-                    return Ok(Response);
+                    Response.user = await CheckUserUnique(users, userRequest.password, userRequest.email);
+                    if (Response.user != null)
+                    {
+                        _redisRepository.AddOneModel(Response.user);
+                        Response.answer = "Вы вошли";                      
+                        return Ok(Response);
+                    }
+                    users = await _context.Users.Include(a => a.people_).ToListAsync();
                 }
-                return Ok(Response);
+                return Ok("Вы не вошли");
             }
             catch
             {
@@ -46,13 +53,12 @@ namespace apiServer.Controllers.Authentication
                 return Ok(new { Message = Response });
             }
         }
-        [HttpGet("CheckUserDatabase")]
-        public async Task<Users> CheckUserDatabase(/*string pas, string email*/ UserRequest Person)
+        [HttpGet("CheckUserUnique")]
+        public async Task<Users> CheckUserUnique(List<Users> users, string password, string email)
         {
-            List<Users> users = await _context.Users.ToListAsync();
             foreach (Users user in users)
             {
-                if (string.Equals(user.password, Person.password, StringComparison.Ordinal) == true && string.Equals(user.email, Person.email, StringComparison.Ordinal) == true)
+                if (string.Equals(user.password, password, StringComparison.Ordinal) == true && string.Equals(user.email, email, StringComparison.Ordinal) == true)
                 {
                     return user;
                 }

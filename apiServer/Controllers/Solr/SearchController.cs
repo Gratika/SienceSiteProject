@@ -15,6 +15,7 @@ using StackExchange.Redis;
 using System.Text;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using apiServer.Controllers.Solr;
 
 namespace apiServer.Controllers.Search
 {
@@ -23,18 +24,20 @@ namespace apiServer.Controllers.Search
     public class SearchController : ControllerBase
     {
         ISolrOperations<Articles> solr;
-        ArhivistDbContext _context;
-       public SearchController(ArhivistDbContext context)
+        SolrArticleController solrArticleController;
+        public SearchController(ArhivistDbContext context, SolrArticleController solrArticleControllerNew)
        {
-            _context = context;
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
+            solrArticleController = solrArticleControllerNew;
         }              
         [HttpGet("Search")]
-        public ActionResult Search(string SearchString) // возвращение конкретной статьи
-        {          
-            var queryOptions = new QueryOptions
+        public List<Articles> Search(string SearchString) // возвращение конкретной статьи
+        {         
+            try
             {
-                ExtraParams = new Dictionary<string, string>
+                var queryOptions = new QueryOptions
+                {
+                    ExtraParams = new Dictionary<string, string>
                 {
            { "defType", "edismax" },  // Используем расширенный запрос
            { "qf", "title text tag author_id" },           // Указываем поле для поиска
@@ -44,11 +47,16 @@ namespace apiServer.Controllers.Search
            { "spellcheck.dictionary", "default" }, // Использование словаря по умолчанию
            { "spellcheck.q", SearchString } // Передача текста для проверки
                 }
-            };
+                };
 
-            List<Articles> articles = solr.Query(new SolrQuery(/*"task example~"*/SearchString + "~"), queryOptions);  // Укажите ваш запрос поиска
+                List<Articles> articles = solrArticleController.GetArticle(SearchString + "~", queryOptions);/*solr.Query(new SolrQuery(SearchString + "~"), queryOptions);*/  // Укажите ваш запрос поиска
 
-            return Ok(articles);
+                return articles;
+            }
+           catch (Exception ex)
+            {
+                throw new Exception("Ошибка, ничего не было найденно - " + ex.Message);
+            }
         }        
     }
 }

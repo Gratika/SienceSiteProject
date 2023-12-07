@@ -17,7 +17,7 @@ namespace apiServer.Controllers.ForModels
     {
         private readonly ArhivistDbContext _context;
         private readonly ILogger<EmotionController> _logger;
-        private readonly RedisEmotionController _redisRepository;
+        private readonly RedisController _redisRepository;
         private readonly TokensController _tokens;
 
         public EmotionController(ArhivistDbContext context, ILogger<EmotionController> logger, TokensController tokens)
@@ -25,7 +25,7 @@ namespace apiServer.Controllers.ForModels
             _context = context;
             _logger = logger;
             _tokens = tokens;
-            _redisRepository = new RedisEmotionController("redis:6379,abortConnect=false");
+            _redisRepository = new RedisController("redis:6379,abortConnect=false");
         }
         // GET: api/Emotions
         [HttpGet(Name = "All")]
@@ -40,19 +40,19 @@ namespace apiServer.Controllers.ForModels
             var emotion = await _context.Emotions.FindAsync(key);
             return emotion;
         }
-        [HttpPost("RedisGetEmotion")]
+        [HttpGet("RedisGetEmotion")]
         public async Task<ActionResult<Emotions>> RedisFullFuncion()
         {
             try
             {
                 // Проверка наличия данных в кэше
-                List<Emotions> data = _redisRepository.GetAllEmotions();
+                List<Emotions> data = _redisRepository.GetAllData<Emotions>();
                 // Данные отсутствуют в кэше, выполняем запрос к источнику данных
                 if (data.Count == 0)
                 {
                     data = await _context.Emotions.ToListAsync();
                     // Сохранение данных в кэше на 10 минут
-                    _redisRepository.AddEmotion(data);
+                    _redisRepository.AddData(data);
                     return Ok(data);
                 }
                 return Ok(data);

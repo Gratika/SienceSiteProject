@@ -1,7 +1,17 @@
 /mysql-data/mysql.sock
 /client/node_modules
+<<<<<<< HEAD
+=======
 /mysql-data
 /.vs/slnx.sqlite
+>>>>>>> 70333a01b1307ee11300aeffc497b0a7f6772204
 *.vsidx
 *.json
 *.sqlite~change
+/data
+/apiServer/bin/Debug/net6.0
+/mysql-data
+/solr/data/gettingstarted/data
+/.vs/SienceSiteProject/v17
+/solr/logs
+/client/src/views

@@ -10,44 +10,58 @@ namespace apiServer.Controllers.ForModels
     public class PeopleController : ControllerBase
     {
         private readonly ArhivistDbContext _context;
-        private readonly RedisPeopleController _redisPeopleController;
+        private readonly RedisController _redisController;
         public PeopleController(ArhivistDbContext context)
         {
             _context = context;
-            _redisPeopleController = new RedisPeopleController("redis:6379,abortConnect=false");
+            _redisController = new RedisController("redis:6379,abortConnect=false");
         }
         [HttpPost("AddPeopleToDb")]
         public string AddPeopleToDb(People people)
         {
-            if (string.Equals(people.name, "") || string.Equals(people.surname, ""))
+            try
             {
-                _context.people.Update(people);
-                _context.SaveChanges();
-                return "Update " + people.name + "  " + people.surname;
+                if (string.Equals(people.name, "") || string.Equals(people.surname, ""))
+                {
+                    _context.people.Update(people);
+                    _context.SaveChanges();
+                    return "Update " + people.name + "  " + people.surname;
+                }
+                else
+                {
+                    _context.people.Add(people);
+                    _context.SaveChanges();
+                    return "Add";
+                }
             }
-            else
+            catch
             {
-                _context.people.Add(people);
-                _context.SaveChanges();
-                return "Add";
+                throw new Exception();
             }
 
         }
         [HttpPost("CreatePeople")]
         public People CreatePeople()
         {
-            People people = new People();
-            people.Id = Guid.NewGuid().ToString();
-            people.birthday = DateTime.Now;
-            people.date_create = DateTime.Now;
-            people.modified_date = DateTime.Now;
-            _redisPeopleController.AddPeople(people);
-            return people;
+            try
+            {
+                People people = new People();
+                people.Id = Guid.NewGuid().ToString();
+                people.birthday = DateTime.Now;
+                people.date_create = DateTime.Now;
+                people.modified_date = DateTime.Now;
+                _redisController.AddOneModel(people);
+                return people;
+            }
+            catch
+            {
+                throw new Exception();
+            }            
         }
-        [HttpPost("GetPeopleFromRedis")]
+        [HttpGet("GetPeopleFromRedis")]
         public People GetPeopleFromRedis(string id)
         {
-            People people = _redisPeopleController.GetPeople(id);
+            People people = _redisController.GetData<People>(id);
 
             return people;
         }

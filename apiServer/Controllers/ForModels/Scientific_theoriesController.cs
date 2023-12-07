@@ -11,24 +11,31 @@ namespace apiServer.Controllers.ForModels
     public class Scientific_theoriesController : ControllerBase
     {
         private readonly ArhivistDbContext _context;
-        private readonly RedisScientific_theoriesController _redisScientific_theories;
+        private readonly RedisController _redis;
 
         public Scientific_theoriesController(ArhivistDbContext context)
         {
             _context = context;
-            _redisScientific_theories = new RedisScientific_theoriesController("redis:6379,abortConnect=false");
+            _redis = new RedisController("redis:6379,abortConnect=false");
         }
         [HttpGet("GetSiences")]
         public async Task<ActionResult<IEnumerable<Scientific_theories>>> GetScientific_theories()
         {
-            List<Scientific_theories> sciences = _redisScientific_theories.GetAllScientific_theories();
-            if (sciences.Count == 0)
+            try
             {
-                sciences = await _context.Scientific_theories.ToListAsync();
-                _redisScientific_theories.AddScientific_theories(sciences);
+                List<Scientific_theories> sciences = _redis.GetAllData<Scientific_theories>();
+                if (sciences.Count == 0)
+                {
+                    sciences = await _context.Scientific_theories.Include(a => a.science_).ToListAsync();
+                    _redis.AddData(sciences);
+                    return sciences;
+                }
                 return sciences;
             }
-            return sciences;
+           catch (Exception ex)
+            {
+                return BadRequest("Ошибка, поднауки не были найденны - " + ex.Message);
+            }
         }
     }
 }
