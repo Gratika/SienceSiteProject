@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import {useArticleStore} from "@/stores/articleStore";
+import {useRoute, useRouter} from "vue-router";
 
+const articleStore = useArticleStore();
 const emits = defineEmits(['show'])
-function onSearch(){}
-const drawer = ref(false)
+const drawer = ref(false);
+const searchStr = ref('');
+const router = useRouter();
 function showSideBar(){
   drawer.value=!drawer.value;
   emits('show', drawer.value);
+}
+function onSearch(){
+  router.push({ name: 'search_article', params: { search: searchStr.value } });
 }
 </script>
 
@@ -32,6 +39,7 @@ function showSideBar(){
             append-inner-icon="mdi-magnify"
             single-line
             hide-details
+            v-model="searchStr"
             @click:append-inner="onSearch"
         ></v-text-field>
         <v-btn

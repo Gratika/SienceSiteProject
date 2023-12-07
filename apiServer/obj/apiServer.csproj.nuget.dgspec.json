@@ -72,10 +72,13 @@
               "target": "Package",
               "version": "[1.1.1, )"
             },
+<<<<<<< HEAD
             "SolrNet.Core": {
               "target": "Package",
               "version": "[1.1.1, )"
             },
+=======
+>>>>>>> 70333a01b1307ee11300aeffc497b0a7f6772204
             "StackExchange.Redis": {
               "target": "Package",
               "version": "[2.6.122, )"

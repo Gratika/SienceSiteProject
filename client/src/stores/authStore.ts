@@ -6,8 +6,8 @@ import type {ILoginInput, IUser, ISignUpInput} from "@/api/type";
 import {
     getRepeatCodeFn,
     loginUserFn,
-    logoutUserFn,
-     /*showErrorMessage, */
+    logoutUserFn, showErrorMessage,
+    /*showErrorMessage, */
     signUpUserFn,
     verifyEmailFn
 } from '@/api/authApi'
@@ -37,9 +37,18 @@ export const useAuthStore = defineStore({
         isLoading:false,
     } ),
     getters:{
-        getUserId():number|undefined{
-            return this.authUser?.id;
-        }
+        getPeopleId(state): string {
+            if (state.authUser) {
+                return state.authUser.people_id ;
+            }
+            return '';
+        },
+        getUserId(state): string {
+            if (state.authUser) {
+                return state.authUser.id ;
+            }
+            return '';
+        },
     },
 
     actions: {
@@ -49,7 +58,6 @@ export const useAuthStore = defineStore({
             signUpUserFn(user).then(
                 res=>{
                     this.isLoading = false;
-                    console.log('res from onRegistration: ',res)
                     createToast(res.message, {
                         position: 'top-right',
                     });
@@ -60,30 +68,34 @@ export const useAuthStore = defineStore({
                 this.isLoading = false;
                 console.log('error from onRegistration: ',error);
 
-                //showErrorMessage(error);
+                showErrorMessage(error);
             })
         },
         onLogin(user:ILoginInput){
             loginUserFn(user).then(
                 res=>{
-                    createToast(res.answer, {
-                        position: 'top-right',
-                    });
-                    this.token = res.user.access_token;
-                    console.log("token: ",res.user.access_token);
-                    this.username = res.user.login;
+                    console.log("authUser: ",res)
+                    this.token = res.message.user.access_token;
+                    console.log("token: ",res.message.user.access_token);
+                    this.username = res.message.user.login;
                     this.isLogin =true;
-                    this.authUser = res.user;
+                    this.authUser = res.message.user;
                     MyLocalStorage.setItem('token',this.token);
                     MyLocalStorage.setItem('username',this.username);
                     MyLocalStorage.setItem('isLogin',this.isLogin);
                     if(this.authUser!=null){
                         MyLocalStorage.setItem('user',this.authUser.toString());
                         MyLocalStorage.setItem('userId',this.authUser.id);
+                        console.log('people_id ', this.authUser.people_id);
+                        MyLocalStorage.setItem('peopleId',this.authUser.people_id);
+                        MyLocalStorage.setItem('email', this.authUser.email);
                     }
-                    if(res.user.email_is_checked ===0){
+                    if(res.message.user.email_is_checked ===0){
                         router.push('/verify_email');
                     }
+                    createToast("Log in!", {
+                        position: 'bottom-center',
+                    });
                     console.log('res from onLogin: ',res)
                 }
             ).catch(error => {
@@ -103,6 +115,8 @@ export const useAuthStore = defineStore({
                     MyLocalStorage.setItem('isLogin',this.isLogin);
                     MyLocalStorage.setItem('user','');
                     MyLocalStorage.setItem('userId','');
+                    MyLocalStorage.setItem('peopleId','');
+                    MyLocalStorage.setItem('email','');
 
                 }
             )
@@ -117,9 +131,10 @@ export const useAuthStore = defineStore({
                         position: 'top-right',
                     });
                     console.log(res);
-                    MyLocalStorage.setItem('email','');
+                    //MyLocalStorage.setItem('email','');
                     router.push('/login');
                 }).catch(err=>{
+                this.isLoading = false;
                 console.log('error from onVerifEmail: ',err);
             })
         },
