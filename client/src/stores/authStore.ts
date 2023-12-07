@@ -7,13 +7,12 @@ import {
     getRepeatCodeFn,
     loginUserFn,
     logoutUserFn, showErrorMessage,
-    /*showErrorMessage, */
     signUpUserFn,
     verifyEmailFn
 } from '@/api/authApi'
 import { createToast } from 'mosha-vue-toastify';
 import router from '@/router'
-import axios from "axios";
+
 
 
 
@@ -86,9 +85,9 @@ export const useAuthStore = defineStore({
                     if(this.authUser!=null){
                         MyLocalStorage.setItem('user',this.authUser.toString());
                         MyLocalStorage.setItem('userId',this.authUser.id);
-                        console.log('people_id ', this.authUser.people_id);
                         MyLocalStorage.setItem('peopleId',this.authUser.people_id);
                         MyLocalStorage.setItem('email', this.authUser.email);
+                        MyLocalStorage.setItem('bucketName', this.authUser.people_!.file_bucket);
                     }
                     if(res.message.user.email_is_checked ===0){
                         router.push('/verify_email');
@@ -117,6 +116,7 @@ export const useAuthStore = defineStore({
                     MyLocalStorage.setItem('userId','');
                     MyLocalStorage.setItem('peopleId','');
                     MyLocalStorage.setItem('email','');
+                    MyLocalStorage.setItem('bucketName', '');
 
                 }
             )

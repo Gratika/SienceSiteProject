@@ -8,7 +8,7 @@ import type {
     ISignUpInput,
     IUserResponse,
 } from './type';
-
+import MyLocalStorage from "@/services/myLocalStorage";
 import { createToast } from 'mosha-vue-toastify'
 
 
@@ -38,12 +38,16 @@ export const refreshAccessTokenFn = async () => {
 authApi.interceptors.request.use(
     (config) => {
         // Проверяем, есть ли токен в localStorage
-        const token = localStorage.getItem('token');
+        const token = MyLocalStorage.getItem('token');
         //console.log("token:");
        // console.log(token);
         if (token) {
             // Если есть, добавляем его в заголовок Authorization
             config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        // Перевірка, чи дані є об'єктом FormData (для відправки файлів)
+        if (config.data instanceof FormData) {
+            config.headers['Content-Type'] = 'multipart/form-data';
         }
         return config;
     },

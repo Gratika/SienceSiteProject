@@ -1,0 +1,5 @@
+192.168.0.3 - - [07/Dec/2023:17:57:49 +0000] "GET /solr/new_core/select?q=*%3A*&rows=4&sort=date_created+desc&version=2.2&wt=xml HTTP/1.1" 200 863
+192.168.0.3 - - [07/Dec/2023:17:57:51 +0000] "GET /solr/new_core/select?q=*%3A*&rows=4&sort=date_created+desc&version=2.2&wt=xml HTTP/1.1" 200 862
+192.168.0.3 - - [07/Dec/2023:17:58:04 +0000] "GET /solr/new_core/select?q=*%3A*&rows=4&sort=date_created+desc&version=2.2&wt=xml HTTP/1.1" 200 861
+192.168.0.3 - - [07/Dec/2023:17:58:06 +0000] "GET /solr/new_core/select?q=*%3A*&rows=4&sort=date_created+desc&version=2.2&wt=xml HTTP/1.1" 200 861
+192.168.0.3 - - [07/Dec/2023:18:17:28 +0000] "GET /solr/new_core/select?q=*%3A*&rows=4&sort=date_created+desc&version=2.2&wt=xml HTTP/1.1" 200 861

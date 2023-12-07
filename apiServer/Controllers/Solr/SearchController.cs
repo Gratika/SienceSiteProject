@@ -29,7 +29,7 @@ namespace apiServer.Controllers.Search
             _context = context;
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
         }              
-        [HttpPost("Search")]
+        [HttpGet("Search")]
         public ActionResult Search(string SearchString) // возвращение конкретной статьи
         {          
             var queryOptions = new QueryOptions

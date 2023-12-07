@@ -36,13 +36,17 @@ function editArticle(){
   router.push({ name: 'edit_article', params: { id: props.article.id } });
 
 }
+function readArticle(){
+  router.push({ name: 'read_article', params: { id: props.article.id } });
+
+}
 </script>
 
 <template>
 
   <v-card class="ma-4 pa-5" >
     <v-card-title class="d-flex">
-      <span class="d-inline font-weight-bold">{{ props.article.title }}</span>
+      <span class="d-inline font-weight-bold" @click="readArticle">{{ props.article.title }}</span>
       <v-spacer></v-spacer>
       <small class="d-inline ">
         <v-tooltip location="top center" origin="end center">
@@ -57,8 +61,8 @@ function editArticle(){
 
     </v-card-title>
 
-    <v-card-text class="headline">
-      {{ article.text }}
+    <v-card-text class="headline"><!--текст статті містить теги, тому відображаємо його через властивість v-html-->
+      <span v-html="article.text"></span>
     </v-card-text>
 
     <v-card-actions>
