@@ -4,3 +4,10 @@
 *.vsidx
 *.json
 *.sqlite~change
+/data
+/apiServer/bin/Debug/net6.0
+/mysql-data
+/solr/data/gettingstarted/data
+/.vs/SienceSiteProject/v17
+/.vs/slnx.sqlite
+/solr/logs
