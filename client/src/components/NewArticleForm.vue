@@ -4,6 +4,7 @@ import {ref, watch} from "vue";
 import {useField, useForm} from "vee-validate";
 import {useArticleStore} from "@/stores/articleStore";
 import MyLocalStorage from "@/services/myLocalStorage";
+import {object} from "zod";
 
 const props = defineProps<{
   scienceList:IScience[],
@@ -27,23 +28,23 @@ const article = ref<IArticle>({
   date_create:new Date(),
   modified_date: new Date(),
   theory_id: '',
+  Scientific_theories:null,
   path_file: '',
-  author_: null,
+  author_: JSON.parse(MyLocalStorage.getItem('user')),
 });
+let scienceTheory = ref<IScientificTheory|undefined>({
+  id: '',
+  science_id:'',
+  science_: null,
+  name: '',
+  note: ''
+})
 //отримуємо значення author_id  з localStorage
 function  getAuthorId():string|null {
   let peopleId = MyLocalStorage.getItem('peopleId');
   if (peopleId!=null)  return peopleId.trim();
   return peopleId;
 }
-//фільтруємо список з розділами залежно від обраної науки
-watch(scienceId,(newValue)=>{
-  console.log("scienceId=",scienceId,' newValue=',newValue);
-  if (newValue!=null && newValue!=''){
-    isEditing.value = true;
-    scienceSectionList_ = props.scienceSectionList.filter(s=>s.science_id.trim()===newValue.trim())
-  }
-})
 /*валідація форм*/
 const { handleSubmit, handleReset } = useForm({
   validationSchema: {
@@ -67,7 +68,17 @@ const { handleSubmit, handleReset } = useForm({
 const title= useField('title');
 const  tag = useField('tag');
 const  theory_id = useField('theory_id');
-
+//фільтруємо список з розділами залежно від обраної науки
+watch([scienceId,theory_id],([newScienceId,newTheory_id])=>{
+  console.log("scienceId=",scienceId,' newValue=',newScienceId);
+  if (newScienceId!=null && newScienceId!=''){
+    isEditing.value = true;
+    scienceSectionList_ = props.scienceSectionList.filter(s=>s.science_id.trim()===newScienceId.trim())
+  }
+  if (newTheory_id && newTheory_id.value.value!=null && newTheory_id.value.value!=''){
+    scienceTheory.value = props.scienceSectionList.find(s=>s.id===newTheory_id.value.value)
+  }
+})
 const submitArticle= handleSubmit(()=>{
   if (typeof title.value.value === "string") {
     article.value.title = title.value.value;
@@ -78,6 +89,8 @@ const submitArticle= handleSubmit(()=>{
   if (typeof theory_id.value.value === "string") {
     article.value.theory_id = theory_id.value.value;
   }
+  if (scienceTheory.value)  article.value.Scientific_theories=scienceTheory.value;
+
   articleStore.saveArticle(article.value);
   emits('close', dialogShow.value);
 })

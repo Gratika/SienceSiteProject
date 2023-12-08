@@ -22,6 +22,7 @@ const article = ref<IArticle>({
   date_create:null,
   modified_date: null,
   theory_id: '',
+  Scientific_theories:null,
   path_file: '',
   author_: null,
 })

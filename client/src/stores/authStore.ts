@@ -87,7 +87,7 @@ export const useAuthStore = defineStore({
                         MyLocalStorage.setItem('userId',this.authUser.id);
                         MyLocalStorage.setItem('peopleId',this.authUser.people_id);
                         MyLocalStorage.setItem('email', this.authUser.email);
-                        MyLocalStorage.setItem('bucketName', this.authUser.people_!.file_bucket);
+                        MyLocalStorage.setItem('bucketName', this.authUser.people_!.path_bucket);
                     }
                     if(res.message.user.email_is_checked ===0){
                         router.push('/verify_email');

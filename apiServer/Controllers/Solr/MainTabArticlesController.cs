@@ -24,8 +24,8 @@ namespace apiServer.Controllers.Search
         [HttpGet("NewArticle")]
         public async Task<ActionResult> NewArticle(int amount) // возвращение статей от новых к старым
         {
-            try
-            {
+           try
+           {
                 var options = new QueryOptions
                 {
                     OrderBy = new[] { new SortOrder("date_created", Order.DESC) },
@@ -34,11 +34,11 @@ namespace apiServer.Controllers.Search
                 List<Articles> articles = solrArticleController.GetArticle("*:*", options);
 
                 return Ok(articles);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
-            }
+           }
+           catch (Exception ex)
+           {
+               return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+           }
         }
         [HttpGet("PopularArticle")]
         public async Task<ActionResult> PopularArticle(int amount) // возвращение статей от новых к старым

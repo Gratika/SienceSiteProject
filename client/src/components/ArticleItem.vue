@@ -26,7 +26,9 @@ function addArticleSelect(){
   let selectedArticle: ISelectedArticle = {
     id:'',
     article_id: props.article?.id as string,
+    article_:props.article,
     user_id: authStore.getUserId as string,
+    user_:authStore.authUser,
     Date_view: new Date(),
   };
   emits('add_selected', selectedArticle);

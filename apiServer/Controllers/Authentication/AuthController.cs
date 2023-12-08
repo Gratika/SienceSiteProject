@@ -22,7 +22,7 @@ namespace apiServer.Controllers.Authentication
             _redisRepository = new RedisController("redis:6379,abortConnect=false");
         }
 
-        [HttpGet("AuthUser")]
+        [HttpPost("AuthUser")]
         public async Task<ActionResult> AuthUser(/*string pas, string email*/UserRequest userRequest) //авторизация
         {
             AuthResponse Response = new AuthResponse();
