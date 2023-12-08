@@ -180,9 +180,9 @@ namespace apiServer.Controllers.Solr
             foreach (var article in articles)
             {
                 var peopleData = PeopleSolr.Query(new SolrQuery(article.author_id), queryOptions).FirstOrDefault();
-                article.author_ = peopleData;
+                article.SetAuthor(peopleData);
                 var TheoriesData = TheoriesSolr.Query(new SolrQuery(article.theory_id), queryOptions).FirstOrDefault();
-                article.theory_ = TheoriesData;
+                article.SetTheory(TheoriesData);
             }
             return articles;
         }

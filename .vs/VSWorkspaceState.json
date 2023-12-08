@@ -1,17 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\apiServer",
-    "\\apiServer\\Controllers",
-    "\\apiServer\\Controllers\\Solr",
-    "\\apiServer\\Models",
-    "\\apiServer\\Models\\ForUser",
-    "\\solr\\data",
-    "\\solr\\data\\gettingstarted",
-    "\\solr\\data\\gettingstarted\\conf",
-    "\\solr\\data\\gettingstarted\\data",
-    "\\solr\\data\\gettingstarted\\data\\snapshot_metadata"
+    ""
   ],
-  "SelectedNode": "\\apiServer\\Models\\ForUser\\ArticleAndPeople.cs",
+  "SelectedNode": "\\apiServer.sln",
   "PreviewInSolutionExplorer": false
 }
