@@ -38,7 +38,7 @@ namespace apiServer.Controllers.ForModels
                 //article = _redisArticleController.GetArticlesForUser(id_people);
                 //if (article.Count == 0)
                 //{
-                     article = await _context.Articles.Where(a => a.author_id == id_people).Include(a => a.author_).Include(a => a.theory_).ToListAsync();                                       
+                article = await _context.Articles.Where(a => a.author_id == id_people).Include(a => a.author_).Include(a => a.theory_).ToListAsync();
                 //}
                 return Ok(article);
             }
@@ -51,17 +51,17 @@ namespace apiServer.Controllers.ForModels
         [HttpPost("CreateArticle")]
         public async Task<ActionResult> CreateArticle(Articles? article) // Создание статьи
         {
-            //article.Id = Guid.NewGuid().ToString();
-            //article.author_id = "10c9926b-de5a-433a-a7cb-d307e00dbb60";
-            //article.title = "Example2";
-            //article.tag = "Example2";
-            //article.text = "Example2";
-            //article.views = 150;
-            //article.theory_id = "2";
-            //article.date_created = DateTime.Now;
-            //article.modified_date = DateTime.Now;
-            try
-            {
+            article.Id = Guid.NewGuid().ToString();
+            article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
+            article.title = "Example2";
+            article.tag = "Example2";
+            article.text = "Example2";
+            article.views = 150;
+            article.theory_id = "2";
+            article.date_created = DateTime.Now;
+            article.modified_date = DateTime.Now;
+            //try
+            //{
                 if (CheckDoiValidity(article.DOI) == false)
                 {
                     article.DOI = null;
@@ -80,11 +80,11 @@ namespace apiServer.Controllers.ForModels
                 }
 
                 return Ok(new { Message = "Вы успешно добавили статью, но DOI-идентификатор не прошел проверку" });
-        }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = $"Вы не добавили статью - {ex.Message}" });
-            }
+        //}
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { Error = $"Вы не добавили статью - {ex.Message}" });
+        //    }
         }
         [HttpGet("GetArticle")]
         public async Task<ActionResult<Articles>> GetArticle(string id)
