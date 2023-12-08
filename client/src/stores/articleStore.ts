@@ -140,6 +140,23 @@ export const useArticleStore = defineStore({
                     //showErrorMessage(error)
                 });
         },
+        async updateArticle(article:IArticle) {
+            this.isLoading=true;
+            sendRequest<GenericResponse>(
+                'POST',
+                'article/RedactArticle',
+                undefined,
+                article
+            )
+                .then((res) =>{
+                    this.isLoading =false;
+                    console.log("updateArticles:", res);
+                },(error)=>{
+                    this.isLoading =false;
+                    console.error(error);
+                    //showErrorMessage(error)
+                });
+        },
         async searchArticlesByParam(searchStr:string) {
             this.isLoading=true;
             sendRequest<Array<IArticle>>(
@@ -152,12 +169,57 @@ export const useArticleStore = defineStore({
                     this.isLoading =false;
                     console.log("search articles", res);
                     this.searchArticles = res;
+                    this.cntRec = this.searchArticles.length;
+                },(error)=>{
+                    this.isLoading =false;
+                    this.cntRec=0;
+                    console.error(error);
+                    //showErrorMessage(error)
+                },
+                );
+        },
+        async saveFile(data:FormData) {
+            this.isLoading=true;
+            sendRequest<GenericResponse>(
+                'POST',
+                'minio/addFiles',
+                undefined,
+                data
+            )
+                .then((res) =>{
+                    this.isLoading =false;
+                    console.log("saveFile:", res);
                 },(error)=>{
                     this.isLoading =false;
                     console.error(error);
                     //showErrorMessage(error)
                 });
         },
+        async downloadFiles() {
+            const downloadUrl = 'article/download';
+            const filename = 'назва_файлу.zip';
+
+            /*sendRequest<ArrayBuffer>('GET', downloadUrl, undefined, undefined)
+             .then(response => {
+               const blob = new Blob([response], { type: 'application/zip' }); // Створення Blob з отриманих даних
+
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);*/
+            sendRequest<Blob>('GET', downloadUrl, undefined, undefined)
+                .then(response => {
+                    const url = window.URL.createObjectURL(new Blob([response]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', filename);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                })
+                .catch(error => {
+                    console.error('Помилка завантаження:', error);
+                    // Обробка помилок, якщо необхідно
+                });
+        }
 
 
     }

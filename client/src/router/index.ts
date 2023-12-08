@@ -55,13 +55,19 @@ const router = createRouter({
     {
       path: '/edit_article/:id',
       name: 'edit_article',
-      component: ()=>import('../views/EditArticleVue.vue'),
+      component: ()=>import('../views/EditArticleView.vue'),
 
     },
     {
       path: '/search/:search',
       name: 'search_article',
-      component: ()=>import('../views/SearchResultVuew.vue'),
+      component: ()=>import('../views/SearchResultView.vue'),
+
+    },
+    {
+      path: '/read_article/:id',
+      name: 'read_article',
+      component: ()=>import('../views/ReadArticleView.vue'),
 
     },
 
