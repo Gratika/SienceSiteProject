@@ -28,14 +28,14 @@ namespace apiServer.Controllers.ForModels
             _redisRepository = new RedisController("redis:6379,abortConnect=false");
         }
         // GET: api/Emotions
-        [HttpGet(Name = "All")]
-        public async Task<ActionResult<IEnumerable<Emotions>>> GetEmotions()
+        [HttpGet("GetAllEmotions")]
+        public async Task<ActionResult<IEnumerable<Emotions>>> GetAllEmotions()
         {
             return await _context.Emotions.ToListAsync();
         }
         // GET: api/Emotions/5
-        [HttpGet("{id}")]
-        public async Task<Emotions> GetEmotion(int key)
+        [HttpGet("GetEmotion")]
+        public async Task<Emotions> GetEmotion(string key)
         {
             var emotion = await _context.Emotions.FindAsync(key);
             return emotion;

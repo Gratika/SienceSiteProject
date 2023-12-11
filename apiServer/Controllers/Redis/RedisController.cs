@@ -45,11 +45,11 @@ namespace apiServer.Controllers.Redis
         {
             key = $"{typeof(T).Name}:{key}";
             string serializedData = _database.StringGet(key);
-            if (serializedData.Length != 0)
+            if (serializedData == null)
             {
-                return JsonConvert.DeserializeObject<T>(serializedData); // Десериализация данных из JSON
-            }
-            return default(T);
+                return default(T);
+            }         
+            return JsonConvert.DeserializeObject<T>(serializedData); // Десериализация данных из JSON
         }
 
         [HttpPost("GetAllData")]

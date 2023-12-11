@@ -23,14 +23,14 @@ namespace apiServer.Controllers.ForModels
         {
             try
             {
-                List<Sciences> sciences = _redisSciences.GetAllData<Sciences>();
-                if (sciences.Count == 0)
-                {
-                    sciences = await _context.Sciences.ToListAsync();
-                    _redisSciences.AddData(sciences);
+                //List<Sciences> sciences = _redisSciences.GetAllData<Sciences>();
+                //if (sciences.Count == 0)
+                //{
+                    List<Sciences> sciences = await _context.Sciences.ToListAsync();
+                    //_redisSciences.AddData(sciences);
                     return Ok(sciences);
-                }
-                return Ok(sciences);
+                //}
+                //return Ok(sciences);
             }
             catch (Exception ex)
             {
