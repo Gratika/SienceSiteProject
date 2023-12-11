@@ -18,19 +18,19 @@ namespace apiServer.Controllers.ForModels
             _context = context;
             _redis = new RedisController("redis:6379,abortConnect=false");
         }
-        [HttpGet("GetSiences")]
+        [HttpGet("GetScientific_theories")]
         public async Task<ActionResult<IEnumerable<Scientific_theories>>> GetScientific_theories()
         {
             try
             {
-                List<Scientific_theories> sciences = _redis.GetAllData<Scientific_theories>();
-                if (sciences.Count == 0)
-                {
-                    sciences = await _context.Scientific_theories.Include(a => a.science_).ToListAsync();
-                    _redis.AddData(sciences);
+                //List<Scientific_theories> sciences = _redis.GetAllData<Scientific_theories>();
+                //if (sciences.Count == 0)
+                //{
+                     List<Scientific_theories> sciences = await _context.Scientific_theories.Include(a => a.science_).ToListAsync();
+                    //_redis.AddData(sciences);
                     return sciences;
-                }
-                return sciences;
+                //}
+                //return sciences;
             }
            catch (Exception ex)
             {

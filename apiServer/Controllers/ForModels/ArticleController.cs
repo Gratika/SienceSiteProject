@@ -89,20 +89,22 @@ namespace apiServer.Controllers.ForModels
         [HttpGet("GetArticle")]
         public async Task<ActionResult<Articles>> GetArticle(string id)
         {
-            try
-            {
-                Articles article = _redisArticleController.GetData<Articles>(id);
-                if(string.IsNullOrEmpty(article.Id) == true)
+            //try
+            //{
+            Articles article = new Articles();
+                //Articles article = _redisArticleController.GetData<Articles>(id);
+                if (string.IsNullOrEmpty(article.Id) == true /*article == null*/)
                 {
                     article = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);
+                //_redisArticleController.AddOneModel(article);
                 }
 
                 return Ok(article);
-            }
-            catch (Exception ex)
-            {
-                return Ok("Ошибка, не удалось найти статью - " + ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return Ok("Ошибка, не удалось найти статью - " + ex.Message);
+            //}
         }
         [HttpPost("RedactArticle")]
         public async Task<ActionResult> RedactArticle(/*IFormFile? file1, IFormFile? file2,*/ Articles article/*, string id, string title, string pathFile, string pathBucket*/)

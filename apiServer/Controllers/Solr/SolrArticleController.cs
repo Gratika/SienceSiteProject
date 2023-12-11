@@ -138,30 +138,30 @@ namespace apiServer.Controllers.Solr
         [HttpPost("Checking")]
         public ActionResult Checking()
         {
-            DateTime DataCreate = DateTime.Now;
-            Articles ex = new Articles();
-            ex.Id = "dasdas-12312csa-cascsa2";
-            ex.title = "Example";
-            ex.text = "Example";
-            ex.tag = "Example";
-            ex.views = 14;
-            ex.author_id = "7d35600a-c9e1-4826-99e7-abe7a23bd19d";
-            ex.date_created = DataCreate;
-            ex.modified_date = DataCreate;
-            ex.theory_id = "bdde4549-5718-40e9-9859-72c080063958";
+            //DateTime DataCreate = DateTime.Now;
+            //Articles ex = new Articles();
+            //ex.Id = "dasdas-12312csa-cascsa2";
+            //ex.title = "Example";
+            //ex.text = "Example";
+            //ex.tag = "Example";
+            //ex.views = 14;
+            //ex.author_id = "7d35600a-c9e1-4826-99e7-abe7a23bd19d";
+            //ex.date_created = DataCreate;
+            //ex.modified_date = DataCreate;
+            //ex.theory_id = "bdde4549-5718-40e9-9859-72c080063958";
 
             //People ex = new People();
-            //ex.Id = Guid.NewGuid().ToString();
+            //ex.Id = "7d35600a-c9e1-4826-99e7-abe7a23bd19d";
             //ex.surname = "Example";
             //ex.name = "ExName";
             //ex.date_create = DateTime.Now;
             //ex.modified_date = DateTime.Now;
 
-            //Scientific_theories ex = new Scientific_theories();
-            //ex.Id = Guid.NewGuid().ToString();
-            //ex.science_id = "1";
-            //ex.note = "Example";
-            //ex.name = "Test";
+            Scientific_theories ex = new Scientific_theories();
+            ex.Id = "bdde4549-5718-40e9-9859-72c080063958";
+            ex.science_id = "1";
+            ex.note = "Example";
+            ex.name = "Test";
 
             return AddArticle(ex);
         }

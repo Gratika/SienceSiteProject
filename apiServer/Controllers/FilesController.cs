@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using static System.Net.Mime.MediaTypeNames;
 using Org.BouncyCastle.Utilities;
 using ImageMagick;
+using Microsoft.IdentityModel.Tokens;
 
 namespace apiServer.Controllers
 {
@@ -36,19 +37,20 @@ namespace apiServer.Controllers
                 .Build();
         }
         [HttpPost("AddFiles")]
-        public async Task<ActionResult<List<string>>> AddFiles(string? path_file, string? BucketNameForDb, List<IFormFile> files)
+        public async Task<ActionResult<List<string>>> AddFiles(string id, List<IFormFile> files)
         {
             try
             {
-                string bucketName;              
-                if (BucketNameForDb == null)
+                Articles article = await _context.Articles.Where(a => a.Id == id).Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync();
+                string bucketName;
+                if (string.IsNullOrEmpty(article.author_.path_bucket) == true)
                 {
                     bucketName = _genericString.GenerateRandomString(15);
-                    BucketNameForDb = bucketName;
+                    article.author_.path_bucket = bucketName;
                 }
                 else
                 {
-                    bucketName = BucketNameForDb;
+                    bucketName = article.author_.path_bucket;
                 }
                 //Если бакета не существует - добавляем
                 var beArgs = new BucketExistsArgs()
@@ -60,7 +62,6 @@ namespace apiServer.Controllers
                         .WithBucket(bucketName);
                     await _minio.MakeBucketAsync(mbArgs).ConfigureAwait(false);
                 }
-
                 
                 string prefixForArticle = _genericString.GenerateRandomString(20);
                 foreach (var file in files)
@@ -81,18 +82,21 @@ namespace apiServer.Controllers
                         // Выполняем операцию загрузки объекта в <link>MinIO</link>
                         await _minio.PutObjectAsync(putObjectArgs);
 
-                        if (path_file == null)
+                        if (article.path_file == null)
                         {
-                            path_file = prefixForArticle + ",";
+                            article.path_file = prefixForArticle + ",";
                         }
-                        path_file += NewFileName + ",";
+                        article.path_file += NewFileName + ",";
                     }
                 }
 
-                List<string> ForReturn = new List<string>();
-                ForReturn.Add(BucketNameForDb);
-                ForReturn.Add(path_file);
-                return ForReturn;
+                _context.Articles.Update(article);
+                _context.people.Update(article.author_);
+                _context.SaveChanges();
+
+                List<string> downloadUrl = new List<string>();
+                downloadUrl = await GetUrl(article.path_file, article.author_.path_bucket);
+                return downloadUrl;
             }
             catch (Exception ex)
             {
@@ -209,12 +213,12 @@ namespace apiServer.Controllers
             }
         }
         [HttpPost("RedactFiles")]
-        public async Task<ActionResult<List<string>>> RedactFiles(string? path_files, string? pathBucket, List<IFormFile>? files) // создаем файлы из url и записываем в архив
+        public async Task<ActionResult<List<string>>> RedactFiles(string id, List<IFormFile>? files) // создаем файлы из url и записываем в архив
         {
             try
             {
-                DeleteFiles(path_files, pathBucket);
-                return await AddFiles(null, pathBucket, files);
+                //DeleteFiles(path_files, pathBucket);
+                return await AddFiles(id, files);
             }
             catch 
             {
