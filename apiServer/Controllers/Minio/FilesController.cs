@@ -13,8 +13,9 @@ using static System.Net.Mime.MediaTypeNames;
 using Org.BouncyCastle.Utilities;
 using ImageMagick;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Hosting.Internal;
 
-namespace apiServer.Controllers
+namespace apiServer.Controllers.Minio
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -24,8 +25,8 @@ namespace apiServer.Controllers
         private readonly GenerateRandomStringController _genericString;
         private readonly HttpClient _httpClient;
         private readonly IMinioClient _minio;
-
-        public FilesController(ArhivistDbContext context, GenerateRandomStringController genericString)
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public FilesController(ArhivistDbContext context, GenerateRandomStringController genericString, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _genericString = genericString;
@@ -33,11 +34,12 @@ namespace apiServer.Controllers
             _minio = new MinioClient()
                 .WithEndpoint("minio1:9000") //localhost:9090
                 .WithCredentials("ROOTUSER", "CHANGEME123")
-                .WithSSL(false)
+            .WithSSL(false)
                 .Build();
+            _hostingEnvironment = hostingEnvironment;
         }
         [HttpPost("AddFiles")]
-        public async Task<ActionResult<List<string>>> AddFiles(string id, List<IFormFile> files)
+        public async Task<ActionResult<List<string>>> AddFiles([FromForm] string id, [FromForm] List<IFormFile> files)
         {
             try
             {
@@ -62,7 +64,7 @@ namespace apiServer.Controllers
                         .WithBucket(bucketName);
                     await _minio.MakeBucketAsync(mbArgs).ConfigureAwait(false);
                 }
-                
+
                 string prefixForArticle = _genericString.GenerateRandomString(20);
                 foreach (var file in files)
                 {
@@ -82,7 +84,7 @@ namespace apiServer.Controllers
                         // Выполняем операцию загрузки объекта в <link>MinIO</link>
                         await _minio.PutObjectAsync(putObjectArgs);
 
-                        if (article.path_file == null)
+                        if (string.IsNullOrEmpty(article.path_file) == true)
                         {
                             article.path_file = prefixForArticle + ",";
                         }
@@ -94,17 +96,15 @@ namespace apiServer.Controllers
                 _context.people.Update(article.author_);
                 _context.SaveChanges();
 
-                List<string> downloadUrl = new List<string>();
-                downloadUrl = await GetUrl(article.path_file, article.author_.path_bucket);
-                return downloadUrl;
+                return Ok("Файлы успешно добавленны");
             }
             catch (Exception ex)
             {
                 return BadRequest("Ошибка, не удалось загрузить файла - " + ex.Message);
             }
         }
-        [HttpPost("ConvertToWebP")]
-        public FormFile ConvertToWebp(IFormFile file)  
+        [HttpGet("ConvertToWebP")]
+        public FormFile ConvertToWebp(IFormFile file)
         {
             // Создаем объект MagickImage из загруженного файла
             using (var image = new MagickImage(file.OpenReadStream()))
@@ -131,14 +131,14 @@ namespace apiServer.Controllers
                     return webpFile;
                 }
             }
-        }     
-        [HttpPost("GetUrl")]
-        public async Task<List<string>> GetUrl(/*ArticleWithUserTokenModel articlesWithUserTokens*/string path_files,string path_bucket) // обращаемся в minio для взятия url файлов
+        }
+       
+        [HttpGet("GetUrlFromMinio")]
+        public async Task<List<string>> GetUrlFromMinio(string path_files, string path_bucket) // обращаемся в minio для взятия url файлов
         {
             try
             {
                 List<string> downloadUrl = new List<string>();
-                //List<byte[]> Files = new List<byte[]>();
                 string[] path_to_file = path_files.Split(',');
 
                 for (int i = 1; i < path_to_file.Length - 1; i++)
@@ -153,18 +153,19 @@ namespace apiServer.Controllers
                 }
                 return downloadUrl;
             }
-            catch 
+            catch
             {
                 throw new Exception();
             }
         }
-        [HttpPost("GetArchivWithFiles")]
-        public async Task<ActionResult> GetArchivWithFiles(string path_files, string path_bucket) // создаем файлы из url и записываем в архив
+        [HttpGet("GetArchivWithFiles")]
+        public async Task<ActionResult> GetArchivWithFiles(string id) // создаем файлы из url и записываем в архив
         {
             try
             {
+                Articles article = await _context.Articles.Where(a => a.Id == id).Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync();
                 List<string> downloadUrl = new List<string>();
-                downloadUrl = await GetUrl(path_files, path_bucket);
+                downloadUrl = await GetUrlFromMinio(article.path_file, article.author_.path_bucket);
 
                 List<byte[]> fileContents = new List<byte[]>();
                 List<string> fileTypes = new List<string>();
@@ -220,7 +221,7 @@ namespace apiServer.Controllers
                 //DeleteFiles(path_files, pathBucket);
                 return await AddFiles(id, files);
             }
-            catch 
+            catch
             {
                 throw new Exception();
             }
@@ -240,7 +241,7 @@ namespace apiServer.Controllers
 
                 }
             }
-           catch 
+            catch
             {
                 throw new Exception();
             }

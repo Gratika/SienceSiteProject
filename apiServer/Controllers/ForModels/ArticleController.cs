@@ -6,6 +6,7 @@ using apiServer.Controllers.Redis;
 using System.Net;
 using apiServer.Controllers.Solr;
 using Microsoft.EntityFrameworkCore;
+using apiServer.Controllers.Minio;
 
 namespace apiServer.Controllers.ForModels
 {
@@ -60,6 +61,7 @@ namespace apiServer.Controllers.ForModels
             article.theory_id = "2";
             article.date_created = DateTime.Now;
             article.modified_date = DateTime.Now;
+            article.path_file = "";
             //try
             //{
                 if (CheckDoiValidity(article.DOI) == false)
