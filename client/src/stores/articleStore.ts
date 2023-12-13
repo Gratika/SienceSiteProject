@@ -66,14 +66,13 @@ export const useArticleStore = defineStore({
         //отримати список моїх статей
         async getMyArticleList(peopleId:string) {
             this.isLoading=true;
-            sendRequest<{article:Array<IArticle>,people:IPeople}>('GET',
+            sendRequest<Array<IArticle>>('GET',
                 'article/GetArticlesForUser',
                 {id_people: peopleId}
             )
                 .then((res) =>{
-                    this.myArticles=res.article;
+                    this.myArticles=res;
                     this.isLoading =false;
-                    this.myArticles.forEach(r=>r.author_=res.people)
                     console.log("myArticles", res);
                     this.cntRec=this.myArticles.length;
                 },(error)=>{
@@ -112,7 +111,7 @@ export const useArticleStore = defineStore({
         //отримати розділи наукових сфер
         async getScienceSectionList() {
             this.isLoading=true;
-            sendRequest<Array<IScientificTheory>>('GET', 'scientific_theories/getSiences')
+            sendRequest<Array<IScientificTheory>>('GET', 'scientific_theories/getscientific_theories')
                 .then((res) =>{
                     this.scientificSections=res;
                     this.isLoading =false;
@@ -182,7 +181,7 @@ export const useArticleStore = defineStore({
             this.isLoading=true;
             sendRequest<GenericResponse>(
                 'POST',
-                'minio/addFiles',
+                '/files/addFiles',
                 undefined,
                 data
             )

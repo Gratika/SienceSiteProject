@@ -44,10 +44,10 @@ function onSearch(){
         ></v-text-field>
         <v-btn
             class="mx-1"
-            to="/new_article"
+            to="/edit_article/1234"
             variant="outlined"
             size="small">
-          new_article
+          edit_article
         </v-btn>
         <v-btn
             class="mx-1"

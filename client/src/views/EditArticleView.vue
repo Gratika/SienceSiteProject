@@ -87,14 +87,13 @@ const uploadFiles = () => {
     console.error('Будь ласка, оберіть файли для завантаження');
     return;
   }
-  const bucketValue = MyLocalStorage.getItem('bucketName');
-  console.log('bucketValue=',bucketValue)
+  const id:string = article.value.id;
   const formData = new FormData();
-  formData.append('path_file', ''); // Значення для параметру path_file
-  formData.append('BucketNameForDb', bucketValue); // Значення для параметру BucketNameForDb
+  formData.append('id', id);
   for (let i = 0; i < filesToUpload.value.length; i++) {
-    formData.append('files[]', filesToUpload.value[i]);
+    formData.append('files', filesToUpload.value[i]);
   }
+
   articleStore.saveFile(formData);
 
 }

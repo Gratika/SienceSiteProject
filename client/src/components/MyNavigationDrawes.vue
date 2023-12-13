@@ -38,7 +38,7 @@
 <template>
   <!--v-card>
     <v-layout-->
-      <v-navigation-drawer v-model="drawer">
+      <v-navigation-drawer> <!--v-model="drawer"-->
         <v-list>
           <v-list-item
               prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"

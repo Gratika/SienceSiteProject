@@ -12,7 +12,7 @@ import MyLocalStorage from "@/services/myLocalStorage";
 import { createToast } from 'mosha-vue-toastify'
 
 
-const BASE_URL = `/api/`;
+const BASE_URL:string = '/api/';
 
 //Створюємо новий екземпляр axios, задавши у ньому потрібну нам конфігурацію (див https://axios-http.com/docs/req_config)
 //базовий URL та withCredentials: true - для відправки файлів cookie разом з запитами
@@ -130,6 +130,10 @@ export const sendRequest = async <T>(
     });
     return response.data;
 
+};
+export const saveFile = async (data: object) => {
+    const response = await authApi.post<Array<string>>('/Files/AddFiles', data);
+    return response.data;
 };
 export const showErrorMessage = function( error : AxiosError){
     if (error && error.response && error.response.data && error.response.data) {

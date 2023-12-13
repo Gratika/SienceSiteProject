@@ -37,11 +37,12 @@ namespace apiServer.Controllers
                 .Build();
         }
         [HttpPost("AddFiles")]
-        public async Task<ActionResult<List<string>>> AddFiles(string id, List<IFormFile> files)
+        public async Task<ActionResult<List<string>>> AddFiles([FromForm] string id, [FromForm] List<IFormFile> files /*FileUploadModel data*/)
         {
             try
             {
-                Articles article = await _context.Articles.Where(a => a.Id == id).Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync();
+                //string id ="1234";
+                Articles article = await _context.Articles.Where(a => a.Id ==id).Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync();
                 string bucketName;
                 if (string.IsNullOrEmpty(article.author_.path_bucket) == true)
                 {
@@ -213,7 +214,7 @@ namespace apiServer.Controllers
             }
         }
         [HttpPost("RedactFiles")]
-        public async Task<ActionResult<List<string>>> RedactFiles(string id, List<IFormFile>? files) // создаем файлы из url и записываем в архив
+        /*public async Task<ActionResult<List<string>>> RedactFiles(string id, List<IFormFile>? files) // создаем файлы из url и записываем в архив
         {
             try
             {
@@ -224,7 +225,7 @@ namespace apiServer.Controllers
             {
                 throw new Exception();
             }
-        }
+        }*/
         [HttpPost("DeleteFiles")]
         public async void DeleteFiles(string path_files, string pathBucket) // создаем файлы из url и записываем в архив
         {

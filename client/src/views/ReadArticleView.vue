@@ -30,7 +30,7 @@ const articleStore = useArticleStore();
 const  userId = MyLocalStorage.getItem('userId');
 const emotionStore = useReactionStore();
 onBeforeMount(()=>{
-  const data = articleStore.newArticles.find(art => art.id ===id);//тимчасово. Потім замінити
+  const data = articleStore.myArticles.find(art => art.id ===id);//тимчасово. Потім замінити
   if (data){
     article.value = data
   }
@@ -62,17 +62,13 @@ function downloadFile(){
 </script>
 <template>
   <div>
-    <v-row>
-      <v-col cols="4">
-        <RatingEmoji
-            :emoji-list="emotionStore.emojiList"
-            :user-reaction-id="emotionStore.selectedEmoji"
-        />
-      </v-col>
-      <v-col cols="2">
-        <v-btn icon="mdi-download" @click="downloadFile"/>
-      </v-col>
-    </v-row>
+    <div class="d-flex justify-end">
+      <RatingEmoji
+          :emoji-list="emotionStore.emojiList"
+          :user-reaction-id="emotionStore.selectedEmoji"
+      />
+      <v-btn icon="mdi-download" @click="downloadFile"/>
+    </div>
     <h1>{{ article.title }}</h1>
     <p v-if="article.author_">
       Автор: {{ article.author_?.surname }} {{ article.author_?.name }}

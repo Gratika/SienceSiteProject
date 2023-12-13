@@ -12,10 +12,10 @@ function showSideBar(show:boolean){
 </script>
 <template>
   <v-app id="inspire">
-    <MyNavigationDrawes
+    <!--MyNavigationDrawes
         :user="authStore.authUser"
         :drawer="drawer"
-    />
+    /-->
 
     <v-app-bar>
       <MyToolbar
