@@ -1,6 +1,7 @@
 using apiServer.Controllers;
 using apiServer.Controllers.Authentication;
 using apiServer.Controllers.ForModels;
+using apiServer.Controllers.Minio;
 using apiServer.Controllers.Redis;
 using apiServer.Controllers.Search;
 using apiServer.Controllers.Solr;
