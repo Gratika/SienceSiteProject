@@ -27,6 +27,8 @@ builder.Services.AddScoped<FilesController>();
 builder.Services.AddScoped<SearchController>();
 builder.Services.AddScoped<PeopleController>();
 builder.Services.AddScoped<SolrArticleController>();
+builder.Services.AddScoped<OrderingController>();
+builder.Services.AddScoped<FiltersController>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

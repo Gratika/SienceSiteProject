@@ -51,19 +51,19 @@ namespace apiServer.Controllers.ForModels
 
         [HttpPost("CreateArticle")]
         public async Task<ActionResult> CreateArticle(Articles? article) // Создание статьи
-        {
-            article.Id = Guid.NewGuid().ToString();
+        {           
             //article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
             //article.title = "Example2";
             //article.tag = "Example2";
             //article.text = "Example2";
             //article.views = 150;
-            //article.theory_id = "2";
-            article.date_created = DateTime.Now;
-            article.modified_date = DateTime.Now;
+            //article.theory_id = "2";        
             //article.path_file = "";
-            //try
-            //{
+            try
+            {
+                article.Id = Guid.NewGuid().ToString();
+                article.date_created = DateTime.Now;
+                article.modified_date = DateTime.Now;
                 if (CheckDoiValidity(article.DOI) == false)
                 {
                     article.DOI = null;
@@ -82,11 +82,11 @@ namespace apiServer.Controllers.ForModels
                 }
 
                 return Ok(new { Message = "Вы успешно добавили статью, но DOI-идентификатор не прошел проверку" });
-            //}
-           /* catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(new { Error = $"Вы не добавили статью - {ex.Message}" });
-            }*/
+            }
         }
         [HttpGet("GetArticle")]
         public async Task<ActionResult<Articles>> GetArticle(string id)
