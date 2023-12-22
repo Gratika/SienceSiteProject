@@ -144,7 +144,7 @@ namespace apiServer.Controllers.Minio
                 List<string> downloadUrl = new List<string>();
                 string[] path_to_file = path_files.Split(',');
 
-                for (int i = 1; i < path_to_file.Length - 1; i++)
+                for (int i = 1; i <= path_to_file.Length - 1; i++)
                 {
                     PresignedGetObjectArgs args = new PresignedGetObjectArgs()
                                                      .WithBucket(path_bucket)
@@ -152,7 +152,6 @@ namespace apiServer.Controllers.Minio
                                                      .WithExpiry(3600);
 
                     downloadUrl.Add(await _minio.PresignedGetObjectAsync(args));
-
                 }
                 return downloadUrl;
             }
@@ -164,8 +163,8 @@ namespace apiServer.Controllers.Minio
         [HttpGet("GetArchivWithFiles")]
         public async Task<ActionResult> GetArchivWithFiles(string id) // создаем файлы из url и записываем в архив
         {
-            try
-            {
+            //try
+            //{
                 Articles article = await _context.Articles.Where(a => a.Id == id).Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync();
                 List<string> downloadUrl = new List<string>();
                 downloadUrl = await GetUrlFromMinio(article.path_file, article.author_.path_bucket);
@@ -184,7 +183,7 @@ namespace apiServer.Controllers.Minio
                 }
 
                 HttpResponseMessage response = await _httpClient.GetAsync(downloadUrl[0]);
-                string zipFileName = "Archiv.zip";
+                string zipFileName = "Archiv.zip";  
 
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
@@ -210,11 +209,11 @@ namespace apiServer.Controllers.Minio
                         FileDownloadName = zipFileName
                     };
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("Ошибка, не удалось выгрузить файлы - " + ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest("Ошибка, не удалось выгрузить файлы - " + ex.Message);
+            //}
         }
         [HttpPost("RedactFiles")]
         public async Task<ActionResult<List<string>>> RedactFiles(string id, List<IFormFile>? files) // создаем файлы из url и записываем в архив

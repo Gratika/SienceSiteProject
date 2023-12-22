@@ -30,10 +30,14 @@ namespace apiServer.Controllers.Minio
             _filesController = filesController;
         }
         [HttpPost("AddImages")]
-        public async Task<List<string>> AddImages([FromForm] List<IFormFile> files) // обращаемся в minio для взятия url файлов
+        public async Task<ActionResult<List<string>>> AddImages([FromForm] List<IFormFile> upload) // обращаемся в minio для взятия url файлов
         {
             try
             {
+                if(upload.Count == 0)
+                {
+                    return Ok("Файлы пустые");
+                }
                 //Если бакета не существует - добавляем
                 var beArgs = new BucketExistsArgs()
                     .WithBucket("images");
@@ -46,9 +50,7 @@ namespace apiServer.Controllers.Minio
                 }
                 List<string> urls = new List<string>();
 
-                foreach (var file in files)
-                {
-                    IFormFile fileInWebp = _filesController.ConvertToWebp(file);
+                    IFormFile fileInWebp = _filesController.ConvertToWebp(upload[0]);
                 string NewFileName = Path.GetFileNameWithoutExtension(fileInWebp.FileName) + "_" + DateTime.Now.Ticks + Path.GetExtension(fileInWebp.FileName);
                 var putObjectArgs = new PutObjectArgs()
                              .WithBucket("images")
@@ -57,7 +59,7 @@ namespace apiServer.Controllers.Minio
                              .WithStreamData(fileInWebp.OpenReadStream());
                     await _minio.PutObjectAsync(putObjectArgs);
                     urls.Add(await GetUrl(NewFileName));
-                }             
+            
 
                 return urls;
             }
@@ -77,8 +79,9 @@ namespace apiServer.Controllers.Minio
                                                      .WithExpiry(3600);
 
                 string downloadUrl = await _minio.PresignedGetObjectAsync(args);
+                string formattedUrl = "{\"url\": \"" + downloadUrl + "\"}";
 
-                return downloadUrl;
+                return formattedUrl;
             }
             catch
             {
