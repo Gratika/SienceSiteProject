@@ -14,6 +14,7 @@ import {Table, TableToolbar} from "@ckeditor/ckeditor5-table";
 import {BlockQuote} from "@ckeditor/ckeditor5-block-quote";
 import {Image,  ImageResizeEditing, ImageResizeHandles, ImageInsert, AutoImage} from "@ckeditor/ckeditor5-image";
 import {SimpleUploadAdapter} from "@ckeditor/ckeditor5-upload";
+import MyLocalStorage from "@/services/myLocalStorage";
 
 const props = defineProps({
   initialContent: {
@@ -25,6 +26,7 @@ const emits = defineEmits(['save-content']);
 const editorRef = ref();//посилання на DOM-елемент CKEditor для подальшого доступу до нього
 const editor = ClassicEditor;
 const editorData = ref<string>(props.initialContent);
+const token = MyLocalStorage.getItem('token');
 //плагін для налаштування редактора. Зобороняємо вкладати в комірку таблиці іншу таблицю
 function DisallowNestingTables( editor:ClassicEditor ) {
   editor.model.schema.addChildCheck( ( context, childDefinition ) => {
@@ -62,12 +64,13 @@ const editorConfig = {
   },
   simpleUpload: {
     // URL-адреса, на яку завантажуються зображення.
-    uploadUrl: 'http://example.com',
+    uploadUrl: '/api/Images/AddImages',
     withCredentials: true,
     // Заголовки, надіслані разом із XMLHttpRequest на сервер завантаження.
     headers: {
       'X-CSRF-TOKEN': 'CSRF-Token',
-      Authorization: 'Bearer <JSON Web Token>'
+      Authorization: `Bearer ${token}`,
+
     }
   },
   toolbar: {

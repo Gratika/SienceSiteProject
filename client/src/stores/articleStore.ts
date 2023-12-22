@@ -194,30 +194,27 @@ export const useArticleStore = defineStore({
                     //showErrorMessage(error)
                 });
         },
-        async downloadFiles() {
-            const downloadUrl = 'article/download';
-            const filename = 'назва_файлу.zip';
-
-            /*sendRequest<ArrayBuffer>('GET', downloadUrl, undefined, undefined)
-             .then(response => {
-               const blob = new Blob([response], { type: 'application/zip' }); // Створення Blob з отриманих даних
+        async downloadFiles(article_id:string, arhiv:string) {
+            const filename = arhiv + article_id +'.zip';
+            try {
+                const response = await sendRequest<ArrayBuffer>(
+                    'GET',
+                    'Files/GetArchivWithFiles',
+                    {id:article_id}
+                );
+                const blob = new Blob([response], { type: 'application/zip' });
+                const url = window.URL.createObjectURL(blob);
 
                 const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);*/
-            sendRequest<Blob>('GET', downloadUrl, undefined, undefined)
-                .then(response => {
-                    const url = window.URL.createObjectURL(new Blob([response]));
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute('download', filename);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                })
-                .catch(error => {
-                    console.error('Помилка завантаження:', error);
-                    // Обробка помилок, якщо необхідно
-                });
+                link.href = url;
+                link.download = filename;
+                link.click();
+
+                window.URL.revokeObjectURL(url);
+            }catch (error) {
+                console.error('Помилка під час завантаження файлів:', error);
+
+            }
         }
 
 

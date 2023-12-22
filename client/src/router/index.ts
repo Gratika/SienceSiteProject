@@ -70,6 +70,12 @@ const router = createRouter({
       component: ()=>import('../views/ReadArticleView.vue'),
 
     },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ()=>import('../views/UserProfileView.vue'),
+
+    },
 
   ]
 })

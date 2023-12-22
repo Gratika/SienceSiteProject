@@ -55,7 +55,8 @@ const showPagination = computed(() => {
   return !!article.value.text && article.value.text.length > (currentPage.value + 1) * pageSize;
 });
 function downloadFile(){
-  articleStore.downloadFiles();
+  let arhivName =  (article.value.path_file.split(','))[1];
+  articleStore.downloadFiles(article.value.id, arhivName);
 }
 
 

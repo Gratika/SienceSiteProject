@@ -11,8 +11,8 @@ export default {
     getItem(name:string){
         const item = localStorage.getItem(name);
         if(item!=null) {
-            myLog("Now " + Date.now())
-            myLog("time " + localStorage.getItem(name + '_time'))
+           // myLog("Now " + Date.now())
+            //myLog("time " + localStorage.getItem(name + '_time'))
             return JSON.parse(item)
 
         }

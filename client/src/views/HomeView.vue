@@ -4,9 +4,9 @@ import {onMounted, ref} from "vue";
 
 import ArticleItem from "@/components/ArticleItem.vue";
 import type {ISelectedArticle} from "@/api/type";
+import Heder from "@/components/Heder.vue";
 
 const articleStore = useArticleStore();
-const showEditBtn = false;
 onMounted(() => {
   articleStore.getNewArticleList();
   //articleStore.getPopularArticleList();
@@ -19,6 +19,7 @@ function addArticleToFavorites(newFavorite:ISelectedArticle) {
 </script>
 
 <template>
+  <Heder/>
   <v-row class="justify-center">
     <v-col cols="12"  md="10" sm="12">
       <v-overlay :model-value="articleStore.isLoading"
@@ -32,7 +33,6 @@ function addArticleToFavorites(newFavorite:ISelectedArticle) {
           v-for="article in articleStore.newArticles"
           :key="article.id"
           :article="article"
-          :show-edit="showEditBtn"
           @add_selected="addArticleToFavorites"
       />
     </v-col>

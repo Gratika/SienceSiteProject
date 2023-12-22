@@ -87,7 +87,7 @@ export const signUpUserFn = async (user: ISignUpInput) => {
 
 //авторизація, вхід в систему
 export const loginUserFn = async (user: ILoginInput) => {
-    const response = await authApi.post<IAuthResponse>('auth/AuthUser', user);
+    const response = await authApi.post<ILoginResponse>('auth/AuthUser', user);
     return response.data;
 };
 
@@ -131,10 +131,7 @@ export const sendRequest = async <T>(
     return response.data;
 
 };
-export const saveFile = async (data: object) => {
-    const response = await authApi.post<Array<string>>('/Files/AddFiles', data);
-    return response.data;
-};
+
 export const showErrorMessage = function( error : AxiosError){
     if (error && error.response && error.response.data && error.response.data) {
         createToast(error.response.data, {

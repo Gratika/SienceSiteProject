@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {IArticle, IScience, IScientificTheory} from "@/api/type";
+import type {IArticle, IPeople, IScience, IScientificTheory, IUser} from "@/api/type";
 import {ref, watch} from "vue";
 import {useField, useForm} from "vee-validate";
 import {useArticleStore} from "@/stores/articleStore";
@@ -30,7 +30,7 @@ const article = ref<IArticle>({
   theory_id: '',
   Scientific_theories:null,
   path_file: '',
-  author_: JSON.parse(MyLocalStorage.getItem('user')),
+  author_: getAuthor(),
 });
 let scienceTheory = ref<IScientificTheory|undefined>({
   id: '',
@@ -44,6 +44,16 @@ function  getAuthorId():string|null {
   let peopleId = MyLocalStorage.getItem('peopleId');
   if (peopleId!=null)  return peopleId.trim();
   return peopleId;
+}
+function  getAuthor():IPeople|null {
+  let userStr:string|null = MyLocalStorage.getItem('user');
+  console.log('userStr=',userStr)
+  let res: null|IPeople = null;
+  if(userStr !=null){
+    let user:IUser =  MyLocalStorage.getItem('user')
+    res = user.people_;
+  }
+  return res;
 }
 /*валідація форм*/
 const { handleSubmit, handleReset } = useForm({

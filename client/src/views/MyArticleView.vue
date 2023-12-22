@@ -8,7 +8,6 @@
 
   const articleStore = useArticleStore();
   const showDialog = ref(false);
-  const showEditBtn = true;
   const peopleId=MyLocalStorage.getItem('peopleId');
   onMounted(() => {
     articleStore.getMyArticleList(peopleId); //список моїх статей
@@ -67,7 +66,6 @@
           v-for="article in articleStore.myArticles"
           :key="article.id"
           :article="article"
-          :show-edit="showEditBtn"
       />
     </v-col>
   </v-row>

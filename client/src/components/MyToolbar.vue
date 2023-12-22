@@ -1,80 +1,73 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {useArticleStore} from "@/stores/articleStore";
-import {useRoute, useRouter} from "vue-router";
+import {onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import MyLocalStorage from "@/services/myLocalStorage";
 
-const articleStore = useArticleStore();
-const emits = defineEmits(['show'])
-const drawer = ref(false);
-const searchStr = ref('');
+
 const router = useRouter();
-function showSideBar(){
-  drawer.value=!drawer.value;
-  emits('show', drawer.value);
-}
-function onSearch(){
-  router.push({ name: 'search_article', params: { search: searchStr.value } });
-}
+const showLogin = ref(true);
+
+onMounted(()=>{
+  showLogin.value = MyLocalStorage.getItem('isLogin')===false;
+
+})
 </script>
 
 <template>
       <v-toolbar
-          color="my-dark"
           class="pa-2"
           density="compact">
-        <v-app-bar-nav-icon @click="showSideBar"></v-app-bar-nav-icon>
-        <RouterLink to="/" >
-          <v-toolbar-title class="text-decoration-underline">
-            Доцент
-          </v-toolbar-title>
-        </RouterLink>
+        <div class="w-50 d-inline-flex justify-center flex-wrap flex-row">
+          <RouterLink to="/" >
+            <v-toolbar-title class="text-decoration-underline">
+              SciFindHub
+            </v-toolbar-title>
+          </RouterLink>
+        </div>
 
-        <v-spacer></v-spacer>
+        <div class="w-50 d-inline-flex d-inline-flex justify-center flex-wrap flex-row">
+          <v-btn
+              class="mx-1"
+              prepend-icon="mdi-magnify"
+              variant="text"
+              size="small">
+            Пошук
+          </v-btn>
+          <v-btn
+              class="mx-1"
+              variant="text"
+              size="small"
+              disabled
+          >
+            Блог
+          </v-btn>
+          <v-btn
+              class="mx-1"
+              variant="text"
+              size="small">
+           Про нас
+          </v-btn>
 
-        <v-text-field
-            class="my-1 me-6"
-            density="compact"
-            variant="outlined"
-            label="Пошук"
-            append-inner-icon="mdi-magnify"
-            single-line
-            hide-details
-            v-model="searchStr"
-            @click:append-inner="onSearch"
-        ></v-text-field>
-        <v-btn
-            class="mx-1"
-            to="/edit_article/1234"
-            variant="outlined"
-            size="small">
-          edit_article
-        </v-btn>
-        <v-btn
-            class="mx-1"
-            variant="outlined"
-            size="small">
-          Обране
-        </v-btn>
-        <v-btn
-            class="mx-1"
-            to="/my_article"
-            variant="outlined"
-            size="small">
-          Мої статті
-        </v-btn>
+          <v-btn v-if="showLogin"
+              class="mx-1"
+              to="/login"
+              variant="outlined"
+              size="small"
+          >
+            Вхід
+          </v-btn>
+          <v-avatar v-else image="avatar.png" size="x-small"></v-avatar>
+        </div>
 
-        <v-btn
-            class="mx-1"
-            to="/login"
-            variant="outlined"
-            size="small"
-        >
-          Вхід
-        </v-btn>
+
       </v-toolbar>
 
 </template>
 
 <style scoped>
+v-toolbar{
+  max-height: 100px;
+}
+
 
 </style>

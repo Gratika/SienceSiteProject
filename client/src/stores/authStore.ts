@@ -29,10 +29,10 @@ export const useAuthStore = defineStore({
     id: 'auth',
     state: ():AuthStoreState => ({
         // initialize state from local storage to enable user to stay logged in
-        authUser: null,//MyLocalStorage.getItem('user')?JSON.parse(MyLocalStorage.getItem('user')):null,
-        token: MyLocalStorage.getItem('token') || '',
-        isLogin:MyLocalStorage.getItem('isLogin')==='true',
-        username: MyLocalStorage.getItem('username'),
+        authUser: MyLocalStorage.getItem('user')?(MyLocalStorage.getItem('user')):null,
+        token: MyLocalStorage.getItem('token')? MyLocalStorage.getItem('token'): '',
+        isLogin:MyLocalStorage.getItem('isLogin')?MyLocalStorage.getItem('isLogin')===true:false,
+        username: MyLocalStorage.getItem('username')?MyLocalStorage.getItem('username'):'',
         isLoading:false,
     } ),
     getters:{
@@ -73,31 +73,29 @@ export const useAuthStore = defineStore({
         onLogin(user:ILoginInput){
             loginUserFn(user).then(
                 res=>{
-                    console.log("authUser: ",res)
-                    this.token = res.message.user.access_token;
-                    console.log("token: ",res.message.user.access_token);
-                    this.username = res.message.user.login;
+                    this.token = res.user.access_token;
+                    this.username = res.user.login;
                     this.isLogin =true;
-                    this.authUser = res.message.user;
+                    this.authUser = res.user;
                     MyLocalStorage.setItem('token',this.token);
                     MyLocalStorage.setItem('username',this.username);
                     MyLocalStorage.setItem('isLogin',this.isLogin);
                     if(this.authUser!=null){
-                        MyLocalStorage.setItem('user', JSON.stringify(this.authUser));
+                        MyLocalStorage.setItem('user', this.authUser);
                         MyLocalStorage.setItem('userId',this.authUser.id);
                         MyLocalStorage.setItem('peopleId',this.authUser.people_id);
                         MyLocalStorage.setItem('email', this.authUser.email);
                         MyLocalStorage.setItem('bucketName', this.authUser.people_!.path_bucket);
                     }
-                    if(res.message.user.email_is_checked ===0){
+                    if(res.user.email_is_checked ===0){
                         router.push('/verify_email');
                     }
                     createToast("Log in!", {
                         position: 'bottom-center',
                     });
-                    console.log('res from onLogin: ',res)
                 }
             ).catch(error => {
+                console.log('error=', error)
                 //showErrorMessage(error);
             })
         },

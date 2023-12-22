@@ -15,7 +15,6 @@ const sortedOptions = [
   {key:'5', value:'Спочатку більш старі'}
 ]
 const articleStore = useArticleStore();
-const showEditBtn = false;
 const route = useRoute();
 const {search} = route.params;
 const cntRec = ref(0);
@@ -43,22 +42,50 @@ function selectSortParam(){
 </script>
 
 <template>
-<h1>Результати пошуку:</h1>
-  <div class="d-flex justify-end">
-    <v-select class="w-25"
-        v-model="selectedValue"
-        density="compact"
-        hint="Оберіть параметр сортування"
-        :items="sortedOptions"
-        item-title="value"
-        item-value="key"
-        label="Оберіть параметр сортування"
-        single-line
-        @change="selectSortParam"
-    ></v-select>
-  </div>
   <v-row class="justify-center">
-    <v-col cols="10"  md="10" sm="12">
+    <v-col cols="4">
+      <v-combobox
+          label="Тег"
+          :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+          variant="outlined"
+      ></v-combobox>
+    </v-col>
+    <v-col cols="4">
+      <v-combobox
+          label="Рік"
+          :items="['2018', '2019', '2020', '2021', '2022', '2023']"
+          variant="outlined"
+      ></v-combobox>
+    </v-col>
+    <v-col cols="4">
+      <v-combobox
+          label="Мова"
+          :items="['Російська', 'Українська', 'Англійська', 'Німецька', 'Французька', 'Іспанська']"
+          variant="outlined"
+      ></v-combobox>
+    </v-col>
+  </v-row>
+  <v-row class="justify-space-between">
+    <v-col cols="8"  md="10" sm="12">
+      <div class="d-flex justify-space-around">
+        <h1>Результати пошуку:</h1>
+        <v-select class="w-25"
+                  v-model="selectedValue"
+                  density="compact"
+                  hint="Оберіть параметр сортування"
+                  :items="sortedOptions"
+                  item-title="value"
+                  item-value="key"
+                  label="Сортувати"
+                  single-line
+                  variant="outlined"
+                  @change="selectSortParam"
+        ></v-select>
+      </div>
+    </v-col>
+  </v-row>
+  <v-row class="justify-center">
+    <v-col cols="8"  md="10" sm="12">
       <v-overlay :model-value="articleStore.isLoading"
                  class="align-center justify-center">
         <v-progress-circular
@@ -74,13 +101,13 @@ function selectSortParam(){
             v-for="article in articleStore.searchArticles"
             :key="article.id"
             :article="article"
-            :show-edit="showEditBtn"
             @add_selected="addArticleToFavorites"
         />
       </div>
 
     </v-col>
   </v-row>
+
 </template>
 
 <style scoped>
