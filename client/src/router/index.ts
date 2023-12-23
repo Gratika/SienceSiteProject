@@ -71,6 +71,12 @@ const router = createRouter({
 
     },
     {
+      path: '/office',
+      name: 'user_office',
+      component: ()=>import('../views/UserOfficeVuew.vue'),
+
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: ()=>import('../views/UserProfileView.vue'),

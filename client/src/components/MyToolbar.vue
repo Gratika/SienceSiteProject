@@ -11,6 +11,10 @@ onMounted(()=>{
   showLogin.value = MyLocalStorage.getItem('isLogin')===false;
 
 })
+function goToUserOffice(){
+  router.push({ name: 'user_office'});
+}
+
 </script>
 
 <template>
@@ -56,7 +60,7 @@ onMounted(()=>{
           >
             Вхід
           </v-btn>
-          <v-avatar v-else image="avatar.png" size="x-small"></v-avatar>
+          <v-avatar v-else image="avatar.png" size="x-small" @click="goToUserOffice"></v-avatar>
         </div>
 
 

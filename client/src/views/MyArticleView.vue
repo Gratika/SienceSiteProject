@@ -5,6 +5,7 @@
   import NewArticleForm from "@/components/NewArticleForm.vue";
   import MyLocalStorage from "@/services/myLocalStorage";
   import {useRouter} from "vue-router";
+  import DateComponent from "@/components/DateComponent.vue";
 
   const articleStore = useArticleStore();
   const showDialog = ref(false);
@@ -26,31 +27,51 @@
 <template>
   <!--відкрити діалог створення нової статті-->
   <v-row justify="center">
-    <v-dialog
-        v-model="showDialog"
-        persistent
-        width="1024"
-    >
-      <template v-slot:activator="{ props }">
-        <v-btn
-            fab
-            dark
-            small
-            v-bind="props"
-            color="primary"
-            class="circular-btn"
+    <v-col cols="2">
+        <v-combobox
+            label="За тегом"
+            :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+            variant="outlined"
+        ></v-combobox>
+    </v-col>
+    <v-col cols="2">
+    <v-combobox
+            label="За датою публікації"
+            :items="['2018', '2019', '2020', '2021', '2022', '2023']"
+            variant="outlined"
+        ></v-combobox>
+    </v-col>
+    <v-col cols="2">
+     <DateComponent/>
+    </v-col>
+    <v-col cols="4">
+      <div>
+        <v-dialog
+            v-model="showDialog"
+            persistent
+            width="1024"
         >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-      </template>
+          <template v-slot:activator="{ props }">
+            <v-btn
+                variant="outlined"
+                v-bind="props"
+                color="primary"
+                class="circular-btn"
+            >
+              Нова стаття
+            </v-btn>
+          </template>
 
-      <NewArticleForm
-          :scienceList=articleStore.sciences
-          :scienceSectionList=articleStore.scientificSections
-          @close="closeDialog"
-      />
+          <NewArticleForm
+              :scienceList=articleStore.sciences
+              :scienceSectionList=articleStore.scientificSections
+              @close="closeDialog"
+          />
 
-    </v-dialog>
+        </v-dialog>
+      </div>
+    </v-col>
+
   </v-row>
 
   <v-row class="justify-center">
@@ -73,10 +94,10 @@
 </template>
 
 <style scoped>
-.circular-btn {
-  position: fixed;
-  top: 100px;
-  right: 20px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-}
+ .filter-zone{
+   display: flex;
+   flex-direction: row;
+   justify-content: flex-start;
+   width: 100%;
+ }
 </style>

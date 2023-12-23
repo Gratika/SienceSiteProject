@@ -39,6 +39,13 @@ function addArticleToFavorites(newFavorite:ISelectedArticle) {
 function selectSortParam(){
   console.log("sortedValue=", selectedValue)
 }
+const currentPage = ref(1); // Поточна сторінка
+const totalPages = 4; // Загальна кількість сторінок
+
+const onPageChange = () => {
+  // Оновлення поточної сторінки при зміні
+  console.log('currentPage =',currentPage.value)
+};
 </script>
 
 <template>
@@ -106,6 +113,13 @@ function selectSortParam(){
       </div>
 
     </v-col>
+  </v-row>
+  <v-row class="justify-center">
+    <v-pagination
+        v-model="currentPage"
+        :length="totalPages"
+        @update:model-value="onPageChange"
+    ></v-pagination>
   </v-row>
 
 </template>
