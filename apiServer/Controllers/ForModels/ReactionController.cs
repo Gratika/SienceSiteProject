@@ -32,5 +32,11 @@ namespace apiServer.Controllers.ForModels
             _context.SaveChanges();
             return Ok("Реакция добавленна");
         }
+        [HttpGet("GetReactionForArticle")]
+        public ActionResult GetReactionForArticle(string articleId)
+        {
+            int CountReaction = _context.Reactions.Count(r => r.article_id == articleId);
+            return Ok(CountReaction);
+        }
     }
 }
