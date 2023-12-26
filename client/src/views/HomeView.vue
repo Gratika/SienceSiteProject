@@ -3,19 +3,22 @@ import {useArticleStore} from "@/stores/articleStore";
 import {onMounted, ref} from "vue";
 
 import ArticleItem from "@/components/ArticleItem.vue";
-import type {ISelectedArticle} from "@/api/type";
 import Heder from "@/components/Heder.vue";
+import MyLocalStorage from "@/services/myLocalStorage";
 
 const articleStore = useArticleStore();
+const showSelected = ref(false);
+const showMenu = false; //меню показуємо тільки в кабінеті користувача
 onMounted(() => {
+  const isLoginString = MyLocalStorage.getItem('isLogin');
+  if (isLoginString!=null){
+    showSelected.value = isLoginString;
+  }
   articleStore.getNewArticleList();
   //articleStore.getPopularArticleList();
 
 });
-function addArticleToFavorites(newFavorite:ISelectedArticle) {
-  console.log('Отримано дані з дочірнього компонента:', newFavorite);
-  articleStore.addToFavorites(newFavorite);
-}
+
 </script>
 
 <template>
@@ -33,7 +36,8 @@ function addArticleToFavorites(newFavorite:ISelectedArticle) {
           v-for="article in articleStore.newArticles"
           :key="article.id"
           :article="article"
-          @add_selected="addArticleToFavorites"
+          :show-selected="showSelected"
+          :show-menu="showMenu"
       />
     </v-col>
   </v-row>

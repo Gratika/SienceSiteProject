@@ -23,7 +23,7 @@ function onSearch(){
           hide-details
           v-model="searchStr"
       ></v-text-field>
-      <v-btn variant="outlined" @click="onSearch">Пошук</v-btn>
+      <v-btn  @click="onSearch">Пошук</v-btn>
     </v-col>
     <v-col cols="5">
       <v-img

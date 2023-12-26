@@ -5,23 +5,32 @@ import {useArticleStore} from "@/stores/articleStore";
 import type {ISelectedArticle} from "@/api/type";
 import {computed, onMounted, ref, watch} from "vue";
 import {useRoute} from "vue-router";
+import MyLocalStorage from "@/services/myLocalStorage";
 
 const selectedValue = ref({key:'', value:''});
-const sortedOptions = [
-  {key:'1', value:'Спочатку з DUI'},
-  {key:'2', value:'Спочатку з DUI'},
-  {key:'3', value:'За рейтингом'},
-  {key:'4', value:'Спочатку більш нові'},
-  {key:'5', value:'Спочатку більш старі'}
-]
+
 const articleStore = useArticleStore();
 const route = useRoute();
 const {search} = route.params;
 const cntRec = ref(0);
+const showSelected = ref(false);
+const showMenu = false; //меню показуємо тільки в кабінеті користувача
+const filterDoi = ref('');
+const selectedTag = ref<Array<string>>([])//модель для фільтру Теги
+const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 onMounted(()=>{
   if (typeof search === "string"){
   articleStore.searchArticlesByParam(search);
   }
+  const isLoginString = MyLocalStorage.getItem('isLogin');
+  if (isLoginString!=null){
+    showSelected.value = isLoginString;
+  }
+  //формуємо масив тегів
+  articleStore.getScienceList();
+
+
+
 })
 watch(
     () => route.params,
@@ -32,13 +41,19 @@ watch(
       }
     }
 );
-function addArticleToFavorites(newFavorite:ISelectedArticle) {
-  console.log('Отримано дані з дочірнього компонента:', newFavorite);
-  articleStore.addToFavorites(newFavorite);
-}
 function selectSortParam(){
   console.log("sortedValue=", selectedValue)
 }
+//функції фільтрації
+function tagFiltered(){
+  console.log('selectedTag =', selectedTag.value)
+}
+//функції фільтрації
+function selectFilter(focused:boolean){
+  console.log('focused=', focused)
+  console.log('selectFilter =', filterDoi.value)
+}
+//пагінація
 const currentPage = ref(1); // Поточна сторінка
 const totalPages = 4; // Загальна кількість сторінок
 
@@ -46,25 +61,47 @@ const onPageChange = () => {
   // Оновлення поточної сторінки при зміні
   console.log('currentPage =',currentPage.value)
 };
+
 </script>
 
 <template>
   <v-row class="justify-center">
-    <v-col cols="4">
+    <v-col cols="3">
       <v-combobox
-          label="Тег"
-          :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+          label="Теги"
+          :items="articleStore.tagItems"
+          :delimiters="delimiters"
+          v-model="selectedTag"
+          multiple
+          chips
           variant="outlined"
+          @update:focused="tagFiltered"
       ></v-combobox>
     </v-col>
-    <v-col cols="4">
+    <v-col cols="3">
+      <v-select
+          v-model="filterDoi"
+          :items="articleStore.filterOptions"
+          item-title="value"
+          item-value="key"
+          label="Науковість"
+          single-line
+          @update:focused="selectFilter"
+      ></v-select>
+      <!--v-combobox
+          label="Рік"
+          :items="['2018', '2019', '2020', '2021', '2022', '2023']"
+          variant="outlined"
+      ></v-combobox-->
+    </v-col>
+    <v-col cols="3">
       <v-combobox
           label="Рік"
           :items="['2018', '2019', '2020', '2021', '2022', '2023']"
           variant="outlined"
       ></v-combobox>
     </v-col>
-    <v-col cols="4">
+    <v-col cols="3">
       <v-combobox
           label="Мова"
           :items="['Російська', 'Українська', 'Англійська', 'Німецька', 'Французька', 'Іспанська']"
@@ -78,14 +115,12 @@ const onPageChange = () => {
         <h1>Результати пошуку:</h1>
         <v-select class="w-25"
                   v-model="selectedValue"
-                  density="compact"
                   hint="Оберіть параметр сортування"
-                  :items="sortedOptions"
+                  :items="articleStore.sortedOptions"
                   item-title="value"
                   item-value="key"
                   label="Сортувати"
                   single-line
-                  variant="outlined"
                   @change="selectSortParam"
         ></v-select>
       </div>
@@ -108,7 +143,8 @@ const onPageChange = () => {
             v-for="article in articleStore.searchArticles"
             :key="article.id"
             :article="article"
-            @add_selected="addArticleToFavorites"
+            :show-selected="showSelected"
+            :show-menu="showMenu"
         />
       </div>
 

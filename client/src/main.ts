@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+//import '@/assets/styles/main.sass'
 
 
 // Vuetify
@@ -12,8 +13,10 @@ import 'vuetify/styles'
 import {createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import CKEditor from '@ckeditor/ckeditor5-vue';
 import type {ThemeDefinition} from 'vuetify'
+import {VBtn} from 'vuetify/components/VBtn';
+
+import CKEditor from '@ckeditor/ckeditor5-vue';
 
 const myCustomLightTheme: ThemeDefinition = {
     dark: false,
@@ -35,8 +38,24 @@ const myCustomLightTheme: ThemeDefinition = {
 const vuetify = createVuetify({
     components,
     directives,
+    defaults: {
+        VBtn: {
+            variant:'text',
+            style: 'border-radius: 0',
+        },
+        VCombobox:{
+            variant:'outlined',
+            density:'compact',
+            style: 'border-radius: 0',
+        },
+        VSelect:{
+            variant:'outlined',
+            density:'compact',
+            style: 'border-radius: 0',
+        }
+    },
     icons: {
-        defaultSet: 'mdi', // This is already the default value - only for display purposes
+        defaultSet: 'mdi',
     },
     theme: {
         defaultTheme: 'myCustomLightTheme',

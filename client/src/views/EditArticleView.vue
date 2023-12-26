@@ -25,6 +25,7 @@ const article = ref<IArticle>({
   Scientific_theories:null,
   path_file: '',
   author_: null,
+  tagItems:[]
 })
  const articleStore = useArticleStore();
  //const isUpdating = ref(false);

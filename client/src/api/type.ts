@@ -75,6 +75,7 @@ export interface IArticle {
     theory_id: string;
     Scientific_theories:IScientificTheory|null;
     path_file: string;
+    tagItems:Array<string>;
 
 }
 export interface IComment {

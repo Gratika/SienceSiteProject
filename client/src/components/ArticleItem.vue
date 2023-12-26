@@ -1,22 +1,30 @@
 <script setup lang="ts">
-import type {IArticle, ISelectedArticle} from "@/api/type";
-import {useAuthStore} from "@/stores/authStore";
+import type {IArticle} from "@/api/type";
 import {useRouter} from "vue-router";
-import {onMounted, ref} from "vue";
-import MyLocalStorage from "@/services/myLocalStorage";
+import {useArticleStore} from "@/stores/articleStore";
+
 //пропси від батьківського елементу
 const props = defineProps<{
-  article:IArticle
+  article:IArticle,
+  showSelected:boolean,
+  showMenu:boolean
 }>()
-const showEdit = ref(false);
 const router = useRouter();
-const authStore = useAuthStore();
-onMounted(()=>{
-  const isLoginString = MyLocalStorage.getItem('isLogin');
-  if (isLoginString!=null){
-    showEdit.value = isLoginString===true;
+const articleStore = useArticleStore();
+// меню
+const location= 'top'; //позиція меню
+const menuItems = [
+  {key:'edit', icon:'mdi-pencil', title: 'Редагувати'},
+  {key:'del', icon:'mdi-delete', title: 'Видалити'}
+]
+function handleAction(action: string){
+  switch (action){
+    case 'edit': editArticle(); break;
+    case 'del': deleteArticle();break;
+    default: console.log('not action')
   }
-})
+}
+
 //функція для виводу автора
 const author_=():string|undefined=>{
   if( props.article.author_ !=null){
@@ -29,28 +37,28 @@ const author_=():string|undefined=>{
     return 'unanimous'
   }
 }
-//дані, які будемо надсилати в батьківський елемент
-const emits = defineEmits(['add_selected'])
-function addArticleSelect(){
-  let selectedArticle: ISelectedArticle = {
-    id:'',
-    article_id: props.article?.id as string,
-    article_:props.article,
-    user_id: authStore.getUserId as string,
-    user_:authStore.authUser,
-    Date_view: new Date(),
-  };
-  emits('add_selected', selectedArticle);
-}
+
 //для налаштування переходу на сторінку редагування статті
 function editArticle(){
   router.push({ name: 'edit_article', params: { id: props.article.id } });
 
 }
+//для налаштування переходу на сторінку перегляду статті
 function readArticle(){
   router.push({ name: 'read_article', params: { id: props.article.id } });
 
 }
+//вилучення статті
+function deleteArticle(){
+  articleStore.deleteArticle(props.article);
+}
+//додати статтю до обраного
+function changeArticleSelect(){
+  let article_id= props.article?.id as string;
+  articleStore.addToFavorites(article_id);
+}
+
+
 </script>
 
 <template>
@@ -62,15 +70,34 @@ function readArticle(){
           <span class="d-inline font-weight-bold" @click="readArticle">{{ props.article.title }}</span>
         </v-col>
         <v-col cols="1">
-          <div v-if="showEdit">
-            <v-tooltip location="top center" origin="end center">
+          <div v-if="props.showSelected">
+            <v-btn icon @click="changeArticleSelect">
+              <v-icon>mdi-bookmark-outline</v-icon>
+            </v-btn>
+          </div>
+          <div v-else-if="props.showMenu" class="text-center">
+            <v-menu :location="location">
               <template v-slot:activator="{ props }">
-                <v-btn icon v-bind="props" @click="addArticleSelect">
-                  <v-icon>mdi-bookmark-outline</v-icon>
+                <v-btn icon v-bind="props">
+                  <v-icon>mdi-dots-horizontal</v-icon>
                 </v-btn>
               </template>
-              <div>Додати в обране</div>
-            </v-tooltip>
+
+              <v-list>
+                <v-list-item
+                    v-for="(item) in menuItems"
+                    :key=item.key
+                    @click="handleAction(item.key)"
+                >
+                  <v-list-item-title>
+                    <v-btn :prepend-icon="item.icon" variant="text">
+                      {{ item.title }}
+                    </v-btn>
+
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
           </div>
         </v-col>
       </v-row>
@@ -82,7 +109,7 @@ function readArticle(){
           Автор: {{ author_() }}
         </div>
         <div>
-          Дата: {{ props.article.date_create}}
+          Дата: {{ props.article.date_create?.toDateString()}}
         </div>
         <div>
           Мова:
@@ -93,13 +120,13 @@ function readArticle(){
       <v-row>
         <v-col cols="11">
           <v-chip
+              v-for="(item, index) in props.article.tagItems"
+              :key="index"
               class="ma-2"
               color="primary-darken-1"
               variant="flat"
-              label
           >
-            <v-icon start icon="mdi-label"></v-icon>
-            Tags
+            {{ item }}
           </v-chip>
         </v-col>
         <v-col cols="1">

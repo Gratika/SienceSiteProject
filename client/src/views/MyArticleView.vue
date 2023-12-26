@@ -4,16 +4,17 @@
   import ArticleItem from "@/components/ArticleItem.vue";
   import NewArticleForm from "@/components/NewArticleForm.vue";
   import MyLocalStorage from "@/services/myLocalStorage";
-  import {useRouter} from "vue-router";
-  import DateComponent from "@/components/DateComponent.vue";
 
   const articleStore = useArticleStore();
   const showDialog = ref(false);
+  const showSelected = false;//не показуємо в кабінеті користувача
+  const showMenu = true; //меню показуємо тільки в кабінеті користувача
   const peopleId=MyLocalStorage.getItem('peopleId');
   onMounted(() => {
     articleStore.getMyArticleList(peopleId); //список моїх статей
     articleStore.getScienceList(); //отримуємо список наукових сфер
     articleStore.getScienceSectionList(); //отримуємо список підкатегорій
+
   });
 
   function handleButtonClick(){
@@ -42,7 +43,6 @@
         ></v-combobox>
     </v-col>
     <v-col cols="2">
-     <DateComponent/>
     </v-col>
     <v-col cols="4">
       <div>
@@ -87,6 +87,8 @@
           v-for="article in articleStore.myArticles"
           :key="article.id"
           :article="article"
+          :show-selected="showSelected"
+          :show-menu="showMenu"
       />
     </v-col>
   </v-row>

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import type {GenericResponse, IArticle, IPeople, IScience, IScientificTheory, ISelectedArticle} from '@/api/type';
 import { sendRequest} from '@/api/authApi';
+import MyLocalStorage from "@/services/myLocalStorage";
 
 export type ArticleStoreState = {
     newArticles: IArticle[] ;
@@ -10,6 +11,9 @@ export type ArticleStoreState = {
     sciences: IScience[];
     scientificSections:IScientificTheory[];
     searchArticles: IArticle[] ;
+    sortedOptions:Array<object>;
+    filterOptions:Array<object>;
+    tagItems:Array<string>;
     cntRec: number;
 }
 
@@ -23,6 +27,19 @@ export const useArticleStore = defineStore({
         sciences: [],
         scientificSections:[],
         searchArticles:[],
+        sortedOptions: [
+            {key:'0', value:'За релевантністю'},
+            {key:'1', value:'Спочатку наукові'},
+            {key:'2', value:'Спочатку без DOI'},
+            {key:'3', value:'За кількістю переглядів'},
+            {key:'4', value:'Спочатку більш нові'},
+            {key:'5', value:'Спочатку більш старі'}
+        ],
+        filterOptions: [
+            {key:'0', value:'Тільки наукові'},
+            {key:'1', value:'Тільки без DOI'},
+        ],
+        tagItems:[],
         cntRec:0
 
     }),
@@ -38,6 +55,10 @@ export const useArticleStore = defineStore({
                 {amount:4})
                 .then((res) =>{
                     this.newArticles=res;
+                    this.newArticles?.forEach(item=>{
+                        item.tagItems = item.tag?.split('#').filter(Boolean);
+
+                    })
                     this.isLoading =false;
                     console.log("articles", res);
                 },(error)=>{
@@ -55,6 +76,10 @@ export const useArticleStore = defineStore({
                 {amount:4})
                 .then((res) =>{
                     this.popularArticles=res;
+                    this.popularArticles.forEach(item=>{
+                        item.tagItems = item.tag.split('#');
+
+                    })
                     this.isLoading =false;
                     console.log("articles", res);
                 },(error)=>{
@@ -72,6 +97,10 @@ export const useArticleStore = defineStore({
             )
                 .then((res) =>{
                     this.myArticles=res;
+                    this.myArticles?.forEach(item=>{
+                        item.tagItems = item.tag?.split('#');
+
+                    });
                     this.isLoading =false;
                     console.log("myArticles", res);
                     this.cntRec=this.myArticles.length;
@@ -82,12 +111,13 @@ export const useArticleStore = defineStore({
                 });
         },
         //додати статтю до Обране
-        async addToFavorites(data:ISelectedArticle){
+        async addToFavorites(ArticleId:string){
+            let userId = MyLocalStorage.getItem('userId');
             sendRequest<GenericResponse>(
                 'POST',
                 'add_favorites_article',
                 undefined,
-                data) //уточнить адресу
+                {'ArticleId':ArticleId, 'UserId':userId}) //уточнить адресу
                 .then((res)=>{
                     console.log(res);
                 }, (error) =>{
@@ -100,6 +130,11 @@ export const useArticleStore = defineStore({
             sendRequest<Array<IScience>>('GET', 'sciences/getSiences')
                 .then((res) =>{
                     this.sciences=res;
+                    this.sciences?.forEach((item)=>{
+                        if (!this.tagItems.includes(item.name))
+                            this.tagItems.push(item.name)
+                    });
+                    console.log('tag=', this.tagItems)
                     this.isLoading =false;
                     console.log("sciences", res);
                 },(error)=>{
@@ -156,6 +191,24 @@ export const useArticleStore = defineStore({
                     //showErrorMessage(error)
                 });
         },
+        async deleteArticle(delArticle:IArticle) {
+            this.isLoading=true;
+            sendRequest<string>(
+                'POST',
+                'article/deleteArticle',
+                undefined,
+                delArticle
+            )
+                .then((res) =>{
+                    this.isLoading =false;
+                    this.myArticles = this.myArticles.filter(item=>item.id!=delArticle.id);
+                    console.log("delArticle = ", res);
+                },(error)=>{
+                    this.isLoading =false;
+                    console.error(error);
+                    //showErrorMessage(error)
+                });
+        },
         async searchArticlesByParam(searchStr:string) {
             this.isLoading=true;
             sendRequest<Array<IArticle>>(
@@ -168,7 +221,11 @@ export const useArticleStore = defineStore({
                     this.isLoading =false;
                     console.log("search articles", res);
                     this.searchArticles = res;
-                    this.cntRec = this.searchArticles.length;
+                    this.searchArticles?.forEach(item=>{
+                        item.tagItems = item.tag?.split('#');
+
+                    })
+                    this.cntRec = this.searchArticles?.length;
                 },(error)=>{
                     this.isLoading =false;
                     this.cntRec=0;
@@ -195,22 +252,25 @@ export const useArticleStore = defineStore({
                 });
         },
         async downloadFiles(article_id:string, arhiv:string) {
-            const filename = arhiv + article_id +'.zip';
             try {
-                const response = await sendRequest<ArrayBuffer>(
+                const response = await sendRequest<Blob>(
                     'GET',
                     'Files/GetArchivWithFiles',
                     {id:article_id}
                 );
+                // Створюємо посилання на отриманий архів
                 const blob = new Blob([response], { type: 'application/zip' });
                 const url = window.URL.createObjectURL(blob);
 
+                // Створюємо посилання для завантаження архіву
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = filename;
+                link.setAttribute('download', 'Archiv.zip');
+                document.body.appendChild(link);
                 link.click();
 
-                window.URL.revokeObjectURL(url);
+                // Видалення посилання після завершення завантаження
+                document.body.removeChild(link);
             }catch (error) {
                 console.error('Помилка під час завантаження файлів:', error);
 

@@ -15,6 +15,7 @@ const emits = defineEmits(['close']);
 const dialogShow = ref(false);//відображення діалогового вікна
 const scienceId = ref('');//id обраної наукової сфери
 const  isEditing = ref(false); //autocomplete з розділами наукової сфери недоступний
+const delimiters = ['#'] //масив рядків, що будуть створювати новий тег при вводі
 let scienceSectionList_: IScientificTheory[] //відфільтрований масив з розділами наукової сфери
 //нова стаття
 const article = ref<IArticle>({
@@ -31,6 +32,7 @@ const article = ref<IArticle>({
   Scientific_theories:null,
   path_file: '',
   author_: getAuthor(),
+  tagItems:[]
 });
 let scienceTheory = ref<IScientificTheory|undefined>({
   id: '',
@@ -63,7 +65,7 @@ const { handleSubmit, handleReset } = useForm({
 
       return 'Введіть назву статті'
     },
-    tag (value:string) {
+    tag (value:Array<string>) {
       if (value?.length > 0) return true
 
       return 'Вкажіть теги для вашої статті'
@@ -93,14 +95,22 @@ const submitArticle= handleSubmit(()=>{
   if (typeof title.value.value === "string") {
     article.value.title = title.value.value;
   }
-  if (typeof tag.value.value === "string") {
+  let tagString='';
+ // console.log('tag',tag.value.value);
+  (tag.value.value as string[]).forEach((item:string)=>{
+    if (!tagString.includes(item+'#')){
+      tagString = tagString.concat(item+'#');
+    }
+  })
+  article.value.tag = tagString;
+  /*if (typeof tag.value.value === "string") {
     article.value.tag = tag.value.value;
-  }
+  }*/
   if (typeof theory_id.value.value === "string") {
     article.value.theory_id = theory_id.value.value;
   }
   if (scienceTheory.value)  article.value.Scientific_theories=scienceTheory.value;
-
+  console.log('article=', article.value);
   articleStore.saveArticle(article.value);
   emits('close', dialogShow.value);
 })
@@ -151,14 +161,26 @@ function closeDialog() {
             ></v-autocomplete>
           </v-col>
           <v-col cols="8">
-            <v-text-field
+            <!--v-text-field
                 clearable
+                chips
                 label="Теги"
                 variant="solo"
                 id="teg_article"
                 v-model="tag.value.value"
                 :error-messages="tag.errorMessage.value"
-            />
+            /-->
+            <v-combobox
+                clearable
+                label="Теги"
+                :items="articleStore.tagItems"
+                :delimiters="delimiters"
+                v-model="tag.value.value as string[]"
+                :error-messages="tag.errorMessage.value"
+                multiple
+                chips
+                variant="outlined"
+            ></v-combobox>
             <v-text-field
                 clearable
                 label="DOI"
