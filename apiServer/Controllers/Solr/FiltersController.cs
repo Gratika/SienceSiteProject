@@ -45,5 +45,44 @@ namespace apiServer.Controllers.Search
                 throw;
             }          
         }
+        [HttpGet("SelectYear")]
+        public List<Articles> SelectYear(List<Articles> articles, int? year) // возвращение статей от новых к старым
+        {
+            try
+            {
+                var filteredModels = articles.Where(m => m.date_created.Year == year).ToList();
+                return filteredModels;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        [HttpGet("SelectTag")]
+        public List<Articles> SelectTag(List<Articles> articles, string? tag) // возвращение статей от новых к старым
+        {
+            try
+            {
+                List<Articles> filteredModels = new List<Articles>();
+                for (int i = 0; i < articles.Count; i++)
+                {
+                    string[] Tags = articles[i].tag.Split(',');
+                    foreach (string ThisTag in Tags)
+                    {
+                        if (tag == ThisTag)
+                        {
+                            filteredModels.Add(articles[i]);
+                            break;
+                        }
+                    }
+                }
+                
+                return filteredModels;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }

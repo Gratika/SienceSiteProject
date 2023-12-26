@@ -31,18 +31,17 @@ namespace apiServer.Controllers.Search
             solrArticleController = solrArticleControllerNew;
         }              
         [HttpGet("Search")]
-        public List<Articles> Search(string SearchString, int pages) // возвращение конкретной статьи(страницы при выводе начинаются от 0)
+        public List<Articles> Search(string SearchString) // возвращение конкретной статьи(страницы при выводе начинаются от 0)
         {         
             try
             {
                 var queryOptions = new QueryOptions
                 {
-                    Start = pages * 10,
                     ExtraParams = new Dictionary<string, string>
                 {
            { "defType", "edismax" },  // Используем расширенный запрос
            { "qf", "title text tag author_id" },           // Указываем поле для поиска
-           { "mm", "5%" },           // Минимальное количество слов, которые должны совпадать
+           { "mm", "5%" },           // Минимальное количество слов, которые должны совпадать   
            { "pf", "title^2 text^1 tag^2 author_id^2" },          // Указываем вес полям
            { "spellcheck", "true" }, // Включение компонента автокоррекции
            { "spellcheck.dictionary", "default" }, // Использование словаря по умолчанию

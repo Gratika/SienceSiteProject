@@ -1,8 +1,8 @@
 ﻿namespace apiServer.Models.ForUser
 {
-    public class ArticlerResponse
+    public class SearchResponse
     {
         public List<Articles> Articles { get; set; }
-        public string Response { get; set; }
+        public double allPages { get; set; }
     }
 }

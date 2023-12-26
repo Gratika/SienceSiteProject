@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Minio;
 using Minio.DataModel.Args;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace apiServer.Controllers.Minio
 {
@@ -30,44 +32,44 @@ namespace apiServer.Controllers.Minio
             _filesController = filesController;
         }
         [HttpPost("AddImages")]
-        public async Task<ActionResult<List<string>>> AddImages([FromForm] List<IFormFile> upload) // обращаемся в minio для взятия url файлов
+        public async Task<ActionResult<string>> AddImages([FromForm] List<IFormFile> upload) // обращаемся в minio для взятия url файлов
         {
             try
             {
-                if(upload.Count == 0)
-                {
-                    return Ok("Файлы пустые");
-                }
-                //Если бакета не существует - добавляем
-                var beArgs = new BucketExistsArgs()
+                if (upload.Count == 0)
+            {
+                return Ok("Файлы пустые");
+            }
+            //Если бакета не существует - добавляем
+            var beArgs = new BucketExistsArgs()
+                .WithBucket("images");
+            bool found = await _minio.BucketExistsAsync(beArgs).ConfigureAwait(false);
+            if (!found)
+            {
+                var mbArgs = new MakeBucketArgs()
                     .WithBucket("images");
-                bool found = await _minio.BucketExistsAsync(beArgs).ConfigureAwait(false);
-                if (!found)
-                {
-                    var mbArgs = new MakeBucketArgs()
-                        .WithBucket("images");
-                    await _minio.MakeBucketAsync(mbArgs).ConfigureAwait(false);
-                }
-                List<string> urls = new List<string>();
+                await _minio.MakeBucketAsync(mbArgs).ConfigureAwait(false);
+            }
 
-                    IFormFile fileInWebp = _filesController.ConvertToWebp(upload[0]);
-                string NewFileName = Path.GetFileNameWithoutExtension(fileInWebp.FileName) + "_" + DateTime.Now.Ticks + Path.GetExtension(fileInWebp.FileName);
-                var putObjectArgs = new PutObjectArgs()
-                             .WithBucket("images")
-                             .WithObject(NewFileName)
-                             .WithObjectSize(fileInWebp.Length)
-                             .WithStreamData(fileInWebp.OpenReadStream());
-                    await _minio.PutObjectAsync(putObjectArgs);
-                    urls.Add(await GetUrl(NewFileName));
-            
 
-                return urls;
+            IFormFile fileInWebp = _filesController.ConvertToWebp(upload[0]);
+            string NewFileName = Path.GetFileNameWithoutExtension(fileInWebp.FileName) + "_" + DateTime.Now.Ticks + Path.GetExtension(fileInWebp.FileName);
+            var putObjectArgs = new PutObjectArgs()
+                         .WithBucket("images")
+                         .WithObject(NewFileName)
+                         .WithObjectSize(fileInWebp.Length)
+                         .WithStreamData(fileInWebp.OpenReadStream());
+            await _minio.PutObjectAsync(putObjectArgs);
+            var url = await GetUrl(NewFileName);
+
+
+            return url;
             }
             catch
             {
                 throw new Exception();
             }
-}
+        }
         [HttpGet("GetUrl")]
         public async Task<string> GetUrl(string path_files) // обращаемся в minio для взятия url файлов
         {
@@ -79,9 +81,17 @@ namespace apiServer.Controllers.Minio
                                                      .WithExpiry(3600);
 
                 string downloadUrl = await _minio.PresignedGetObjectAsync(args);
-                string formattedUrl = "{\"url\": \"" + downloadUrl + "\"}";
+            // Создание объекта JSON
+            var json = new
+            {
 
-                return formattedUrl;
+                url = downloadUrl
+            };
+
+            // Преобразование объекта JSON в строку
+            string jsonResult = JsonConvert.SerializeObject(json);
+
+            return jsonResult;
             }
             catch
             {
