@@ -2,7 +2,7 @@
 {
     public class Reactions
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string user_id { get; set; }
         public string article_id { get; set; }
         public string reaction_id { get; set; }
