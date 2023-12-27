@@ -20,14 +20,14 @@ namespace apiServer.Controllers.Solr
             _filtersController = filtersController;
         }
 
-        [HttpGet("SearchWithFilters")]
-        public ActionResult<List<Articles>> SearchWithFilters(string SearchString, int Pages,int? year, List<int>? Filters, int? TypeOrder,string? tag) // возвращение по наибольшему числу просмотров
+        [HttpPost("SearchWithFilters")]
+        public ActionResult<List<Articles>> SearchWithFilters(string SearchString, int Pages,int? year, List<int>? Filters, int? TypeOrder,string? tags) // возвращение по наибольшему числу просмотров
         {
             try
             {
                 //Filters = new List<int>();
                 //Filters.Add(1);
-                SearchResponse searchResponse = SearchWithOrders(SearchString, Pages * 10, TypeOrder);
+                SearchResponse searchResponse = SearchWithOrders(SearchString, Pages * 10, TypeOrder, tags);
                 for (int i = 0; i < Filters.Count; i++)
                 {
                     switch (Filters[i])
@@ -44,10 +44,10 @@ namespace apiServer.Controllers.Solr
                 {
                     searchResponse.Articles = _filtersController.SelectYear(searchResponse.Articles, year);
                 }
-                if (string.IsNullOrEmpty(tag) == false)
-                {
-                    searchResponse.Articles = _filtersController.SelectTag(searchResponse.Articles,tag);
-                }
+                //if (string.IsNullOrEmpty(tags) == false)
+                //{
+                //    searchResponse.Articles = _filtersController.SelectTag(searchResponse.Articles,tags);
+                //}
 
             return Ok(searchResponse);
             }
@@ -56,10 +56,10 @@ namespace apiServer.Controllers.Solr
                 return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
     }
 }
-        [HttpGet("SearchWithOrders")]
-        public SearchResponse SearchWithOrders(string SearchString, int Pages, int? TypeOrder) // возвращение по наибольшему числу просмотров
+        [HttpGet("SearchWithOrdersAndTags")]
+        public SearchResponse SearchWithOrders(string SearchString, int Pages, int? TypeOrder, string? tags) // возвращение по наибольшему числу просмотров
         {
-            List<Articles> articles = _searchController.Search(SearchString);
+            List<Articles> articles = _searchController.Search(SearchString, tags);
                 switch (TypeOrder)
                 {
                     case 10:

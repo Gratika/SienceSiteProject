@@ -54,7 +54,7 @@ namespace apiServer.Controllers.ForModels
         {
             //article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
             //article.title = "Example2";
-            //article.tag = "Example2";
+            //article.tag = "Example,Example2";
             //article.text = "Example2";
             //article.views = 150;
             //article.theory_id = "2";
