@@ -91,7 +91,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "9000:3306"
+      - "9001:3306"
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 10s
@@ -109,7 +109,8 @@ services:
 
   minio:
     image: quay.io/minio/minio
-    ports:    
+    ports:
+      - 9000:9000
       - 9090:9090
     container_name: minio1
     environment:
