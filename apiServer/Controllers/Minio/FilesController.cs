@@ -184,7 +184,7 @@ namespace apiServer.Controllers.Minio
 
                 HttpResponseMessage response = await _httpClient.GetAsync(downloadUrl[0]);
                 string zipFileName = "Archiv.zip";  
-
+                
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     using (ZipArchive zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))

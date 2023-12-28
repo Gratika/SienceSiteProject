@@ -33,9 +33,9 @@ namespace apiServer.Controllers.ForModels
             return Ok("Реакция добавленна");
         }
         [HttpGet("GetReactionForArticle")]
-        public ActionResult GetReactionForArticle(string articleId)
+        public ActionResult<int> GetReactionForArticle(string articleId, string emoji_id)
         {
-            int CountReaction = _context.Reactions.Count(r => r.article_id == articleId);
+            int CountReaction = _context.Reactions.Where(r => r.reaction_id == emoji_id).Count(r => r.article_id == articleId);
             return Ok(CountReaction);
         }
     }

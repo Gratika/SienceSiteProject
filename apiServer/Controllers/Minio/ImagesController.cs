@@ -80,7 +80,12 @@ namespace apiServer.Controllers.Minio
                                                      .WithObject(path_files)
                                                      .WithExpiry(3600);
 
-                string downloadUrl = await _minio.PresignedGetObjectAsync(args);
+                IMinioClient minio = new MinioClient()
+                .WithEndpoint("localhost:9000") //localhost:9090
+                .WithCredentials("ROOTUSER", "CHANGEME123")
+                .WithSSL(false)
+                .Build();
+                string downloadUrl = await minio.PresignedGetObjectAsync(args);
             // Создание объекта JSON
             var json = new
             {

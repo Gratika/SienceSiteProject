@@ -51,6 +51,7 @@ namespace apiServer.Controllers.ForModels
                 people.date_create = DateTime.Now;
                 people.modified_date = DateTime.Now;
                 _redisController.AddOneModel(people);
+                
                 return people;
             }
             catch

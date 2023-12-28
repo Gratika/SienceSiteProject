@@ -28,7 +28,7 @@ namespace apiServer.Controllers.Search
            {
                 var options = new QueryOptions
                 {
-                    OrderBy = new[] { new SortOrder("date_created", Order.DESC) },
+                    OrderBy = new[] { new SortOrder("date_created", Order.DESC) },      
                     Rows = amount // Количество записей, которые вы хотите получить
                 };
                 List<Articles> articles = solrArticleController.GetArticle("*:*", options);
