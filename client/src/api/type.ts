@@ -124,3 +124,7 @@ export interface ISelectedArticle{
     Date_view: Date|null;
 
 }
+export interface ISearchResponse{
+    Articles: Array<IArticle>;
+    allPages: number;
+}

@@ -4,7 +4,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
-//import '@/assets/styles/main.sass'
+import '@/assets/styles/main.scss'
 
 
 // Vuetify
@@ -14,7 +14,6 @@ import {createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import type {ThemeDefinition} from 'vuetify'
-import {VBtn} from 'vuetify/components/VBtn';
 
 import CKEditor from '@ckeditor/ckeditor5-vue';
 
@@ -46,12 +45,17 @@ const vuetify = createVuetify({
         VCombobox:{
             variant:'outlined',
             density:'compact',
-            style: 'border-radius: 0',
+            style: 'border-radius: 2px;',
         },
         VSelect:{
             variant:'outlined',
             density:'compact',
-            style: 'border-radius: 0',
+            style: 'border-radius: 2px;',
+        },
+        VTextField:{
+            variant:'outlined',
+            density:'compact',
+            style: 'border-radius: 2px;',
         }
     },
     icons: {

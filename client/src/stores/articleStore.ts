@@ -1,5 +1,13 @@
 import { defineStore } from 'pinia';
-import type {GenericResponse, IArticle, IPeople, IScience, IScientificTheory, ISelectedArticle} from '@/api/type';
+import type {
+    GenericResponse,
+    IArticle,
+    IPeople,
+    IScience,
+    IScientificTheory,
+    ISearchResponse,
+    ISelectedArticle
+} from '@/api/type';
 import { sendRequest} from '@/api/authApi';
 import MyLocalStorage from "@/services/myLocalStorage";
 
@@ -15,6 +23,7 @@ export type ArticleStoreState = {
     filterOptions:Array<object>;
     tagItems:Array<string>;
     cntRec: number;
+    totalPage:number;
 }
 
 export const useArticleStore = defineStore({
@@ -28,19 +37,18 @@ export const useArticleStore = defineStore({
         scientificSections:[],
         searchArticles:[],
         sortedOptions: [
-            {key:'0', value:'За релевантністю'},
-            {key:'1', value:'Спочатку наукові'},
-            {key:'2', value:'Спочатку без DOI'},
-            {key:'3', value:'За кількістю переглядів'},
-            {key:'4', value:'Спочатку більш нові'},
-            {key:'5', value:'Спочатку більш старі'}
+            {key:0, value:'За релевантністю'},
+            {key:10, value:'Спочатку більш нові'},
+            {key:11, value:'Спочатку більш старі'},
+            {key:12, value:'За кількістю переглядів'}
         ],
         filterOptions: [
-            {key:'0', value:'Тільки наукові'},
-            {key:'1', value:'Тільки без DOI'},
+            {key:1, value:'Тільки наукові'},
+            {key:2, value:'Тільки без DOI'},
         ],
         tagItems:[],
-        cntRec:0
+        cntRec:0,
+        totalPage:0
 
     }),
     getters:{},
@@ -77,7 +85,7 @@ export const useArticleStore = defineStore({
                 .then((res) =>{
                     this.popularArticles=res;
                     this.popularArticles.forEach(item=>{
-                        item.tagItems = item.tag.split('#');
+                        item.tagItems = item.tag.split('#').filter(Boolean);
 
                     })
                     this.isLoading =false;
@@ -98,7 +106,7 @@ export const useArticleStore = defineStore({
                 .then((res) =>{
                     this.myArticles=res;
                     this.myArticles?.forEach(item=>{
-                        item.tagItems = item.tag?.split('#');
+                        item.tagItems = item.tag?.split('#').filter(Boolean);
 
                     });
                     this.isLoading =false;
@@ -209,23 +217,30 @@ export const useArticleStore = defineStore({
                     //showErrorMessage(error)
                 });
         },
-        async searchArticlesByParam(searchStr:string) {
+        async searchArticlesByParam(searchStr:string, pages:number, year:number|null,filters:Array<number>,typeOrder:number|null){
             this.isLoading=true;
-            sendRequest<Array<IArticle>>(
+            sendRequest<ISearchResponse>(
                 'GET',
                 'search/search',
-                {SearchString: searchStr}
+                {
+                    SearchString: searchStr,
+                    Pages:pages,
+                    year: year,
+                    Filters:filters,
+                    TypeOrder: typeOrder
+                }
 
             )
                 .then((res) =>{
                     this.isLoading =false;
                     console.log("search articles", res);
-                    this.searchArticles = res;
+                    this.searchArticles = res.Articles;
                     this.searchArticles?.forEach(item=>{
-                        item.tagItems = item.tag?.split('#');
+                        item.tagItems = item.tag?.split('#').filter(Boolean);
 
                     })
                     this.cntRec = this.searchArticles?.length;
+                    this.totalPage = res.allPages;
                 },(error)=>{
                     this.isLoading =false;
                     this.cntRec=0;

@@ -16,8 +16,6 @@ function onSearch(){
       <h1>Discovery Science, Uncover Knowledge with SciFindHub</h1>
       <v-text-field
           class="my-1 me-6 rounded-0"
-          density="compact"
-          variant="outlined"
           label="Пошук за назвою, автором, темою..."
           single-line
           hide-details
