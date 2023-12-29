@@ -40,7 +40,7 @@ onBeforeMount(()=>{
     emotionStore.getSelectedEmoji(id[0],userId);
   }
 })
-
+const url = ' http://localhost:5000/api/Files/GetArchivFiles?id='+article.value.id
 const currentPage = ref<number>(0);
 const pageSize = 500; // Розмір сторінки для відображення тексту статті
 const displayedText = computed(() => {
@@ -56,8 +56,7 @@ const showPagination = computed(() => {
   return !!article.value.text && article.value.text.length > (currentPage.value + 1) * pageSize;
 });
 function downloadFile(){
-  let arhivName =  (article.value.path_file.split(','))[1];
-  articleStore.downloadFiles(article.value.id, arhivName);
+  articleStore.downloadFiles(article.value.id);
 }
 
 
@@ -69,6 +68,7 @@ function downloadFile(){
           :emoji-list="emotionStore.emojiList"
           :user-reaction-id="emotionStore.selectedEmoji"
       />
+      <a href="{{url}}"/>
       <v-btn icon="mdi-download" @click="downloadFile"/>
     </div>
     <h1>{{ article.title }}</h1>

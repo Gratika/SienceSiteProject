@@ -266,8 +266,18 @@ export const useArticleStore = defineStore({
                     //showErrorMessage(error)
                 });
         },
-        async downloadFiles(article_id:string, arhiv:string) {
-            try {
+        async downloadFiles(article_id:string) {
+
+            const link = document.createElement('a');
+            link.href = ' http://127.0.0.11:5000/api/Files/GetArchivWithFiles?id='+article_id;
+            //link.setAttribute('download', 'Archiv.zip');
+            console.log(link)
+            document.body.appendChild(link);
+            link.click();
+
+            // Видалення посилання після завершення завантаження
+            document.body.removeChild(link);
+            /* try {
                 const response = await sendRequest<Blob>(
                     'GET',
                     'Files/GetArchivWithFiles',
@@ -289,7 +299,7 @@ export const useArticleStore = defineStore({
             }catch (error) {
                 console.error('Помилка під час завантаження файлів:', error);
 
-            }
+            }*/
         }
 
 

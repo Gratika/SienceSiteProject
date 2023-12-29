@@ -112,7 +112,6 @@ services:
     ports:
       - 9000:9000
       - 9090:9090
-      - 9000:9000
     container_name: minio1
     environment:
       - MINIO_ROOT_USER=ROOTUSER

@@ -30,7 +30,7 @@ onMounted(()=>{
   }
   //формуємо масив тегів
   articleStore.getScienceList();
-
+  console.log('відпрацював хук onMounted')
 })
 watch(
     () => route.params,
@@ -42,6 +42,7 @@ watch(
       selectedTag.value=[];
       selectedYear.value=null;
       filterDoi.value=null;
+      console.log('відпрацював хук watch')
 
     }
 );
@@ -153,11 +154,11 @@ const onPageChange = () => {
       </div>
       <div v-else>
         <ArticleItem
-            v-for="article in articleStore.searchArticles"
-            :key="article.id"
-            :article="article"
-            :show-selected="showSelected"
-            :show-menu="showMenu"
+          v-for="article in articleStore.searchArticles"
+          :key="article.id"
+          :show-selected="showSelected"
+          :show-menu="showMenu"
+          :article="article"
         />
       </div>
 
