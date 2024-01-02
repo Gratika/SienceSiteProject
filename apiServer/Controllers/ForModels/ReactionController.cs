@@ -1,5 +1,6 @@
 ﻿using apiServer.Controllers.Authentication;
 using apiServer.Models;
+using apiServer.Models.ForUser;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,10 +34,13 @@ namespace apiServer.Controllers.ForModels
             return Ok("Реакция добавленна");
         }
         [HttpGet("GetReactionForArticle")]
-        public ActionResult<int> GetReactionForArticle(string articleId, string emoji_id)
+        public ArticleAndReactions GetReactionForArticle(string articleId, string emoji_id)
         {
-            int CountReaction = _context.Reactions.Where(r => r.reaction_id == emoji_id).Count(r => r.article_id == articleId);
-            return Ok(CountReaction);
+            ArticleAndReactions articleAndReactions = new ArticleAndReactions();
+            articleAndReactions.CountReactions = _context.Reactions.Where(r => r.reaction_id == emoji_id).Count(r => r.article_id == articleId);
+            articleAndReactions.Emotion = _context.Emotions.FirstOrDefault(e => e.Id == emoji_id);
+            return articleAndReactions;
+
         }
     }
 }

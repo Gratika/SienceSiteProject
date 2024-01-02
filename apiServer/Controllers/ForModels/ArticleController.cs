@@ -20,8 +20,10 @@ namespace apiServer.Controllers.ForModels
         private readonly FilesController _minioController;
         private readonly RedisArticleController _redisArticleController;
         private readonly SolrArticleController _searchController;
+        private readonly ReactionController _reactionController;
+        private readonly string emojiId;
 
-        public ArticleController(ArhivistDbContext context, GenerateRandomStringController genericString, FilesController minioController, SolrArticleController searchController)
+        public ArticleController(ArhivistDbContext context, GenerateRandomStringController genericString, FilesController minioController, SolrArticleController searchController, ReactionController reactionController)
         {
             _context = context;
             _genericString = genericString;
@@ -29,19 +31,23 @@ namespace apiServer.Controllers.ForModels
             _minioController = minioController;
             _redisArticleController = new RedisArticleController("redis:6379,abortConnect=false");
             _searchController = searchController;
+            _reactionController = reactionController;
+            emojiId = "1";
         }
         [HttpGet("GetArticlesForUser")]
-        public async Task<List<Articles>> GetArticlesForUser(string id_people) // Возвращение статей конкретного пользователя
+        public async Task<List<ArticleAndReactions>> GetArticlesForUser(string id_people) // Возвращение статей конкретного пользователя
         {
             try
             {
-                List<Articles> article = new List<Articles>();
-                //article = _redisArticleController.GetArticlesForUser(id_people);
-                //if (article.Count == 0)
-                //{
-                article = await _context.Articles.Where(a => a.author_id == id_people).Include(a => a.author_).Include(a => a.theory_).ToListAsync();
-                //}
-                return article;
+                List<ArticleAndReactions> articleAndReactions = new List<ArticleAndReactions>();
+                List<Articles> articles = await _context.Articles.Where(a => a.author_id == id_people).Include(a => a.author_).Include(a => a.theory_).ToListAsync();
+                foreach(var article in articles)
+                {
+                    ArticleAndReactions ar = _reactionController.GetReactionForArticle(article.Id, emojiId);
+                    articleAndReactions.Add(new ArticleAndReactions {Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions});
+                }
+
+                return articleAndReactions;
             }
             catch (Exception ex)
             {
@@ -76,16 +82,16 @@ namespace apiServer.Controllers.ForModels
 
                 _searchController.AddArticle(article);
 
-                ArticlerResponse articlerResponse = new ArticlerResponse();
-                articlerResponse.Articles = await GetArticlesForUser(article.author_id);
-                if (article.DOI != null)
-                {
-                    articlerResponse.Response = "Вы успешно добавили статью ";
-                    return Ok(articlerResponse);
-                }
+                //ArticlerResponse articlerResponse = new ArticlerResponse();
+                //articlerResponse.Articles = await GetArticlesForUser(article.author_id);
+                //if (article.DOI != null)
+                //{
+                //    articlerResponse.Response = "Вы успешно добавили статью ";
+                //    return Ok(articlerResponse);
+                //}
 
-                articlerResponse.Response = "Вы успешно добавили статью, но DOI-идентификатор не прошел проверку";
-                return Ok(articlerResponse);
+                //articlerResponse.Response = "Вы успешно добавили статью, но DOI-идентификатор не прошел проверку";
+                return Ok(/*articlerResponse*/);
             }
             catch (Exception ex)
             {
@@ -93,19 +99,15 @@ namespace apiServer.Controllers.ForModels
             }
         }
         [HttpGet("GetArticle")]
-        public async Task<ActionResult<Articles>> GetArticle(string id)
+        public async Task<ActionResult<ArticleAndReactions>> GetArticle(string id)
         {
             //try
             //{
-            Articles article = new Articles();
-                //Articles article = _redisArticleController.GetData<Articles>(id);
-                if (string.IsNullOrEmpty(article.Id) == true /*article == null*/)
-                {
-                    article = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);
-                //_redisArticleController.AddOneModel(article);
-                }
+            ArticleAndReactions articleAndReaction = new ArticleAndReactions();
+                articleAndReaction = _reactionController.GetReactionForArticle(id, emojiId);
+                articleAndReaction.Articles = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);               
 
-                return Ok(article);
+                return Ok(articleAndReaction);
             //}
             //catch (Exception ex)
             //{
