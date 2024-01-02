@@ -141,6 +141,11 @@ namespace apiServer.Controllers.Minio
         {
             try
             {
+                IMinioClient minio = new MinioClient()
+               .WithEndpoint("localhost:9000") //localhost:9090
+               .WithCredentials("ROOTUSER", "CHANGEME123")
+               .WithSSL(false)
+               .Build();
                 List<string> downloadUrl = new List<string>();
                 string[] path_to_file = path_files.Split(',');
 
@@ -151,7 +156,7 @@ namespace apiServer.Controllers.Minio
                                                      .WithObject(path_to_file[0] + "/" + path_to_file[i])
                                                      .WithExpiry(3600);
 
-                    downloadUrl.Add(await _minio.PresignedGetObjectAsync(args));
+                    downloadUrl.Add(await minio.PresignedGetObjectAsync(args));
                 }
                 return downloadUrl;
             }
