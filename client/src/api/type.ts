@@ -68,7 +68,7 @@ export interface IArticle {
     author_: IPeople|null;
     title: string;
     tag: string;
-    text: string|null;
+    text: string;
     views: number;
     date_create: Date|null;
     modified_date: Date|null;
@@ -125,6 +125,10 @@ export interface ISelectedArticle{
 
 }
 export interface ISearchResponse{
-    Articles: Array<IArticle>;
+    articles: Array<IArticle>;
     allPages: number;
+}
+export interface ArticlerResponse{
+    Articles: Array<IArticle>;
+    Response: string;
 }

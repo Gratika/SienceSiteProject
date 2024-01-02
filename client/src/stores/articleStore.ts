@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import type {
+    ArticlerResponse,
     GenericResponse,
     IArticle,
     IPeople,
@@ -13,12 +14,10 @@ import MyLocalStorage from "@/services/myLocalStorage";
 
 export type ArticleStoreState = {
     newArticles: IArticle[] ;
-    popularArticles: IArticle[] ;
-    myArticles: IArticle[] ;
+    articles: IArticle[] ;
     isLoading: boolean;
     sciences: IScience[];
     scientificSections:IScientificTheory[];
-    searchArticles: IArticle[] ;
     sortedOptions:Array<object>;
     filterOptions:Array<object>;
     tagItems:Array<string>;
@@ -30,12 +29,10 @@ export const useArticleStore = defineStore({
     id: 'article',
     state: (): ArticleStoreState => ({
         newArticles: [],
-        popularArticles: [],
-        myArticles:[],
+        articles:[],
         isLoading:false,
         sciences: [],
         scientificSections:[],
-        searchArticles:[],
         sortedOptions: [
             {key:0, value:'За релевантністю'},
             {key:10, value:'Спочатку більш нові'},
@@ -48,7 +45,7 @@ export const useArticleStore = defineStore({
         ],
         tagItems:[],
         cntRec:0,
-        totalPage:0
+        totalPage:1
 
     }),
     getters:{},
@@ -56,67 +53,90 @@ export const useArticleStore = defineStore({
     actions: {
         //отримати список нових статтей
         async getNewArticleList() {
-            this.isLoading=true;
-            sendRequest<Array<IArticle>>(
-                'GET',
-                'mainTabArticles/newArticle',
-                {amount:4})
-                .then((res) =>{
-                    this.newArticles=res;
-                    this.newArticles?.forEach(item=>{
-                        item.tagItems = item.tag?.split('#').filter(Boolean);
+            try {
+                this.isLoading=true;
+                const res = await sendRequest<Array<IArticle>>(
+                    'GET',
+                    'mainTabArticles/newArticle',
+                    {amount:4}
+                );
+                this.newArticles=res;
+                this.newArticles?.forEach(item=>{
+                    item.tagItems = item.tag?.split(',').filter(Boolean);
 
-                    })
-                    this.isLoading =false;
-                    console.log("articles", res);
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
-                });
+                }) ;
+            }catch(error){
+                this.newArticles=[];
+                console.error(error);
+            }finally{
+              this.isLoading=false;
+            }
+
         },
         //отримати список популярних статтей
-        async getPopularArticleList() {
-            this.isLoading=true;
-            sendRequest<Array<IArticle>>(
-                'GET',
-                'mainTabArticles/popularArticle',
-                {amount:4})
-                .then((res) =>{
-                    this.popularArticles=res;
-                    this.popularArticles.forEach(item=>{
-                        item.tagItems = item.tag.split('#').filter(Boolean);
+        async getPopularArticleList(amount:number) {
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<Array<IArticle>>(
+                    'GET',
+                    'mainTabArticles/popularArticle',
+                    {amount:4}
+                );
+                this.articles =res;
+                this.articles.forEach(item=>{
+                    item.tagItems = item.tag.split(',').filter(Boolean);
 
-                    })
-                    this.isLoading =false;
-                    console.log("articles", res);
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
                 });
+                //console.log("PopularArticle=", res);
+            }catch (error){
+                console.error(error);
+                this.articles = [];
+                this.cntRec=0;
+            }finally {
+                this.isLoading =false;
+            }
         },
         //отримати список моїх статей
         async getMyArticleList(peopleId:string) {
-            this.isLoading=true;
-            sendRequest<Array<IArticle>>('GET',
-                'article/GetArticlesForUser',
-                {id_people: peopleId}
-            )
-                .then((res) =>{
-                    this.myArticles=res;
-                    this.myArticles?.forEach(item=>{
-                        item.tagItems = item.tag?.split('#').filter(Boolean);
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<Array<IArticle>>('GET',
+                    'article/GetArticlesForUser',
+                    {id_people: peopleId}
+                );
+                this.articles=res;
+                this.articles?.forEach(item=>{
+                    item.tagItems = item.tag?.split(',').filter(Boolean);
 
-                    });
-                    this.isLoading =false;
-                    console.log("myArticles", res);
-                    this.cntRec=this.myArticles.length;
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
                 });
+                //console.log("myArticles=", res);
+                this.cntRec=this.articles.length;
+            }catch (error) {
+                console.error(error);
+                this.articles = [];
+                this.cntRec=0;
+
+            }finally {
+                this.isLoading =false;
+            }
+
+        },
+        async getArticle(articleId:string):Promise<IArticle|undefined> {
+            try{
+                this.isLoading=true;
+                const article = await sendRequest<IArticle>(
+                    'GET',
+                    'Article/GetArticle',
+                    {id: articleId}
+                );
+                //console.log("article=", article);
+                return article;
+            }catch (error) {
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
+
         },
         //додати статтю до Обране
         async addToFavorites(ArticleId:string){
@@ -134,150 +154,162 @@ export const useArticleStore = defineStore({
         },
         //отримати перелік наукових сфер
         async getScienceList() {
-            this.isLoading=true;
-            sendRequest<Array<IScience>>('GET', 'sciences/getSiences')
-                .then((res) =>{
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<Array<IScience>>(
+                    'GET',
+                    'sciences/getSiences');
                     this.sciences=res;
                     this.sciences?.forEach((item)=>{
                         if (!this.tagItems.includes(item.name))
                             this.tagItems.push(item.name)
                     });
-                    console.log('tag=', this.tagItems)
-                    this.isLoading =false;
-                    console.log("sciences", res);
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
-                });
+
+            }catch (error) {
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
+
         },
         //отримати розділи наукових сфер
         async getScienceSectionList() {
-            this.isLoading=true;
-            sendRequest<Array<IScientificTheory>>('GET', 'scientific_theories/getscientific_theories')
-                .then((res) =>{
-                    this.scientificSections=res;
-                    this.isLoading =false;
-                    console.log("scientificSections", res);
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
-                });
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<Array<IScientificTheory>>(
+                    'GET',
+                    'scientific_theories/getscientific_theories'
+                );
+                this.scientificSections=res;
+                //console.log("scientificSections=", res);
+            }catch (error) {
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
         },
         async saveArticle(newArticle:IArticle) {
-            this.isLoading=true;
-            sendRequest<GenericResponse>(
-                'POST',
-                'article/CreateArticle',
-                undefined,
-                  newArticle
-                )
-                .then((res) =>{
-                    this.isLoading =false;
-                    console.log("articles", res);
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<ArticlerResponse>(
+                    'POST',
+                    'article/CreateArticle',
+                    undefined,
+                    newArticle
+                );
+                this.articles = res.Articles;
+                this.articles?.forEach(item=>{
+                    item.tagItems = item.tag?.split(',').filter(Boolean);
+
                 });
+                this.cntRec=this.articles.length;
+                //console.log("saveArticles =", res);
+            }catch (error) {
+                this.articles=[];
+                this.cntRec=0;
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
+
         },
         async updateArticle(article:IArticle) {
-            this.isLoading=true;
-            sendRequest<GenericResponse>(
-                'POST',
-                'article/RedactArticle',
-                undefined,
-                article
-            )
-                .then((res) =>{
-                    this.isLoading =false;
-                    console.log("updateArticles:", res);
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
-                });
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<GenericResponse>(
+                    'POST',
+                    'article/RedactArticle',
+                    undefined,
+                    article
+                );
+                console.log("updateArticles:", res);
+            }catch (error) {
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
+
         },
         async deleteArticle(delArticle:IArticle) {
-            this.isLoading=true;
-            sendRequest<string>(
-                'POST',
-                'article/deleteArticle',
-                undefined,
-                delArticle
-            )
-                .then((res) =>{
-                    this.isLoading =false;
-                    this.myArticles = this.myArticles.filter(item=>item.id!=delArticle.id);
-                    console.log("delArticle = ", res);
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
-                });
-        },
-        async searchArticlesByParam(searchStr:string, pages:number, year:number|null,filters:Array<number>,typeOrder:number|null){
-            this.isLoading=true;
-            sendRequest<ISearchResponse>(
-                'GET',
-                'search/search',
-                {
-                    SearchString: searchStr,
-                    Pages:pages,
-                    year: year,
-                    Filters:filters,
-                    TypeOrder: typeOrder
-                }
-
-            )
-                .then((res) =>{
-                    this.isLoading =false;
-                    console.log("search articles", res);
-                    this.searchArticles = res.Articles;
-                    this.searchArticles?.forEach(item=>{
-                        item.tagItems = item.tag?.split('#').filter(Boolean);
-
-                    })
-                    this.cntRec = this.searchArticles?.length;
-                    this.totalPage = res.allPages;
-                },(error)=>{
-                    this.isLoading =false;
-                    this.cntRec=0;
-                    console.error(error);
-                    //showErrorMessage(error)
-                },
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<string>(
+                    'POST',
+                    'article/deleteArticle',
+                    undefined,
+                    delArticle
                 );
+                this.articles = this.articles.filter(item=>item.id!=delArticle.id);
+                console.log("delArticle = ", res);
+            }catch (error) {
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
+
+        },
+        async searchArticlesByParam(searchStr:string, pages:number, year:number|null,filters:number|null,typeOrder:number|null){
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<ISearchResponse>(
+                    'GET',
+                    'MenuSearching/SearchWithFilters',
+                    {
+                        'SearchString': searchStr,
+                        'Pages': pages,
+                        'Filters': filters,
+                        'year': year,
+                        'TypeOrder':typeOrder
+                    }
+
+                );
+                //console.log("search articles", res);
+                this.articles = res.articles;
+                //console.log("articles []= ", this.articles);
+                this.articles?.forEach(item=>{
+                    item.tagItems = item.tag?.split(',').filter(Boolean);
+
+                })
+                this.cntRec = this.articles?.length;
+                this.totalPage = res.allPages;
+            }catch (error) {
+                this.cntRec=0;
+                this.articles=[];
+                this.totalPage=1;
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
+
         },
         async saveFile(data:FormData) {
-            this.isLoading=true;
-            sendRequest<GenericResponse>(
-                'POST',
-                '/files/addFiles',
-                undefined,
-                data
-            )
-                .then((res) =>{
-                    this.isLoading =false;
-                    console.log("saveFile:", res);
-                },(error)=>{
-                    this.isLoading =false;
-                    console.error(error);
-                    //showErrorMessage(error)
-                });
+            try{
+                this.isLoading=true;
+                const res = await sendRequest<GenericResponse>(
+                    'POST',
+                    '/files/addFiles',
+                    undefined,
+                    data
+                );
+                console.log("saveFile:", res);
+            }catch (error) {
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
         },
         async downloadFiles(article_id:string) {
 
+          /* варіант при відсутності авторизації
             const link = document.createElement('a');
             link.href = ' http://127.0.0.11:5000/api/Files/GetArchivWithFiles?id='+article_id;
-            //link.setAttribute('download', 'Archiv.zip');
             console.log(link)
             document.body.appendChild(link);
             link.click();
-
             // Видалення посилання після завершення завантаження
             document.body.removeChild(link);
-            /* try {
+           */
+            try {
                 const response = await sendRequest<Blob>(
                     'GET',
                     'Files/GetArchivWithFiles',
@@ -285,12 +317,12 @@ export const useArticleStore = defineStore({
                 );
                 // Створюємо посилання на отриманий архів
                 const blob = new Blob([response], { type: 'application/zip' });
-                const url = window.URL.createObjectURL(blob);
-
+                const arhiv = this.blobToFile(blob,'Archiv.zip')
+                const url = window.URL.createObjectURL(arhiv);
                 // Створюємо посилання для завантаження архіву
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', 'Archiv.zip');
+                //link.setAttribute('download', );
                 document.body.appendChild(link);
                 link.click();
 
@@ -299,7 +331,14 @@ export const useArticleStore = defineStore({
             }catch (error) {
                 console.error('Помилка під час завантаження файлів:', error);
 
-            }*/
+            }
+        },
+        blobToFile (theBlob: Blob, fileName:string): File {
+            const b: any = theBlob;
+            //A Blob() is almost a File() - it's just missing the two properties below which we will add
+            b.lastModifiedDate = new Date();
+            b.name = fileName;
+            return theBlob as File;
         }
 
 

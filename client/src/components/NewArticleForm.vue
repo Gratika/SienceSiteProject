@@ -15,7 +15,7 @@ const emits = defineEmits(['close']);
 const dialogShow = ref(false);//відображення діалогового вікна
 const scienceId = ref('');//id обраної наукової сфери
 const  isEditing = ref(false); //autocomplete з розділами наукової сфери недоступний
-const delimiters = ['#'] //масив рядків, що будуть створювати новий тег при вводі
+const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 let scienceSectionList_: IScientificTheory[] //відфільтрований масив з розділами наукової сфери
 //нова стаття
 const article = ref<IArticle>({
@@ -24,7 +24,7 @@ const article = ref<IArticle>({
   author_id: getAuthorId(),
   title: '',
   tag: '',
-  text: null,
+  text: '',
   views: 0,
   date_create:new Date(),
   modified_date: new Date(),
@@ -98,8 +98,8 @@ const submitArticle= handleSubmit(()=>{
   let tagString='';
  // console.log('tag',tag.value.value);
   (tag.value.value as string[]).forEach((item:string)=>{
-    if (!tagString.includes(item+'#')){
-      tagString = tagString.concat(item+'#');
+    if (!tagString.includes(item+',')){
+      tagString = tagString.concat(item+',');
     }
   })
   article.value.tag = tagString;

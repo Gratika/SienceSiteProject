@@ -84,7 +84,7 @@
         ></v-progress-circular>
       </v-overlay>
       <ArticleItem
-          v-for="article in articleStore.myArticles"
+          v-for="article in articleStore.articles"
           :key="article.id"
           :article="article"
           :show-selected="showSelected"

@@ -95,8 +95,8 @@ namespace apiServer.Controllers.ForModels
         [HttpGet("GetArticle")]
         public async Task<ActionResult<Articles>> GetArticle(string id)
         {
-            //try
-            //{
+            try
+            {
             Articles article = new Articles();
                 //Articles article = _redisArticleController.GetData<Articles>(id);
                 if (string.IsNullOrEmpty(article.Id) == true /*article == null*/)
@@ -106,11 +106,11 @@ namespace apiServer.Controllers.ForModels
                 }
 
                 return Ok(article);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return Ok("Ошибка, не удалось найти статью - " + ex.Message);
-            //}
+            }
+            catch (Exception ex)
+            {
+                return Ok("Ошибка, не удалось найти статью - " + ex.Message);
+            }
         }
         [HttpPost("RedactArticle")]
         public async Task<ActionResult> RedactArticle(/*IFormFile? file1, IFormFile? file2,*/ Articles article/*, string id, string title, string pathFile, string pathBucket*/)

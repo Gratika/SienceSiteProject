@@ -11,10 +11,10 @@ import MyToolbar from "@/components/MyToolbar.vue";
     </v-app-bar>
 
     <v-main>
-      <v-container>
+      <!--v-container-->
           <RouterView />
 
-      </v-container>
+      <!--/v-container-->
     </v-main>
   </v-app>
 </template>

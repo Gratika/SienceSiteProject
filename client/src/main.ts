@@ -20,8 +20,9 @@ import CKEditor from '@ckeditor/ckeditor5-vue';
 const myCustomLightTheme: ThemeDefinition = {
     dark: false,
     colors: {
-        background: '#FFFFFF',
-        surface: '#FFFFFF',
+        background: '#F9F9F9',
+        surface: '#FFF',
+        'on-surface-variant':'#FFF',
         primary: '#5E8D64',
         'primary-darken-1': '#385D3D',
         secondary: '#778FD2',
@@ -31,8 +32,12 @@ const myCustomLightTheme: ThemeDefinition = {
         success: '#4CAF50',
         warning: '#FB8C00',
         'my-dark':'#607D8B',
-        'my-accent':'#F44336'
+        'my-accent':'#F44336',
+        'my-background-darken-1':'#E2E2E2'
     },
+    variables:{
+        'theme-background':'#F9F9F9'
+    }
 }
 const vuetify = createVuetify({
     components,
