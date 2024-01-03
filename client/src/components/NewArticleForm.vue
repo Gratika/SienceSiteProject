@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {IArticle, IPeople, IScience, IScientificTheory, IUser} from "@/api/type";
+import type {IArticle, IEmotion, IPeople, IScience, IScientificTheory, IUser} from "@/api/type";
 import {ref, watch} from "vue";
 import {useField, useForm} from "vee-validate";
 import {useArticleStore} from "@/stores/articleStore";
@@ -20,19 +20,21 @@ let scienceSectionList_: IScientificTheory[] //відфільтрований м
 //нова стаття
 const article = ref<IArticle>({
   id: '',
-  DOI: null,
+  doi: null,
   author_id: getAuthorId(),
   title: '',
   tag: '',
   text: '',
   views: 0,
-  date_create:new Date(),
+  date_created:new Date(),
   modified_date: new Date(),
   theory_id: '',
-  Scientific_theories:null,
+  theory_:null,
   path_file: '',
   author_: getAuthor(),
-  tagItems:[]
+  tagItems:[],
+  reaction: null,
+  countLike:0
 });
 let scienceTheory = ref<IScientificTheory|undefined>({
   id: '',
@@ -109,7 +111,7 @@ const submitArticle= handleSubmit(()=>{
   if (typeof theory_id.value.value === "string") {
     article.value.theory_id = theory_id.value.value;
   }
-  if (scienceTheory.value)  article.value.Scientific_theories=scienceTheory.value;
+  if (scienceTheory.value)  article.value.theory_=scienceTheory.value;
   console.log('article=', article.value);
   articleStore.saveArticle(article.value);
   emits('close', dialogShow.value);
@@ -186,7 +188,7 @@ function closeDialog() {
                 label="DOI"
                 variant="solo"
                 id="DOI_article"
-                v-model="article.DOI"
+                v-model="article.doi"
             />
           </v-col>
         </v-row>

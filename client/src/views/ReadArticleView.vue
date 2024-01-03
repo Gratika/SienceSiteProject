@@ -15,16 +15,16 @@ const {id} = route.params;
 const editorReadOnly = true;
 const article = ref<IArticle>({
   id: '',
-  DOI: null,
+  doi: null,
   author_id: '',
   title: '',
   tag: '',
   text: '',
   views: 0,
-  date_create: null,
+  date_created: null,
   modified_date: null,
   theory_id: '',
-  Scientific_theories:null,
+  theory_:null,
   path_file: '',
   author_: {
     id:'',
@@ -35,7 +35,9 @@ const article = ref<IArticle>({
     date_create: new Date(),
     modified_date: new Date()
   },
-  tagItems:[]
+  tagItems:[],
+  reaction: null,
+  countLike:0
 });
 const initContent = ref('');
 const articleStore = useArticleStore();
@@ -50,8 +52,6 @@ onBeforeMount(()=>{
           if (data !== undefined){
             article.value = data;
             initContent.value=data.text;
-            console.log('initContent=',initContent.value)
-            article.value.tagItems = data.tag.split(',').filter(Boolean);
           }
         })
   }
@@ -139,7 +139,7 @@ function downloadFile(){
               <v-list-item>
                 <v-icon class="me-2" icon="mdi-calendar-blank-outline"/>
                 <v-list-item-title class="d-inline">
-                  Дата: {{article.date_create}}
+                  Дата: {{ article.date_created?.toLocaleDateString }}
                 </v-list-item-title>
               </v-list-item>
               <v-list-item>
@@ -151,37 +151,40 @@ function downloadFile(){
               <v-list-item>
                 <v-icon class="me-2" icon="mdi-map-marker-radius-outline"/>
                 <v-list-item-title class="d-inline">
-                  Країна публікації: {{article.date_create}}
+                  Країна публікації: {{ article.date_created }}
                 </v-list-item-title>
               </v-list-item>
             </v-list>
-              <v-list class="mt-6">
+            <v-card
+                class="mx-auto mt-6"
+                max-width="300"
+            >
+              <v-list>
                 <v-list-subheader class="article-list-title">Популярні</v-list-subheader>
 
                 <v-list-item class="d-flex flex-row flex-wrap align-center"
                     v-for="(item, i) in articleStore.articles"
                     :key="i"
-                    :value="item"
-                    color="primary"
                 >
-                  <span class="article-list-key">{{ i+1 }}</span>
+                  <span class="article-list-key d-inline me-1">{{ i+1 }}</span>
 
-                  <v-list-item-title class="article-list-item">{{item.title}}</v-list-item-title>
+                  <v-list-item-title class="article-list-item d-inline flex-wrap">{{item.title}}</v-list-item-title>
                 </v-list-item>
               </v-list>
+            </v-card>
           </div>
         </v-col>
       </v-row>
 
     </v-container>
   </v-row>
-  <v-container>
+  <!--v-container>
 
     <div>
-      <div class="d-flex justify-end">
+      <div class="d-flex justify-end"-->
 
         <!--a href="{{url}}"/-->
-        <v-btn icon="mdi-download" @click="downloadFile"/>
+        <!--v-btn icon="mdi-download" @click="downloadFile"/>
       </div>
       <h1>{{ article.title }}</h1>
       <p v-if="article.author_">
@@ -190,7 +193,7 @@ function downloadFile(){
       <div v-html="displayedText"></div>
       <button @click="nextPage" v-if="showPagination">Next Page</button>
     </div>
-  </v-container>
+  </v-container-->
 
 </template>
 <style scoped>
@@ -213,32 +216,28 @@ function downloadFile(){
   border-radius: 0;
 }
 .auth-list{
-  font-family: Mariupol, sans-serif;
+  font-family: Mariupol;
   font-size: 24px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
 }
 .article-list-item{
-  display: flex;
-  flex-wrap: wrap;
-  font-family: Mariupol,sans-serif;
+  font-family: Mariupol;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
 }
 .article-list-key{
-  display: inline-block;
-  font-family: Mariupol,sans-serif;
+  font-family: Mariupol;
   font-size: 35px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
-  margin-right: 5px;
 }
 .article-list-title{
-  font-family: Mariupol,sans-serif;
+  font-family: Mariupol;
   font-size: 20px;
   font-style: normal;
   font-weight: 700;

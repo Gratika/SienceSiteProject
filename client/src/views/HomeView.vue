@@ -5,6 +5,7 @@ import {onMounted, ref} from "vue";
 import ArticleItem from "@/components/ArticleItem.vue";
 import Heder from "@/components/Heder.vue";
 import MyLocalStorage from "@/services/myLocalStorage";
+import ArticleCarousels from "@/components/ArticleCarousels.vue";
 
 const articleStore = useArticleStore();
 const showSelected = ref(false);
@@ -15,7 +16,7 @@ onMounted(() => {
     showSelected.value = isLoginString;
   }
   articleStore.getNewArticleList();
-  //articleStore.getPopularArticleList();
+  articleStore.getPopularArticleList(9);
 
 });
 
@@ -25,7 +26,7 @@ onMounted(() => {
   <v-container>
     <Heder/>
     <v-row class="justify-center">
-      <v-col cols="12"  md="10" sm="12">
+      <v-col cols="12"  md="12" sm="12">
         <v-overlay :model-value="articleStore.isLoading"
                    class="align-center justify-center">
           <v-progress-circular
@@ -33,6 +34,13 @@ onMounted(() => {
               color="primary"
           ></v-progress-circular>
         </v-overlay>
+      </v-col>
+    </v-row>
+  </v-container>
+  <ArticleCarousels :articles="articleStore.articles"/>
+  <v-container>
+    <v-row class="justify-center">
+      <v-col cols="12"  md="12" sm="12">
         <ArticleItem
             v-for="article in articleStore.newArticles"
             :key="article.id"

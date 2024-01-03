@@ -13,19 +13,21 @@ const {id} = route.params;
 //модель статті
 const article = ref<IArticle>({
   id: '',
-  DOI: null,
+  doi: null,
   author_id: '',
   title: '',
   tag: '',
   text: '',
   views: 0,
-  date_create:null,
+  date_created:null,
   modified_date: null,
   theory_id: '',
-  Scientific_theories:null,
+  theory_:null,
   path_file: '',
   author_: null,
-  tagItems:[]
+  tagItems:[],
+  reaction: null,
+  countLike:0
 })
 const articleStore = useArticleStore();
  const editorReadOnly = false;
@@ -131,7 +133,7 @@ const uploadFiles = () => {
               label="DOI"
               variant="solo"
               id="DOI_article"
-              v-model="article.DOI"
+              v-model="article.doi"
           />
         </v-col>
         <v-col cols="2">

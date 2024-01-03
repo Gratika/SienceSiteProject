@@ -63,19 +63,21 @@ export interface IUser{
 }
 export interface IArticle {
     id: string;
-    DOI: string|null;
+    doi: string|null;
     author_id: string|null;
     author_: IPeople|null;
     title: string;
     tag: string;
     text: string;
     views: number;
-    date_create: Date|null;
+    date_created: Date|null;
     modified_date: Date|null;
     theory_id: string;
-    Scientific_theories:IScientificTheory|null;
+    theory_:IScientificTheory|null;
     path_file: string;
     tagItems:Array<string>;
+    reaction: IEmotion|null;
+    countLike:number;
 
 }
 export interface IComment {
@@ -128,7 +130,13 @@ export interface ISearchResponse{
     articles: Array<IArticle>;
     allPages: number;
 }
-export interface ArticlerResponse{
+export interface ArticleResponse{
     Articles: Array<IArticle>;
     Response: string;
+}
+
+export interface IArticleAndReactions{
+    articles: IArticle;
+    emotion: IEmotion;
+    countReactions:number;
 }

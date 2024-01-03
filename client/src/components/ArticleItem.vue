@@ -109,7 +109,7 @@ function changeArticleSelect(){
           Автор: {{ author_() }}
         </div>
         <div>
-          Дата: {{ props.article.date_create?.toDateString()}}
+          Дата: {{ props.article.date_created}}
         </div>
         <div>
           Мова:

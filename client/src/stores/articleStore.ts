@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import type {
-    ArticlerResponse,
+    ArticleResponse,
     GenericResponse,
-    IArticle,
+    IArticle, IArticleAndReactions,
     IPeople,
     IScience,
     IScientificTheory,
@@ -60,6 +60,8 @@ export const useArticleStore = defineStore({
                     'mainTabArticles/newArticle',
                     {amount:4}
                 );
+                console.log("NewArticle=", res);
+                console.log("NewArticle[]=", this.newArticles)
                 this.newArticles=res;
                 this.newArticles?.forEach(item=>{
                     item.tagItems = item.tag?.split(',').filter(Boolean);
@@ -87,7 +89,8 @@ export const useArticleStore = defineStore({
                     item.tagItems = item.tag.split(',').filter(Boolean);
 
                 });
-                //console.log("PopularArticle=", res);
+                console.log("PopularArticle[]=", this.articles);
+                console.log("PopularArticle=", res);
             }catch (error){
                 console.error(error);
                 this.articles = [];
@@ -100,16 +103,27 @@ export const useArticleStore = defineStore({
         async getMyArticleList(peopleId:string) {
             try{
                 this.isLoading=true;
-                const res = await sendRequest<Array<IArticle>>('GET',
+                const res = await sendRequest<Array<IArticleAndReactions>>('GET',
                     'article/GetArticlesForUser',
                     {id_people: peopleId}
                 );
-                this.articles=res;
-                this.articles?.forEach(item=>{
+                console.log("myArticles=", res);
+                this.articles=[];
+                res?.forEach((item)=>{
+                    let article = item?.articles;
+                    console.log("article=", article);
+                    if (article!==undefined){
+                        article.tagItems = item.articles?.tag?.split(',').filter(Boolean);
+                        article.reaction = item.emotion;
+                        article.countLike = item.countReactions;
+                        this.articles.push(article);
+                    }
+                })
+                /*this.articles?.forEach(item=>{
                     item.tagItems = item.tag?.split(',').filter(Boolean);
 
-                });
-                //console.log("myArticles=", res);
+                });*/
+                console.log("myArticles[]=", this.articles.values());
                 this.cntRec=this.articles.length;
             }catch (error) {
                 console.error(error);
@@ -124,11 +138,17 @@ export const useArticleStore = defineStore({
         async getArticle(articleId:string):Promise<IArticle|undefined> {
             try{
                 this.isLoading=true;
-                const article = await sendRequest<IArticle>(
+                const res = await sendRequest<IArticleAndReactions>(
                     'GET',
                     'Article/GetArticle',
                     {id: articleId}
                 );
+                let article = res?.articles;
+                if(article!==undefined){
+                    article.tagItems = res?.articles?.tag?.split(',').filter(Boolean);
+                    article.reaction = res?.emotion;
+                    article.countLike = res?.countReactions;
+                }
                 //console.log("article=", article);
                 return article;
             }catch (error) {
@@ -191,7 +211,7 @@ export const useArticleStore = defineStore({
         async saveArticle(newArticle:IArticle) {
             try{
                 this.isLoading=true;
-                const res = await sendRequest<ArticlerResponse>(
+                const res = await sendRequest<ArticleResponse>(
                     'POST',
                     'article/CreateArticle',
                     undefined,

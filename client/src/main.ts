@@ -61,6 +61,9 @@ const vuetify = createVuetify({
             variant:'outlined',
             density:'compact',
             style: 'border-radius: 2px;',
+        },
+        VChip:{
+            style: 'border-radius: 0;',
         }
     },
     icons: {
