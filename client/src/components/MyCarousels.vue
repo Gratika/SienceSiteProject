@@ -1,4 +1,42 @@
 <script setup lang="ts">
+import {ref, onMounted, computed, getCurrentInstance} from 'vue';
+
+const props = defineProps<{
+  title:String
+}>();
+const index = ref(0);
+let slides = ref([]);
+const slideDirection = ref('');
+
+const slidesLength = computed(() => slides.value.length);
+
+function next() {
+  index.value++;
+  if (index.value >= slidesLength.value) {
+    index.value = 0;
+  }
+  slideDirection.value = 'slide-right';
+}
+
+function prev() {
+  index.value--;
+  if (index.value < 0) {
+    index.value = slidesLength.value - 1;
+  }
+  slideDirection.value = 'slide-left';
+}
+
+
+//const instance = getCurrentInstance();
+//slides = instance?.proxy?.$children;
+/*onMounted(() => {
+  slides.value = $children;
+  slides.value.forEach((slide, idx) => {
+    slide.index = idx;
+  });
+});*/
+</script>
+<!--script setup lang="ts">
 import { ref } from 'vue';
 
 const props = defineProps<{
@@ -18,25 +56,27 @@ const next = () => {
   }
 };
 
-</script>
+</script-->
 <template>
   <div class="slide-group">
     <div class="header">
-      <h2>{{ title }}</h2>
+      <h2>{{ props.title }}</h2>
       <div class="navigation">
         <v-btn icon="mdi-chevron-left" size="small" @click="prev"/>
         <v-btn icon="mdi-chevron-right" size="small" @click="next"/>
       </div>
     </div>
-    <div class="content">
-      <slot></slot>
+    <div class="wrapper">
+      <div class="content">
+        <slot></slot>
+      </div>
     </div>
+
   </div>
 </template>
 
 <style>
 .slide-group {
-  /* Стилі для контейнера */
 }
 
 .header {
@@ -54,11 +94,9 @@ const next = () => {
 
 .content {
   display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  flex-wrap: wrap;
-  overflow-wrap: break-word;
-  overflow-x: hidden;
-
+}
+.wrapper{
+  max-width: 400px;
+  overflow: hidden;
 }
 </style>

@@ -32,10 +32,11 @@ function readArticle(){
 <template>
 
   <v-card
-      class="left-border pa-2 me-2 font-card"
+      class="left-border pa-2 ma-6 font-card"
       variant="elevated"
-      max-width="400"
-      max-height="300"
+      min-width="300"
+      width="400"
+      height="300"
       @click="readArticle"
   >
     <v-card-text class="font-title">
