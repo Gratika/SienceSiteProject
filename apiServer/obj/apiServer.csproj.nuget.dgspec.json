@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj": {}
+    "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj": {
+    "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj",
+        "projectUniqueName": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj",
         "projectName": "apiServer",
-        "projectPath": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\apiServer.csproj",
-        "packagesPath": "C:\\Users\\Evgen\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Evgen\\source\\repos\\SienceSiteProject\\apiServer\\obj\\",
+        "projectPath": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\apiServer.csproj",
+        "packagesPath": "C:\\Users\\Gratika\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Gratika\\Desktop\\diplom\\apiServer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Evgen\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Gratika\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -72,13 +72,10 @@
               "target": "Package",
               "version": "[1.1.1, )"
             },
-<<<<<<< HEAD
             "SolrNet.Core": {
               "target": "Package",
               "version": "[1.1.1, )"
             },
-=======
->>>>>>> 70333a01b1307ee11300aeffc497b0a7f6772204
             "StackExchange.Redis": {
               "target": "Package",
               "version": "[2.6.122, )"
@@ -111,7 +108,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }

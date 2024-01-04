@@ -27,7 +27,7 @@ export const useReactionStore = defineStore({
           try {
               const res = await sendRequest<Array<IEmotion>>(
                   'GET',
-                  'emotion/getEmotions'
+                  'Emotion/GetAllEmotions'
               );
               this.emojiList = res;
 

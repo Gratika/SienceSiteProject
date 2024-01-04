@@ -42,7 +42,7 @@ export interface IPeople{
     surname:string;
     name:string;
     birthday:Date;
-    file_bucket:string;
+    path_bucket:string;
     date_create: Date|number;
     modified_date: Date|number;
 }
@@ -63,17 +63,22 @@ export interface IUser{
 }
 export interface IArticle {
     id: string;
-    DOI: string|null;
+    doi: string|null;
     author_id: string|null;
+    author_: IPeople|null;
     title: string;
     tag: string;
-    text: string|null;
+    text: string;
     views: number;
-    date_create: Date|null;
+    date_created: Date|null;
     modified_date: Date|null;
     theory_id: string;
+    theory_:IScientificTheory|null;
     path_file: string;
-    author_: IPeople|null;
+    tagItems:Array<string>;
+    reaction: IEmotion|null;
+    countLike:number;
+
 }
 export interface IComment {
     id: string;
@@ -107,6 +112,7 @@ export interface IScience {
 export interface IScientificTheory {
     id: string;
     science_id: string;
+    science_: IScience|null;
     name: string;
     note: string;
 
@@ -114,7 +120,23 @@ export interface IScientificTheory {
 export interface ISelectedArticle{
     id: string;
     user_id: string;
+    user_: IUser|null;
     article_id: string;
+    article_:IArticle|null;
     Date_view: Date|null;
 
+}
+export interface ISearchResponse{
+    articles: Array<IArticle>;
+    allPages: number;
+}
+export interface ArticleResponse{
+    Articles: Array<IArticle>;
+    Response: string;
+}
+
+export interface IArticleAndReactions{
+    articles: IArticle;
+    emotion: IEmotion;
+    countReactions:number;
 }

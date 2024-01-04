@@ -4,16 +4,17 @@
   import ArticleItem from "@/components/ArticleItem.vue";
   import NewArticleForm from "@/components/NewArticleForm.vue";
   import MyLocalStorage from "@/services/myLocalStorage";
-  import {useRouter} from "vue-router";
 
   const articleStore = useArticleStore();
   const showDialog = ref(false);
-  const showEditBtn = true;
+  const showSelected = false;//не показуємо в кабінеті користувача
+  const showMenu = true; //меню показуємо тільки в кабінеті користувача
   const peopleId=MyLocalStorage.getItem('peopleId');
   onMounted(() => {
     articleStore.getMyArticleList(peopleId); //список моїх статей
     articleStore.getScienceList(); //отримуємо список наукових сфер
     articleStore.getScienceSectionList(); //отримуємо список підкатегорій
+
   });
 
   function handleButtonClick(){
@@ -27,31 +28,50 @@
 <template>
   <!--відкрити діалог створення нової статті-->
   <v-row justify="center">
-    <v-dialog
-        v-model="showDialog"
-        persistent
-        width="1024"
-    >
-      <template v-slot:activator="{ props }">
-        <v-btn
-            fab
-            dark
-            small
-            v-bind="props"
-            color="primary"
-            class="circular-btn"
+    <v-col cols="2">
+        <v-combobox
+            label="За тегом"
+            :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+            variant="outlined"
+        ></v-combobox>
+    </v-col>
+    <v-col cols="2">
+    <v-combobox
+            label="За датою публікації"
+            :items="['2018', '2019', '2020', '2021', '2022', '2023']"
+            variant="outlined"
+        ></v-combobox>
+    </v-col>
+    <v-col cols="2">
+    </v-col>
+    <v-col cols="4">
+      <div>
+        <v-dialog
+            v-model="showDialog"
+            persistent
+            width="1024"
         >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-      </template>
+          <template v-slot:activator="{ props }">
+            <v-btn
+                variant="outlined"
+                v-bind="props"
+                color="primary"
+                class="circular-btn"
+            >
+              Нова стаття
+            </v-btn>
+          </template>
 
-      <NewArticleForm
-          :scienceList=articleStore.sciences
-          :scienceSectionList=articleStore.scientificSections
-          @close="closeDialog"
-      />
+          <NewArticleForm
+              :scienceList=articleStore.sciences
+              :scienceSectionList=articleStore.scientificSections
+              @close="closeDialog"
+          />
 
-    </v-dialog>
+        </v-dialog>
+      </div>
+    </v-col>
+
   </v-row>
 
   <v-row class="justify-center">
@@ -64,10 +84,11 @@
         ></v-progress-circular>
       </v-overlay>
       <ArticleItem
-          v-for="article in articleStore.myArticles"
+          v-for="article in articleStore.articles"
           :key="article.id"
           :article="article"
-          :show-edit="showEditBtn"
+          :show-selected="showSelected"
+          :show-menu="showMenu"
       />
     </v-col>
   </v-row>
@@ -75,10 +96,10 @@
 </template>
 
 <style scoped>
-.circular-btn {
-  position: fixed;
-  top: 100px;
-  right: 20px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-}
+ .filter-zone{
+   display: flex;
+   flex-direction: row;
+   justify-content: flex-start;
+   width: 100%;
+ }
 </style>
