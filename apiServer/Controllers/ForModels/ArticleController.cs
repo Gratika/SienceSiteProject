@@ -41,10 +41,10 @@ namespace apiServer.Controllers.ForModels
             {
                 List<ArticleAndReactions> articleAndReactions = new List<ArticleAndReactions>();
                 List<Articles> articles = await _context.Articles.Where(a => a.author_id == id_people).Include(a => a.author_).Include(a => a.theory_).ToListAsync();
-                foreach(var article in articles)
+                foreach (var article in articles)
                 {
-                    ArticleAndReactions ar = _reactionController.GetReactionForArticle(article.Id, emojiId);
-                    articleAndReactions.Add(new ArticleAndReactions {Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions});
+                    ArticleAndReactions ar = _reactionController.GetReactionForArticle(article.Id, emojiId, id_people);
+                    articleAndReactions.Add(new ArticleAndReactions { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions });
                 }
 
                 return articleAndReactions;
@@ -99,12 +99,12 @@ namespace apiServer.Controllers.ForModels
             }
         }
         [HttpGet("GetArticle")]
-        public async Task<ActionResult<ArticleAndReactions>> GetArticle(string id)
+        public async Task<ActionResult<ArticleAndReactions>> GetArticle(string id, string peopleId)
         {
             //try
             //{
             ArticleAndReactions articleAndReaction = new ArticleAndReactions();
-                articleAndReaction = _reactionController.GetReactionForArticle(id, emojiId);
+                articleAndReaction = _reactionController.GetReactionForArticle(id, emojiId, peopleId);
                 articleAndReaction.Articles = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);               
 
                 return Ok(articleAndReaction);
