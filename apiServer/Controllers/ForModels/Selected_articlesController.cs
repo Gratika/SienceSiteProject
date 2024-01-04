@@ -41,8 +41,8 @@ namespace apiServer.Controllers.ForModels
             {
                 Selected_articles SelectArticle = new Selected_articles();
                 SelectArticle.Id = Guid.NewGuid().ToString();
-                SelectArticle.article_id = ArticleId;
-                SelectArticle.user_id = UserId;
+                //SelectArticle.article_id = ArticleId;
+                //SelectArticle.user_id = UserId;
                 SelectArticle.Date_view = DateTime.Now;
 
                 _context.Selected_articles.Add(SelectArticle);

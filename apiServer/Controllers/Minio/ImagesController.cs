@@ -94,5 +94,10 @@ namespace apiServer.Controllers.Minio
                 throw new Exception();
             }
         }
+        //[HttpPost("Delete")]
+        //public async Task<string> Delete(string url) // обращаемся в minio для взятия url файлов
+        //{
+
+        //}
     }
 }

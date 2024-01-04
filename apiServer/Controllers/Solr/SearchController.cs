@@ -32,7 +32,7 @@ namespace apiServer.Controllers.Search
             solrArticleController = solrArticleControllerNew;
         }              
         [HttpGet("Search")]
-        public List<Articles> Search(string SearchString, string? tags) // возвращение конкретной статьи(страницы при выводе начинаются от 0)
+        public List<Articles> Search(string SearchString, string? tags, string? peopleId) // возвращение конкретной статьи(страницы при выводе начинаются от 0)
         {         
             try
             {
@@ -60,6 +60,16 @@ namespace apiServer.Controllers.Search
                    new SolrQuery(tagFilter)
                     };
                 }
+                if(string.IsNullOrEmpty(peopleId) == false)
+                {
+                    var filterQueries = queryOptions.FilterQueries.ToList();
+                    filterQueries.Add(new SolrQuery($"author_id:{peopleId}"));
+                    queryOptions.FilterQueries = filterQueries.ToArray();
+                    //queryOptions.FilterQueries = new ISolrQuery[]
+                    //{
+                    //   new SolrQuery($"author_id:{peopleId}")
+                    //};
+                }
 
                 List<Articles> articles = solrArticleController.GetArticle(SearchString + "~", queryOptions);/*solr.Query(new SolrQuery(SearchString + "~"), queryOptions);*/  // Укажите ваш запрос поиска
 
@@ -70,39 +80,5 @@ namespace apiServer.Controllers.Search
                 throw new Exception("Ошибка, ничего не было найденно - " + ex.Message);
             }
         }
-        //[HttpGet("SearchWithTags")]
-        //public List<Articles> SearchWithTags(string SearchString, string tags) // возвращение конкретной статьи(страницы при выводе начинаются от 0)
-        //{
-        //    try
-        //    {
-        //        var queryOptions = new QueryOptions
-        //        {
-        //            ExtraParams = new Dictionary<string, string>
-        //            {
-        //   { "defType", "edismax" },  // Используем расширенный запрос
-        //   { "qf", "title text tag author_id" },           // Указываем поле для поиска
-        //   { "mm", "5%" },           // Минимальное количество слов, которые должны совпадать   
-        //   { "pf", "title^2 text^1 tag^2 author_id^2" },          // Указываем вес полям
-        //   { "spellcheck", "true" }, // Включение компонента автокоррекции
-        //   { "spellcheck.dictionary", "default" }, // Использование словаря по умолчанию
-        //   { "spellcheck.q", SearchString }, // Передача текста для проверки
-        //            }
-        //        };
-        //        var searchWords = tags.Split(',');
-        //        var tagFilter = string.Join(" AND ", searchWords.Select(word => $"tag:{word}"));
-
-        //        queryOptions.FilterQueries = new ISolrQuery[]
-        //        {
-        //           new SolrQuery(tagFilter)
-        //        };
-        //        List<Articles> articles = solrArticleController.GetArticle(SearchString + "~", queryOptions);/*solr.Query(new SolrQuery(SearchString + "~"), queryOptions);*/  // Укажите ваш запрос поиска
-
-        //        return articles;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Ошибка, ничего не было найденно - " + ex.Message);
-        //    }
-        //}
     }
 }
