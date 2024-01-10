@@ -2,6 +2,7 @@
 import type {IArticle} from "@/api/type";
 import {useRouter} from "vue-router";
 import {useArticleStore} from "@/stores/articleStore";
+import moment from 'moment';
 
 //пропси від батьківського елементу
 const props = defineProps<{
@@ -22,6 +23,12 @@ const author_=():string|undefined=>{
     return 'unanimous'
   }
 }
+function formatDate(date: null | string): string {
+  if (date == null) return '';
+  const formattedDate: Date = new Date(date);
+  return (moment(formattedDate)).format('DD.MM.YYYY HH:mm')
+}
+
 
 //для налаштування переходу на сторінку перегляду статті
 function readArticle(){
@@ -30,83 +37,78 @@ function readArticle(){
 </script>
 
 <template>
-
-  <v-card
-      class="left-border pa-2 ma-6 font-card"
-      variant="elevated"
-      min-width="300"
-      width="400"
-      height="300"
-      @click="readArticle"
-  >
-    <v-card-text class="font-title">
-      {{ props.article.title }}
-    </v-card-text>
-    <v-card-actions class="flex-column card-align">
-      <div class="font-text">
-        <div>
-          Автор: {{ author_() }}
+  <div class="card-box">
+    <v-card
+        class="left-border pt-6 pb-3 ps-4 pe-5 d-flex flex-column justify-space-between"
+        variant="elevated"
+        min-width="300"
+        width="400"
+        height="300"
+        @click="readArticle"
+    >
+      <v-card-text
+          class="pa-0 my-auto text-h5 font-weight-medium"
+          style="line-height: 1.5rem"
+      >
+        {{ props.article.title }}
+      </v-card-text>
+      <v-card-actions class=" flex-grow-1 flex-column card-align pa-0 my-auto">
+        <div class="my-auto text-subtitle-1 font-weight-medium" >
+          <div>
+            Автор: {{ author_() }}
+          </div>
+          <div>
+            Дата: {{ formatDate(props.article.date_created) }}
+          </div>
+          <div>
+            Мова:
+          </div>
         </div>
-        <div>
-          Дата: {{ props.article.date_created?.toDateString}}
+        <div class="wrapper">
+          <div class="my-auto d-flex">
+            <v-chip
+                v-for="(item, index) in props.article.tagItems"
+                :key="index"
+                class="text-subtitle-2 mt-1 me-4 d-flex font-weight-bold"
+            >
+              {{ item }}
+            </v-chip>
+          </div>
         </div>
-        <div>
-          Мова:
+
+        <div class=" d-flex flex-row justify-end mt-2">
+          <v-icon icon="mdi-thumb-up-outline"/>
+          <span class="d-inline text-subtitle-2 font-weight-bold">{{article.countLike}}</span>
         </div>
-      </div>
-        <v-chip-group class="mt-2">
-          <v-chip
-              v-for="(item, index) in props.article.tagItems"
-              :key="index"
-              class="mt-1 me-1"
-              variant="flat"
-              color="primary-darken-1"
-          >
-            {{ item }}
-          </v-chip>
-        </v-chip-group>
-
-      <div class=" d-flex flex-row justify-end">
-          <v-btn icon>
-            <v-icon>mdi-thumb-up-outline</v-icon>
-          </v-btn>
-          <span class="d-inline">{{article.countLike}}</span>
-      </div>
 
 
-    </v-card-actions>
-  </v-card>
+      </v-card-actions>
+    </v-card>
+  </div>
+
+
 </template>
 
 <style scoped>
+.card-box{
+  background-color: transparent;
+  height: 300px;
+  margin: 0 10px;
+  padding: 0 10px;
+  width: 440px;
+}
 .left-border{
   border-left-width: 21px;
-  border-left-color: #2A3759
+  border-left-color: #2A3759;
+  border-radius: 5px;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
 }
 .card-align{
   align-items: normal!important;
 }
-.font-card{
-  color: #000;
-  font-family: Mariupol;
-  line-height: normal!important;
-}
-.font-title{
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 500;
-
-}
-.font-text{
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 500;
-}
-.font-chips{
-  color: #FFF;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
+.wrapper{
+  overflow: hidden;
+  margin: auto 0;
 }
 
 </style>

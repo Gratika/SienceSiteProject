@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '@/views/HomeView.vue'
 
-const LoginView = () => import('../views/LoginView.vue');
+//const LoginView = () => import('../views/LoginView.vue');
+const AuthView = () => import('@/views/AuthView.vue');
 const VerifyEmailView = () => import('../views/VerifyEmailView.vue');
 
 
@@ -16,7 +17,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView,
+      component: AuthView,
       beforeEnter: (to, from, next) => {
         import('../views/LoginView.vue').then(module => {
           next();
@@ -27,11 +28,11 @@ const router = createRouter({
         });
       }
     },
-    {
+    /*{
       path: '/register',
       name: 'register',
       component: () => import('../views/RegisterView.vue')
-    },
+    },*/
     {
       path: '/verify_email',
       name: 'verify_email',
@@ -80,6 +81,12 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ()=>import('../views/UserProfileView.vue'),
+
+    },
+    {
+      path: '/test',
+      name: 'test',
+      component: ()=>import('../views/EditArticleView.vue'),
 
     },
 

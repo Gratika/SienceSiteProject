@@ -10,34 +10,21 @@ const props =defineProps({
     required:true
   }
 })
-const title = "Популярні статті";
+const title = "Останні опубліковані статті";
 </script>
 
 <template>
   <v-row class="justify-center carousel-color">
     <v-container>
-      <MyCarousels :title="title">
+      <MyCarousels :title="title" :count-slade=2 :slade-width=440 :count-child-element="props.articles?.length">
+        <!--v-col v-for="n in 3" :key="n" cols="4"-->
         <SmallArticleItem
             v-for="item in props.articles"
             :key="item?.id"
             :article="item"
         />
+        <!--/v-col-->
       </MyCarousels>
-      <!--v-slide-group
-          prev-icon="mdi-arrow-left-drop-circle-outline"
-          next-icon="mdi-arrow-right-drop-circle-outline"
-          selected-class="bg-primary"
-          show-arrows
-      >
-        <v-slide-group-item
-            v-for="item in props.articles"
-            :key="item?.id"
-            v-slot="{ isSelected, toggle }"
-        >
-           <SmallArticleItem :article="item" @click="toggle"/>
-
-        </v-slide-group-item>
-      </v-slide-group-->
     </v-container>
 
   </v-row>

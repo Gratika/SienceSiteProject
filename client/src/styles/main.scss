@@ -1,0 +1,18 @@
+@use 'vuetify' with (
+   $body-font-family: Mariupol,
+);
+@font-face{
+  font-family: "Mariupol";
+  src: url('../assets/fonts/Mariupol-Bold.eot');
+  src: url('../assets/fonts/Mariupol-Bold.eot?#iefix') format('embedded-opentype'),
+  url('../assets/fonts/Mariupol-Bold.woff2') format('woff2'),
+  url('../assets/fonts/Mariupol-Bold.woff') format('woff'),
+  url('../assets/fonts/Mariupol-Bold.svg#Mariupol-Bold') format('svg');
+  font-weight: 700;
+  font-style: normal;
+  font-stretch: normal;
+  unicode-range: U+0020-00F7
+
+};
+@import "@/assets/fonts/fonts";
+/*@import 'vuetify/styles';*/

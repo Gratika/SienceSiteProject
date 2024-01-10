@@ -3,126 +3,159 @@
 import {onMounted, ref} from 'vue';
 import type {IPeople, IUser} from "@/api/type";
 import {useAuthStore} from "@/stores/authStore";
-import type { Ref} from "vue"
+import {useField, useForm} from "vee-validate";
+import moment from "moment";
 
 const authStore = useAuthStore();
-const user = ref<IUser>({
+let userName =ref('');
+let userSurname =ref('');
+let userBirthday =ref<string|null>('');
+let user = ref<IUser>({
     id:'',
     login:'',
     password:'',
     email:'',
     access_token:'',
     refresh_token:'',
-    date_create: new Date(),
-    modified_date: new Date(),
+    date_create: '',
+    modified_date: '',
     role_id:1,
     email_is_checked:0,
     people_id:'',
-    people_:{
+    people_:null,
+});
+let people_ = ref<IPeople>(
+    {
       id:'',
       surname:'',
       name:'',
-      birthday:new Date(),
+      birthday:'',
       path_bucket:'',
-      date_create: new Date(),
-      modified_date: new Date()
-    },
-});
+      date_create: '',
+      modified_date:''
+    }
+)
 onMounted(()=>{
-  if (authStore.authUser){
+  if (authStore.authUser!==null){
     user.value = authStore.authUser;
+    userName.value = getName();
+    userSurname.value = getSurname();
+    userBirthday.value = getBirthday();
+    email.value.value=user.value.email;
   }
 });
-const imageToUpload: Ref<FileList | null> = ref(null);
-const avatarUrl = ref<string>('');
-const standartURL ='@/assets/image/avatar.png';
-const handleFileChange = (event: Event & { target: HTMLInputElement & { files: FileList }}) => {
-  imageToUpload.value = event.target.files;
-  const file = event.target.files?.[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      avatarUrl.value = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  } else {
-    avatarUrl.value = standartURL;
-  }
-};
-/*function saveUserData(){
-  authStore.onUpdateUser(user.value);
-}*/
-function saveAvatar(){
-  if (!imageToUpload.value) {
-    console.error('Будь ласка, оберіть файли для завантаження');
-    return;
-  }
-  const formData = new FormData();
-  for (let i = 0; i < imageToUpload.value.length; i++) {
-    formData.append('files[]', imageToUpload.value[i]);
-  }
-  authStore.onSaveAvatar(formData);
-
-
+function formatDate(date: null | string): string {
+  console.log('date=',date)
+  console.log('typeof date=',typeof date)
+  if (date == null) return '';
+  const formattedDate: Date = new Date(date);
+  return (moment(formattedDate)).format('DD.MM.YYYY HH:mm')
 }
+function getName():string {
+  if (user.value.people_ ==null) return '';
+  return user.value.people_.name;
+}
+function getSurname():string {
+  if (user.value.people_ ==null) return '';
+  return user.value.people_.surname;
+}
+function getBirthday():string|null {
+  if (user.value.people_ ==null) return '';
+  return formatDate(user.value.people_.birthday);
+}
+/*валідація форм*/
+const { handleSubmit, handleReset } = useForm({
+  validationSchema: {
+    email (value:string) {
+      if (/^.+@[a-z.-]+\.[a-z]+$/i.test(value)) return true
 
+      return 'Введіть валідну електронну адресу'
+    },
+  },
+})
+const email= useField('email');
+
+const submitLogin= handleSubmit(()=>{
+  if (typeof email.value.value === "string") {
+    user.value.email = email.value.value;
+  }
+  if (user.value.people_ ==null){
+    people_.value.name = userName.value;
+    people_.value.surname=userSurname.value;
+    people_.value.birthday=userBirthday.value;
+    user.value.people_=people_.value;
+  }else{
+    user.value.people_.surname=userSurname.value;
+    user.value.people_.name = userName.value;
+    user.value.people_.birthday = userBirthday.value;
+  }
+  //authStore.onLogin(userLogin.value);
+  alert(JSON.stringify(user.value));
+})
 </script>
 
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="4">
-        <v-card>
-          <v-card-title>Avatar</v-card-title>
-          <v-file-input
-              clearable
-              label="Завантажити файли"
-              variant="solo-inverted"
-              @change="handleFileChange"
-          ></v-file-input>
-          <img class="rounded" :src="avatarUrl" alt="Avatar"/>
-          <v-btn @click="saveAvatar" v-if="avatarUrl">Save Avatar</v-btn>
-        </v-card>
-      </v-col>
+    <v-sheet class="mt-10 pa-10">
+      <v-row>
+        <v-col cols="12">
+          <div class="gradient"/>
+          <div class="my-10">
+            <v-avatar image="avatar.png" size="x-large"></v-avatar>
+          </div>
+          <v-form @submit.prevent="submitLogin" >
 
-      <v-col cols="8">
-
-            <v-form ><!--@submit.prevent="saveUserData"-->
-              <v-card>
-                <v-card-title>Profile</v-card-title>
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="6">
-
-                      <v-text-field v-model="user.login" label="Login"></v-text-field>
-                      <v-text-field v-model="user.password" label="Password" type="password"></v-text-field>
-                      <v-text-field v-model="user.email" label="Email"></v-text-field>
-                      <v-checkbox v-model="user.email_is_checked" label="Email Verified"></v-checkbox>
-
-
-                    </v-col>
-                    <!--v-col cols="6">
-
-                      <v-text-field v-model="user.people_.surname" label="Surname"></v-text-field>
-                      <v-text-field v-model="user.people_.name" label="Name"></v-text-field>
-                      <v-date-picker v-model="user.people_.birthday.toLocaleDateString()" label="Birthday"></v-date-picker>
-
-                    </v-col-->
-                  </v-row>
-                </v-card-text>
-                <v-card-actions>
-                   <v-btn class="mx-2" type="submit">Зберегти</v-btn>
-                   <v-btn class="mx-2">Скасувати</v-btn>
-                </v-card-actions>
-
-              </v-card>
-            </v-form>
-
-      </v-col>
-    </v-row>
+              <div class="mt-4 mb-3">
+                <h2>Ім'я</h2>
+              </div>
+              <v-text-field
+                  v-model.trim="userName"
+                  label="Ім'я"
+                  id="userName"
+              />
+            <div class="mt-4 mb-3">
+              <h2>Прізвище</h2>
+            </div>
+            <v-text-field
+                clearable
+                v-model.trim="userSurname"
+                label="Прізвище"
+                id="surname"
+            />
+              <div class="mt-2 mb-3">
+                <h2>Дата народження</h2>
+              </div>
+              <v-text-field
+                  clearable
+                  v-model.trim="userBirthday"
+                  label="01.01.2000"
+                  id="birthday"
+              />
+            <div class="mt-4 mb-3">
+              <h2>Пошта</h2>
+            </div>
+            <v-text-field
+                v-model="email.value.value"
+                label="email@example.com"
+                id="email"
+                :error-messages="email.errorMessage.value"
+            />
+            <div class="d-flex justify-end">
+              <v-btn type="submit" class="mt-4">Зберегти</v-btn>
+            </div>
+          </v-form>
+        </v-col>
+      </v-row>
+    </v-sheet>
   </v-container>
 </template>
 
-<style>
-
+<style scoped>
+.gradient{
+  background: linear-gradient(to bottom right, #ead9ff, #c3f2ff);
+  max-height: 100px;
+  min-height: 100px;
+  position: relative;
+  width: 100%;
+}
 </style>

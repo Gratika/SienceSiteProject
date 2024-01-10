@@ -3,7 +3,7 @@ import type {
     ArticleResponse,
     GenericResponse,
     IArticle, IArticleAndReactions,
-    IPeople,
+    IPeople, IReaction,
     IScience,
     IScientificTheory,
     ISearchResponse,
@@ -54,21 +54,21 @@ export const useArticleStore = defineStore({
         //отримати список нових статтей
         async getNewArticleList() {
             try {
+                this.newArticles=[];
                 this.isLoading=true;
                 const res = await sendRequest<Array<IArticle>>(
                     'GET',
                     'mainTabArticles/newArticle',
                     {amount:4}
                 );
-                console.log("NewArticle=", res);
-                console.log("NewArticle[]=", this.newArticles)
+                //console.log("NewArticle=", res);
+               // console.log("NewArticle[]=", this.newArticles)
                 this.newArticles=res;
-                this.newArticles?.forEach(item=>{
+                this.newArticles?.map(item=>{
                     item.tagItems = item.tag?.split(',').filter(Boolean);
 
                 }) ;
             }catch(error){
-                this.newArticles=[];
                 console.error(error);
             }finally{
               this.isLoading=false;
@@ -78,6 +78,8 @@ export const useArticleStore = defineStore({
         //отримати список популярних статтей
         async getPopularArticleList(amount:number) {
             try{
+                this.articles = [];
+                this.cntRec=0;
                 this.isLoading=true;
                 const res = await sendRequest<Array<IArticle>>(
                     'GET',
@@ -85,7 +87,7 @@ export const useArticleStore = defineStore({
                     {amount:4}
                 );
                 this.articles =res;
-                this.articles.forEach(item=>{
+                this.articles.map(item=>{
                     item.tagItems = item.tag.split(',').filter(Boolean);
 
                 });
@@ -93,8 +95,6 @@ export const useArticleStore = defineStore({
                 console.log("PopularArticle=", res);
             }catch (error){
                 console.error(error);
-                this.articles = [];
-                this.cntRec=0;
             }finally {
                 this.isLoading =false;
             }
@@ -102,53 +102,61 @@ export const useArticleStore = defineStore({
         //отримати список моїх статей
         async getMyArticleList(peopleId:string) {
             try{
+                this.cntRec=0;
+                this.articles=[];
                 this.isLoading=true;
                 const res = await sendRequest<Array<IArticleAndReactions>>('GET',
                     'article/GetArticlesForUser',
                     {id_people: peopleId}
                 );
                 console.log("myArticles=", res);
-                this.articles=[];
-                res?.forEach((item)=>{
-                    let article = item?.articles;
-                    console.log("article=", article);
-                    if (article!==undefined){
-                        article.tagItems = item.articles?.tag?.split(',').filter(Boolean);
-                        article.reaction = item.emotion;
-                        article.countLike = item.countReactions;
-                        this.articles.push(article);
-                    }
-                })
-                /*this.articles?.forEach(item=>{
-                    item.tagItems = item.tag?.split(',').filter(Boolean);
-
-                });*/
+                this.transformArticleAndReactionToListArticle(res);
                 console.log("myArticles[]=", this.articles.values());
                 this.cntRec=this.articles.length;
             }catch (error) {
                 console.error(error);
-                this.articles = [];
-                this.cntRec=0;
-
             }finally {
                 this.isLoading =false;
             }
 
         },
-        async getArticle(articleId:string):Promise<IArticle|undefined> {
+        //отримати список моїх статей
+        async getMySelectedArticleList(peopleId:string) {
+            try{
+                this.cntRec=0;
+                this.articles=[];
+                this.isLoading=true;
+                const res = await sendRequest<Array<IArticle>>('GET',
+                    'selected_articles/getSelectedArticle',
+                    {idPeople: peopleId}
+                );
+                console.log("mySelectedArticles=", res);
+                /*this.transformArticleAndReactionToListArticle( res?);*/
+                this.articles = res;
+                this.articles?.forEach(item=>{
+                    item.tagItems = item.tag?.split(',').filter(Boolean);
+
+                });
+                console.log("mySelectedArticles[]=", this.articles.values());
+                this.cntRec=this.articles.length;
+            }catch (error) {
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
+
+        },
+        async getArticle(articleId:string, peopleId:string):Promise<IArticle|undefined> {
             try{
                 this.isLoading=true;
                 const res = await sendRequest<IArticleAndReactions>(
                     'GET',
                     'Article/GetArticle',
-                    {id: articleId}
+                    {id: articleId,
+                            peopleId:peopleId}
+
                 );
-                let article = res?.articles;
-                if(article!==undefined){
-                    article.tagItems = res?.articles?.tag?.split(',').filter(Boolean);
-                    article.reaction = res?.emotion;
-                    article.countLike = res?.countReactions;
-                }
+                let article =this.parseArticleAndReaction(res);
                 //console.log("article=", article);
                 return article;
             }catch (error) {
@@ -175,27 +183,23 @@ export const useArticleStore = defineStore({
         //отримати перелік наукових сфер
         async getScienceList() {
             try{
-                this.isLoading=true;
                 const res = await sendRequest<Array<IScience>>(
                     'GET',
                     'sciences/getSiences');
                     this.sciences=res;
-                    this.sciences?.forEach((item)=>{
+                    this.sciences?.map((item)=>{
                         if (!this.tagItems.includes(item.name))
                             this.tagItems.push(item.name)
                     });
 
             }catch (error) {
                 console.error(error);
-            }finally {
-                this.isLoading =false;
             }
 
         },
         //отримати розділи наукових сфер
         async getScienceSectionList() {
             try{
-                this.isLoading=true;
                 const res = await sendRequest<Array<IScientificTheory>>(
                     'GET',
                     'scientific_theories/getscientific_theories'
@@ -204,8 +208,6 @@ export const useArticleStore = defineStore({
                 //console.log("scientificSections=", res);
             }catch (error) {
                 console.error(error);
-            }finally {
-                this.isLoading =false;
             }
         },
         async saveArticle(newArticle:IArticle) {
@@ -218,7 +220,7 @@ export const useArticleStore = defineStore({
                     newArticle
                 );
                 this.articles = res.Articles;
-                this.articles?.forEach(item=>{
+                this.articles?.map(item=>{
                     item.tagItems = item.tag?.split(',').filter(Boolean);
 
                 });
@@ -268,10 +270,15 @@ export const useArticleStore = defineStore({
             }
 
         },
-        async searchArticlesByParam(searchStr:string, pages:number, year:number|null,filters:number|null,typeOrder:number|null){
+        async searchArticlesByParam(searchStr:string,
+                                    pages:number,
+                                    year:number|null,
+                                    filters:number|null,
+                                    typeOrder:number|null,
+                                    tags:string|null){
             try{
                 this.isLoading=true;
-                const res = await sendRequest<ISearchResponse>(
+                const res = await sendRequest<ISearchResponse<IArticleAndReactions>>(
                     'GET',
                     'MenuSearching/SearchWithFilters',
                     {
@@ -279,17 +286,16 @@ export const useArticleStore = defineStore({
                         'Pages': pages,
                         'Filters': filters,
                         'year': year,
-                        'TypeOrder':typeOrder
+                        'TypeOrder':typeOrder,
+                        'tags':tags
                     }
 
                 );
-                //console.log("search articles", res);
-                this.articles = res.articles;
-                //console.log("articles []= ", this.articles);
-                this.articles?.forEach(item=>{
-                    item.tagItems = item.tag?.split(',').filter(Boolean);
+                console.log("search articles", res);
+                this.articles = [];
+                this.transformArticleAndReactionToListArticle( res?.articles);
+                console.log("articles []= ", this.articles);
 
-                })
                 this.cntRec = this.articles?.length;
                 this.totalPage = res.allPages;
             }catch (error) {
@@ -359,7 +365,26 @@ export const useArticleStore = defineStore({
             b.lastModifiedDate = new Date();
             b.name = fileName;
             return theBlob as File;
+        },
+        parseArticleAndReaction(item:IArticleAndReactions):IArticle|undefined{
+            let article = item?.articles;
+            console.log("article=", article);
+            if (article!==undefined){
+                article.tagItems = item.articles?.tag?.split(',').filter(Boolean);
+                article.reaction = item.emotion;
+                article.countLike = item.countReactions;
+                return article;
+            }
+        },
+        transformArticleAndReactionToListArticle(data?:Array<IArticleAndReactions>){
+            data?.map((item)=>{
+                let article = this.parseArticleAndReaction(item);
+                if (article!==undefined){
+                    this.articles.push(article);
+                }
+            })
         }
+
 
 
     }

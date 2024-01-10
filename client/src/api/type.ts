@@ -10,6 +10,9 @@ export interface ILoginInput {
 }
 
 export interface ISignUpInput {
+    surname:string;
+    name:string;
+    birthday:Date|string;
     email: string;
     password: string;
 
@@ -35,16 +38,16 @@ export interface IUserResponse {
 export interface IRole{
     id:string;
     role_name:string;
-    modified_date: Date|number;
+    modified_date: string|null;
 }
 export interface IPeople{
     id:string;
     surname:string;
     name:string;
-    birthday:Date;
+    birthday:string|null;
     path_bucket:string;
-    date_create: Date|number;
-    modified_date: Date|number;
+    date_create: string|null;
+    modified_date: string|null;
 }
 
 export interface IUser{
@@ -54,8 +57,8 @@ export interface IUser{
     email:string;
     access_token:string;
     refresh_token:string;
-    date_create: Date|number;
-    modified_date: Date|number;
+    date_create: string|null;
+    modified_date: string|null;
     role_id:number;
     email_is_checked:number;
     people_id: string;
@@ -70,8 +73,8 @@ export interface IArticle {
     tag: string;
     text: string;
     views: number;
-    date_created: Date|null;
-    modified_date: Date|null;
+    date_created: string|null;
+    modified_date: string|null;
     theory_id: string;
     theory_:IScientificTheory|null;
     path_file: string;
@@ -86,8 +89,8 @@ export interface IComment {
     user_id: string;
     article_id: string;
     text: string;
-    date_create: Date|number;
-    modified_date: Date|number;
+    date_create: string|null;
+    modified_date: string|null;
 }
 export interface  IEmotion{
     id: string;
@@ -100,8 +103,8 @@ export interface IReaction
     user_id: string;
     article_id: string;
     reaction_id: string;
-    date_create: Date|number;
-    modified_date: Date|number;
+    date_create: string|null;
+    modified_date: string|null;
 }
 
 export interface IScience {
@@ -123,11 +126,11 @@ export interface ISelectedArticle{
     user_: IUser|null;
     article_id: string;
     article_:IArticle|null;
-    Date_view: Date|null;
+    Date_view: string|null;
 
 }
-export interface ISearchResponse{
-    articles: Array<IArticle>;
+export interface ISearchResponse<T>{
+    articles: Array<T>;
     allPages: number;
 }
 export interface ArticleResponse{

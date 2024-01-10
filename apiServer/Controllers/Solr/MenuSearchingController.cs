@@ -26,17 +26,16 @@ namespace apiServer.Controllers.Solr
             emojiId = "1";
         }
 
-        [HttpPost("SearchWithFilters")]
-        public ActionResult<List<Articles>> SearchWithFilters(string SearchString, int Pages,int? year, List<int>? Filters, int? TypeOrder,string? tags, string? peopleId) // возвращение по наибольшему числу просмотров
+        [HttpGet("SearchWithFilters")]
+        public ActionResult<List<Articles>> SearchWithFilters(string SearchString, int Pages,int? year, int? Filters, int? TypeOrder,string? tags, string? peopleId) // возвращение по наибольшему числу просмотров
         {
             try
             {
                 //Filters = new List<int>();
                 //Filters.Add(1);
                 SearchResponse<Articles> searchResponse = SearchWithOrders(SearchString, Pages * 10, TypeOrder, tags, peopleId);
-                for (int i = 0; i < Filters.Count; i++)
-                {
-                    switch (Filters[i])
+                
+                    switch (Filters)
                     {
                         case 1:
                             searchResponse.Articles = _filtersController.OnlySciensceArticles(searchResponse.Articles);
@@ -45,7 +44,7 @@ namespace apiServer.Controllers.Solr
                             searchResponse.Articles = _filtersController.SimpleArticles(searchResponse.Articles);
                             break;
                     }
-                }
+              
                 if (year != null)
                 {
                     searchResponse.Articles = _filtersController.SelectYear(searchResponse.Articles, year);

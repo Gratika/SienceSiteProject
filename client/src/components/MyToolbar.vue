@@ -2,15 +2,24 @@
 import {computed, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import MyLocalStorage from "@/services/myLocalStorage";
+import {useAuthStore} from "@/stores/authStore";
 
 
+const authStore = useAuthStore();
 const router = useRouter();
-const showLogin = ref(true);
 const showSearchStr = ref(false);
 const searchStr = ref('');
-
+//const isLogin = ref(true);
+/*const isLogin =computed(()=>{
+   let login = MyLocalStorage.getItem('isLogin');
+   if (login===null) {
+     return false;
+   }else {
+     return login;
+   }
+})*/
 onMounted(()=>{
-  showLogin.value = MyLocalStorage.getItem('isLogin')===false;
+  //console.log('showLogin', isLogin.value)
 })
 function goToUserOffice(){
   router.push({ name: 'user_office'});
@@ -23,7 +32,8 @@ const isSearchResultPage = computed(() => {
   return route.path.startsWith('/search/');
 });
 //отримуємо пошуковий запит для відображення у рядку пошуку
-const searchParam = computed(() => route.params.search || '');
+//const searchParam = computed(() => route.params.search || '');
+
 // Слідкування за змінами параметра маршруту 'search'
 watch(() => route.params.search, (newValue) => {
   if (typeof newValue === "string")  searchStr.value = newValue || '';
@@ -46,7 +56,7 @@ function onShowSearchStr(){
             <v-avatar   size="32" class="me-3" image="Icon.png"></v-avatar>
             <RouterLink to="/" >
               <v-toolbar-title class="me-3">
-                SciFindHub
+                <h3>SсiFindHub</h3>
               </v-toolbar-title>
             </RouterLink>
           </div>
@@ -64,7 +74,7 @@ function onShowSearchStr(){
 
           <div class="d-inline-flex align-center justify-end flex-wrap flex-row">
             <v-btn v-if="!isSearchResultPage && !showSearchStr"
-                   class="mx-3"
+                   class="round-btn mx-3"
                    prepend-icon="mdi-magnify"
                    variant="text"
                    size="small"
@@ -73,7 +83,7 @@ function onShowSearchStr(){
               Пошук
             </v-btn>
             <v-btn
-                class="mx-1"
+                class="round-btn mx-1"
                 variant="text"
                 size="small"
                 disabled
@@ -81,14 +91,17 @@ function onShowSearchStr(){
               Блог
             </v-btn>
             <v-btn
-                class="mx-1"
+                to="/test"
+                class="round-btn mx-1"
                 variant="text"
                 size="small">
               Про нас
             </v-btn>
 
-            <v-btn v-if="showLogin"
-                   class="mx-1"
+            <v-btn v-if="!authStore.isLogin"
+                   class="round-btn mx-1"
+                   color="primary-darken-1"
+                   variant="flat"
                    to="/login"
                    size="small"
             >
@@ -111,6 +124,9 @@ function onShowSearchStr(){
   align-content: center;
   display: flex;
   flex-wrap: wrap;
+}
+.round-btn{
+  border-radius: 2px;
 }
 .search-input{
   border-radius: 2px;

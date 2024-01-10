@@ -30,10 +30,10 @@ const article = ref<IArticle>({
     id:'',
     surname:'',
     name:'',
-    birthday:new Date(),
+    birthday:'',
     path_bucket:'',
-    date_create: new Date(),
-    modified_date: new Date()
+    date_create: '',
+    modified_date: ''
   },
   tagItems:[],
   reaction: null,
@@ -41,13 +41,14 @@ const article = ref<IArticle>({
 });
 const initContent = ref('');
 const articleStore = useArticleStore();
-const  userId = MyLocalStorage.getItem('userId');
+const  peopleId = MyLocalStorage.getItem('peopleId');
 const emotionStore = useReactionStore();
 const isLoading = ref(true);
 onBeforeMount(()=>{
   if(typeof id ==='string'){
-    articleStore.getArticle(id)//отримуємо статтю з сервера
+    articleStore.getArticle(id, peopleId)//отримуємо статтю з сервера
         .then((data) =>{
+          console.log('readArticle=', data)
           isLoading.value=false;
           if (data !== undefined){
             article.value = data;
@@ -121,13 +122,13 @@ function downloadFile(){
   <v-row>
     <v-container class=" px-0 px-lg-1">
       <v-row class="flex-grow-1">
-        <v-col lg="9" md="8" class="d-flex flex-grow-1 px-0 px-lg-1">
+        <v-col lg="9" md="7" class="d-flex flex-grow-1 pe-3">
           <RichTextEditor v-if="!isLoading"
               :initialContent="initContent"
               :is-read-only="editorReadOnly"
           />
         </v-col>
-        <v-col lg="3" md="4" class="d-none d-md-flex px-0 px-lg-1">
+        <v-col lg="3" md="5" class="d-none d-md-flex px-0 px-lg-1">
           <div class="d-flex flex-column">
             <v-list bg-color="background" class="auth-list">
               <v-list-item >
@@ -139,7 +140,7 @@ function downloadFile(){
               <v-list-item>
                 <v-icon class="me-2" icon="mdi-calendar-blank-outline"/>
                 <v-list-item-title class="d-inline">
-                  Дата: {{ article.date_created?.toLocaleDateString }}
+                  Дата: {{ article.date_created }}
                 </v-list-item-title>
               </v-list-item>
               <v-list-item>
@@ -156,19 +157,29 @@ function downloadFile(){
               </v-list-item>
             </v-list>
             <v-card
-                class="mx-auto mt-6"
-                max-width="300"
+                class="ps-3 mt-6"
             >
               <v-list>
-                <v-list-subheader class="article-list-title">Популярні</v-list-subheader>
+                <v-list-subheader
+                    class="text-h5 font-weight-bold text-center"
+                >
+                  <span class="my-auto">Популярні</span>
+                </v-list-subheader>
 
-                <v-list-item class="d-flex flex-row flex-wrap align-center"
+                <v-list-item
                     v-for="(item, i) in articleStore.articles"
                     :key="i"
                 >
-                  <span class="article-list-key d-inline me-1">{{ i+1 }}</span>
+                  <v-row>
+                    <v-col cols="2" class="pa-0">
+                      <span class="text-h4 font-weight-bold me-1">{{ i+1 }}</span>
+                    </v-col>
+                    <v-col cols="10" class="pa-0">
+                      <v-card-text class="text-subtitle-1 ps-1">{{item.title}}</v-card-text>
+                    </v-col>
+                  </v-row>
 
-                  <v-list-item-title class="article-list-item d-inline flex-wrap">{{item.title}}</v-list-item-title>
+
                 </v-list-item>
               </v-list>
             </v-card>

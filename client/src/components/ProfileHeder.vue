@@ -1,5 +1,19 @@
 <script setup lang="ts">
+  import {computed} from "vue";
+  import  type {ComputedRef} from "vue";
+  import type {IUser} from "@/api/type";
+  import MyLocalStorage from "@/services/myLocalStorage";
+  import {useRouter} from "vue-router";
 
+  const user:ComputedRef<null | IUser>= computed(()=>{
+    let userStorage = MyLocalStorage.getItem('user');
+    if (userStorage == null) return null;
+    return userStorage as IUser;
+  })
+  const router = useRouter();
+  function goToUserProfile(){
+    router.push({ name: 'profile'});
+  }
 </script>
 
 <template>
@@ -12,15 +26,15 @@
     </div>
     <div class="general-size content-zone">
       <div class="btn-zone general-size">
-        <v-chip>
+        <v-chip color="black" variant="tonal" class="rounded-btn" size="small" @click="goToUserProfile">
           Редагувати профіль
         </v-chip>
-        <v-chip variant="outlined">
+        <v-chip variant="outlined" class="rounded-btn" size="small" color="black">
           Налаштування
         </v-chip>
       </div>
-      <div class="general-size info-align">Прізвище ім'я</div>
-      <div class="general-size info-align">Київ, Україна</div>
+      <div class="general-size info-align">{{user?.people_?.surname}} {{user?.people_?.name}} </div>
+      <div class="general-size info-align">{{user?.email}}</div>
     </div>
 
   </v-col>
@@ -43,7 +57,9 @@
 
  }
  .content-zone{
+   background-color: white;
    flex-direction:column;
+   padding: 10px 10px 30px 30px;
    z-index: 0;
  }
  .general-size{
@@ -61,5 +77,10 @@
 
  .info-align{
    justify-content: flex-start;
+ }
+ .rounded-btn{
+   border-radius: 20px!important;
+   margin: 0 5px;
+
  }
 </style>

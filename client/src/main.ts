@@ -4,7 +4,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
-import '@/assets/styles/main.scss'
+//import '@/styles/main.scss'
 
 
 // Vuetify
@@ -44,26 +44,34 @@ const vuetify = createVuetify({
     directives,
     defaults: {
         VBtn: {
-            variant:'text',
-            style: 'border-radius: 0',
+            color:'primary-darken-1',
+            variant:'flat',
+
         },
         VCombobox:{
             variant:'outlined',
             density:'compact',
-            style: 'border-radius: 2px;',
+            style: {
+                borderRadius: '2px',
+            },
         },
-        VSelect:{
-            variant:'outlined',
-            density:'compact',
-            style: 'border-radius: 2px;',
+        VSelect: {
+            variant: 'outlined',
+            density: 'compact',
+            style: {
+                borderRadius: '2px',
+            },
         },
         VTextField:{
             variant:'outlined',
-            density:'compact',
-            style: 'border-radius: 2px;',
+            density:'compact'
         },
         VChip:{
-            style: 'border-radius: 0;',
+            color:'primary-darken-1',
+            variant:'elevated',
+            style: {
+                borderRadius: '2px',
+            },
         }
     },
     icons: {
@@ -75,6 +83,7 @@ const vuetify = createVuetify({
             myCustomLightTheme
         },
     },
+
 })
 const app = createApp(App)
 

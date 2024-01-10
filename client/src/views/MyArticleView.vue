@@ -10,6 +10,11 @@
   const showSelected = false;//не показуємо в кабінеті користувача
   const showMenu = true; //меню показуємо тільки в кабінеті користувача
   const peopleId=MyLocalStorage.getItem('peopleId');
+  const selectedTag = ref<Array<string>>([])//модель для фільтру Теги
+  const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
+
+  const sortedValue = ref<number>(0);
+
   onMounted(() => {
     articleStore.getMyArticleList(peopleId); //список моїх статей
     articleStore.getScienceList(); //отримуємо список наукових сфер
@@ -23,28 +28,46 @@
   function closeDialog(show:boolean){
     showDialog.value=show;
   }
+  function tagFiltered(focused:boolean){ //по тегу
+    if (!focused)
+      console.log('selectedTag =', selectedTag.value)
+    // articleStore.searchArticlesByParam()
+  }
+  function selectSortParam(){
+    console.log("sortedValue=", sortedValue)
+  }
 </script>
 
 <template>
   <!--відкрити діалог створення нової статті-->
-  <v-row justify="center">
-    <v-col cols="2">
-        <v-combobox
-            label="За тегом"
-            :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-            variant="outlined"
-        ></v-combobox>
-    </v-col>
-    <v-col cols="2">
-    <v-combobox
-            label="За датою публікації"
-            :items="['2018', '2019', '2020', '2021', '2022', '2023']"
-            variant="outlined"
-        ></v-combobox>
-    </v-col>
-    <v-col cols="2">
-    </v-col>
-    <v-col cols="4">
+  <v-row class="py-10 justify-space-between align-content-center">
+      <v-col cols="6" class="ps-0">
+        <div class="d-flex">
+          <v-combobox
+              class="mx-3 w-50"
+              label="Теги"
+              :items="articleStore.tagItems"
+              :delimiters="delimiters"
+              v-model="selectedTag"
+              multiple
+              chips
+              @update:focused="tagFiltered"
+          ></v-combobox>
+          <v-select
+              class="mx-3 w-50"
+              v-model="sortedValue"
+              hint="Оберіть параметр сортування"
+              :items="articleStore.sortedOptions"
+              item-title="value"
+              item-value="key"
+              label="Впорядкувати"
+              @update:modelValue= "selectSortParam"
+          ></v-select>
+        </div>
+
+      </v-col>
+
+    <v-col cols="4" class="d-flex justify-end pe-0">
       <div>
         <v-dialog
             v-model="showDialog"
@@ -53,10 +76,8 @@
         >
           <template v-slot:activator="{ props }">
             <v-btn
-                variant="outlined"
                 v-bind="props"
-                color="primary"
-                class="circular-btn"
+                class="circular-btn text-center"
             >
               Нова стаття
             </v-btn>
@@ -75,7 +96,7 @@
   </v-row>
 
   <v-row class="justify-center">
-    <v-col cols="12"  md="10" sm="12">
+    <v-col cols="12">
       <v-overlay :model-value="articleStore.isLoading"
                  class="align-center justify-center">
         <v-progress-circular
@@ -102,4 +123,5 @@
    justify-content: flex-start;
    width: 100%;
  }
+
 </style>

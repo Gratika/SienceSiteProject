@@ -86,8 +86,16 @@ namespace apiServer.Controllers.Minio
                 .WithSSL(false)
                 .Build();
                 string downloadUrl = await minio.PresignedGetObjectAsync(args);
+                var json = new
+                {
 
-            return downloadUrl;
+                    url = downloadUrl
+                };
+
+                // Преобразование объекта JSON в строку
+                string jsonResult = JsonConvert.SerializeObject(json);
+
+                return jsonResult;
             }
             catch
             {

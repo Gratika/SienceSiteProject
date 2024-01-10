@@ -6,6 +6,8 @@ import ArticleItem from "@/components/ArticleItem.vue";
 import Heder from "@/components/Heder.vue";
 import MyLocalStorage from "@/services/myLocalStorage";
 import ArticleCarousels from "@/components/ArticleCarousels.vue";
+import CategoryCard from "@/components/CategoryCard.vue";
+import ScienceCarousels from "@/components/ScienceCarousels.vue";
 
 const articleStore = useArticleStore();
 const showSelected = ref(false);
@@ -17,6 +19,7 @@ onMounted(() => {
   }
   articleStore.getNewArticleList();
   articleStore.getPopularArticleList(9);
+  articleStore.getScienceList();
 
 });
 
@@ -24,7 +27,6 @@ onMounted(() => {
 
 <template>
   <v-container>
-    <Heder/>
     <v-row class="justify-center">
       <v-col cols="12"  md="12" sm="12">
         <v-overlay :model-value="articleStore.isLoading"
@@ -37,12 +39,21 @@ onMounted(() => {
       </v-col>
     </v-row>
   </v-container>
-  <ArticleCarousels :articles="articleStore.articles"/>
+  <Heder/>
+  <ArticleCarousels :articles="articleStore.newArticles"/>
+  <ScienceCarousels :science="articleStore.sciences"/>
   <v-container>
+    <v-row>
+      <v-col cols="12">
+        <div class="sub-title mb-6">
+          Популярне
+        </div>
+      </v-col>
+    </v-row>
     <v-row class="justify-center">
       <v-col cols="12"  md="12" sm="12">
         <ArticleItem
-            v-for="article in articleStore.newArticles"
+            v-for="article in articleStore.articles"
             :key="article.id"
             :article="article"
             :show-selected="showSelected"
@@ -55,5 +66,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
+.sub-title{
+  color: #000;
+  font-family: Mariupol;
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
 </style>

@@ -2,6 +2,7 @@
 import type {IArticle} from "@/api/type";
 import {useRouter} from "vue-router";
 import {useArticleStore} from "@/stores/articleStore";
+import moment from "moment/moment";
 
 //пропси від батьківського елементу
 const props = defineProps<{
@@ -57,6 +58,13 @@ function changeArticleSelect(){
   let article_id= props.article?.id as string;
   articleStore.addToFavorites(article_id);
 }
+function formatDate(date: null | string): string {
+  //console.log('date=',date)
+ // console.log('typeof date=',typeof date)
+  if (date == null) return '';
+  const formattedDate: Date = new Date(date);
+  return (moment(formattedDate)).format('DD.MM.YYYY HH:mm')
+}
 
 
 </script>
@@ -64,26 +72,40 @@ function changeArticleSelect(){
 <template>
 
   <v-card class="ma-4 pa-5 left-border" variant="elevated">
-    <v-card-title class="d-flex">
+
       <v-row>
         <v-col cols="11">
-          <span class="d-inline font-weight-bold" @click="readArticle">{{ props.article.title }}</span>
+          <v-card-text
+              class="text-h5 font-weight-bold"
+              style="line-height: 1.5rem"
+              @click="readArticle">
+            {{ props.article.title }}
+          </v-card-text>
         </v-col>
         <v-col cols="1">
           <div v-if="props.showSelected">
-            <v-btn icon @click="changeArticleSelect">
-              <v-icon>mdi-bookmark-outline</v-icon>
-            </v-btn>
+            <v-btn
+                icon="mdi-bookmark-outline"
+                class="style-btn-article-card flex-grow-1"
+                variant="text"
+                @click="changeArticleSelect"
+            />
+
           </div>
           <div v-else-if="props.showMenu" class="text-center">
             <v-menu :location="location">
               <template v-slot:activator="{ props }">
-                <v-btn icon v-bind="props">
-                  <v-icon>mdi-dots-horizontal</v-icon>
-                </v-btn>
+                <v-btn
+                    icon="mdi-dots-horizontal"
+                    variant="text"
+                    class="style-btn-article-card flex-grow-1"
+                    v-bind="props"
+                />
+
+
               </template>
 
-              <v-list>
+              <v-list color="black">
                 <v-list-item
                     v-for="(item) in menuItems"
                     :key=item.key
@@ -101,15 +123,15 @@ function changeArticleSelect(){
           </div>
         </v-col>
       </v-row>
-    </v-card-title>
 
-    <v-card-text class="headline">
-      <div>
+
+    <v-card-text>
+      <div class="text-h6 font-weight-medium">
         <div>
-          Автор: {{ author_() }}
+         Автор: {{ author_() }}
         </div>
         <div>
-          Дата: {{ props.article.date_created}}
+        Дата: {{ formatDate(props.article.date_created)}}
         </div>
         <div>
           Мова:
@@ -122,7 +144,7 @@ function changeArticleSelect(){
           <v-chip
               v-for="(item, index) in props.article.tagItems"
               :key="index"
-              class="ma-2"
+              class="ma-2 text-sm-body-1 font-weight-bold"
               color="primary-darken-1"
               variant="flat"
           >
@@ -130,9 +152,12 @@ function changeArticleSelect(){
           </v-chip>
         </v-col>
         <v-col cols="1">
-          <v-btn icon>
-            <v-icon>mdi-thumb-up-outline</v-icon>
-          </v-btn>
+          <div class="d-flex justify-space-between">
+            <v-icon icon="mdi-thumb-up-outline"/>
+            <span>{{props.article.countLike}}</span>
+          </div>
+
+
         </v-col>
       </v-row>
 
@@ -142,7 +167,12 @@ function changeArticleSelect(){
 
 <style scoped>
 .left-border{
-  border-left-width: 5px;
-  border-left-color: #2A3759
+  border-left-width: 21px;
+  border-left-color: #2A3759;
+  border-radius: 5px;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
+}
+.style-btn-article-card{
+  border-radius: 50%!important;
 }
 </style>
