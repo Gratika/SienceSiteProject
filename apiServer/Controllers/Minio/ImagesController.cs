@@ -5,6 +5,8 @@ using Minio;
 using Minio.DataModel.Args;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
+using System.Linq;
 
 namespace apiServer.Controllers.Minio
 {
@@ -18,6 +20,7 @@ namespace apiServer.Controllers.Minio
         private readonly IMinioClient _minio;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly FilesController _filesController;
+        private readonly string bucket;
         public ImagesController(ArhivistDbContext context, GenerateRandomStringController genericString, IWebHostEnvironment hostingEnvironment, FilesController filesController)
         {
             _context = context;
@@ -30,9 +33,10 @@ namespace apiServer.Controllers.Minio
                 .Build();
             _hostingEnvironment = hostingEnvironment;
             _filesController = filesController;
+            bucket = "images";
         }
         [HttpPost("AddImages")]
-        public async Task<ActionResult<string>> AddImages([FromForm] List<IFormFile> upload) // обращаемся в minio для взятия url файлов
+        public async Task<ActionResult<string>> AddImages([FromForm] List<IFormFile> upload, string articleId) // обращаемся в minio для взятия url файлов
         {
             try
             {
@@ -42,12 +46,12 @@ namespace apiServer.Controllers.Minio
             }
             //Если бакета не существует - добавляем
             var beArgs = new BucketExistsArgs()
-                .WithBucket("images");
+                .WithBucket(bucket);
             bool found = await _minio.BucketExistsAsync(beArgs).ConfigureAwait(false);
             if (!found)
             {
                 var mbArgs = new MakeBucketArgs()
-                    .WithBucket("images");
+                    .WithBucket(bucket);
                 await _minio.MakeBucketAsync(mbArgs).ConfigureAwait(false);
             }
 
@@ -55,13 +59,17 @@ namespace apiServer.Controllers.Minio
             IFormFile fileInWebp = _filesController.ConvertToWebp(upload[0]);
             string NewFileName = Path.GetFileNameWithoutExtension(fileInWebp.FileName) + "_" + DateTime.Now.Ticks + Path.GetExtension(fileInWebp.FileName);
             var putObjectArgs = new PutObjectArgs()
-                         .WithBucket("images")
+                         .WithBucket(bucket)
                          .WithObject(NewFileName)
                          .WithObjectSize(fileInWebp.Length)
                          .WithStreamData(fileInWebp.OpenReadStream());
             await _minio.PutObjectAsync(putObjectArgs);
             var url = await GetUrl(NewFileName);
 
+                Articles article = _context.Articles.FirstOrDefault(a => a.Id == articleId);
+                article.urls += url + ",";
+                _context.Articles.Update(article);
+                _context.SaveChanges();
 
             return url;
             }
@@ -76,7 +84,7 @@ namespace apiServer.Controllers.Minio
             try
             {
                 PresignedGetObjectArgs args = new PresignedGetObjectArgs()
-                                                     .WithBucket("images")
+                                                     .WithBucket(bucket)
                                                      .WithObject(path_files)
                                                      .WithExpiry(3600);
 
@@ -86,9 +94,10 @@ namespace apiServer.Controllers.Minio
                 .WithSSL(false)
                 .Build();
                 string downloadUrl = await minio.PresignedGetObjectAsync(args);
+
+                // Создание объекта JSON
                 var json = new
                 {
-
                     url = downloadUrl
                 };
 
@@ -102,10 +111,19 @@ namespace apiServer.Controllers.Minio
                 throw new Exception();
             }
         }
-        //[HttpPost("Delete")]
-        //public async Task<string> Delete(string url) // обращаемся в minio для взятия url файлов
-        //{
-
-        //}
+        [HttpPost("Delete")]
+        public async void Delete(Articles article) // обращаемся в minio для взятия url файлов
+        {
+            string[] urls = article.urls.Split(',');
+            foreach (string url in urls)
+            {
+                Uri uri = new Uri(url);
+                string FileName = uri.Segments[uri.Segments.Length - 1];
+                RemoveObjectArgs args = new RemoveObjectArgs()
+                                                         .WithBucket(bucket)
+                                                         .WithObject(FileName);
+                await _minio.RemoveObjectAsync(args);
+            }           
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace apiServer.Controllers.Solr
         ISolrOperations<Articles> ArticleSolr;      
         ISolrOperations<People> PeopleSolr;
         ISolrOperations<Scientific_theories> TheoriesSolr;
+        //ISolrOperations<Selected_articles> SelectedArticlesSolr;
         ArhivistDbContext _context;
        
         public SolrArticleController(ArhivistDbContext context)
@@ -22,25 +23,26 @@ namespace apiServer.Controllers.Solr
             _context = context;
             ArticleSolr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
             PeopleSolr = ServiceLocator.Current.GetInstance<ISolrOperations<People>>();
-            TheoriesSolr = ServiceLocator.Current.GetInstance<ISolrOperations<Scientific_theories>>();           
+            TheoriesSolr = ServiceLocator.Current.GetInstance<ISolrOperations<Scientific_theories>>();
+            //SelectedArticlesSolr = ServiceLocator.Current.GetInstance<ISolrOperations<Selected_articles>>();
+        }
+        [HttpPost("Check")]
+        public ActionResult Check()
+        {
+            Selected_articles sel = new Selected_articles();
+            sel.Id = Guid.NewGuid().ToString();
+            sel.article_id = "da7df965-1419-4516-bae0-5b2dddf12bbb";
+            sel.people_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
+            sel.Date_view = DateTime.Now;
+
+
+            return AddArticle(sel);
         }
         [HttpPost("AddArticle")]
-        public ActionResult AddArticle<T>(T model /*string title, string text, string tag, string author, int views, string? DOI*/) // возвращение конкретной статьи
+        public ActionResult AddArticle<T>(T model ) // возвращение конкретной статьи
         {
             try
-            {
-                //DateTime DataCreate = DateTime.Now;
-                //Articles ex = new Articles();
-                //ex.Id = "dasdas-12312csa-cascsa2";
-                //ex.title = "Example";
-                //ex.text = "Example";
-                //ex.tag = "Example";
-                //ex.views = 14;
-                ////ex.author_id = "1";
-                //ex.date_created = DataCreate;
-                //ex.modified_date = DataCreate;
-                //ex.theory_id = "1";
-
+            {              
                 switch (model)
                 {
                     case Articles article:
@@ -55,6 +57,10 @@ namespace apiServer.Controllers.Solr
                         TheoriesSolr.Add(theoris);
                         TheoriesSolr.Commit();
                         break;
+                    //case Selected_articles selected:
+                    //    SelectedArticlesSolr.Add(selected);
+                    //    SelectedArticlesSolr.Commit();
+                    //    break;
                 }
                 
 
@@ -65,15 +71,27 @@ namespace apiServer.Controllers.Solr
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost("AddAllArticleFromDb")]
+        [HttpPost("AddAllFromDb")]
         public ActionResult AddAllArticleFromDb()
         {
             try
             {
                 List<Articles> articles = _context.Articles.ToList();
+                List<People> peoples = _context.people.ToList();
+                List<Scientific_theories> theories = _context.Scientific_theories.ToList();
+                List<Selected_articles> SelectedArticles = _context.Selected_articles.ToList();
 
-                ArticleSolr.AddRange(articles);
+                ArticleSolr.AddRange(articles);                         
                 ArticleSolr.Commit();
+
+                PeopleSolr.AddRange(peoples);
+                PeopleSolr.Commit();
+
+                TheoriesSolr.AddRange(theories);
+                TheoriesSolr.Commit();
+
+                //SelectedArticlesSolr.AddRange(SelectedArticles);
+                //SelectedArticlesSolr.Commit();
 
                 return Ok("Успешно данные добавлены в Solr");
             }
@@ -85,16 +103,6 @@ namespace apiServer.Controllers.Solr
         [HttpPost("RedactArticle")]
         public void RedactArticle(Articles article)
         {
-
-            //Example ex = new Example();
-            //ex.Id = article.Id;
-            //ex.title = article.title;
-            //ex.text = article.text;
-            //ex.tag = article.tag;
-            //ex.views = article.views;
-            //ex.author = article.author_id;
-            //ex.dataCreate = article.date_created;
-            //ex.DOI = article.DOI;
             try
             {
                 ArticleSolr.Add(article, new AddParameters { Overwrite = true });
@@ -134,36 +142,6 @@ namespace apiServer.Controllers.Solr
             {
                 throw new Exception();
             }
-        }
-        [HttpPost("Checking")]
-        public ActionResult Checking()
-        {
-            //DateTime DataCreate = DateTime.Now;
-            //Articles ex = new Articles();
-            //ex.Id = "dasdas-12312csa-cascsa2";
-            //ex.title = "Example";
-            //ex.text = "Example";
-            //ex.tag = "Example";
-            //ex.views = 14;
-            //ex.author_id = "7d35600a-c9e1-4826-99e7-abe7a23bd19d";
-            //ex.date_created = DataCreate;
-            //ex.modified_date = DataCreate;
-            //ex.theory_id = "bdde4549-5718-40e9-9859-72c080063958";
-
-            //People ex = new People();
-            //ex.Id = "7d35600a-c9e1-4826-99e7-abe7a23bd19d";
-            //ex.surname = "Example";
-            //ex.name = "ExName";
-            //ex.date_create = DateTime.Now;
-            //ex.modified_date = DateTime.Now;
-
-            Scientific_theories ex = new Scientific_theories();
-            ex.Id = "bdde4549-5718-40e9-9859-72c080063958";
-            ex.science_id = "1";
-            ex.note = "Example";
-            ex.name = "Test";
-
-            return AddArticle(ex);
         }
         [HttpGet("GetArticle")]
         public List<Articles> GetArticle(string SearchStr, QueryOptions optionForSolr)

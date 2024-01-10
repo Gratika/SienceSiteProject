@@ -25,7 +25,7 @@ namespace apiServer.Controllers.ForModels
         {
             try
             {
-                var SelectArticle = _context.Selected_articles.Where(a => a.user_id == idPeople).Include(a => a.user_).Include(a => a.article_).ToList();
+                var SelectArticle = _context.Selected_articles.Where(a => a.people_id == idPeople).Include(a => a.people_).Include(a => a.article_).ToList();
 
                 return Ok(SelectArticle);
             }
@@ -35,14 +35,14 @@ namespace apiServer.Controllers.ForModels
             }
         }
         [HttpPost("AddSelectArticle")]
-        public async Task<ActionResult> AddSelectArticle(string ArticleId, string UserId) //добавление в избранное
+        public async Task<ActionResult> AddSelectArticle(string ArticleId, string PeopleId) //добавление в избранное
         {
             try
-            {
+            {              
                 Selected_articles SelectArticle = new Selected_articles();
+                SelectArticle.article_id = ArticleId;
+                SelectArticle.people_id = PeopleId;
                 SelectArticle.Id = Guid.NewGuid().ToString();
-                //SelectArticle.article_id = ArticleId;
-                //SelectArticle.user_id = UserId;
                 SelectArticle.Date_view = DateTime.Now;
 
                 _context.Selected_articles.Add(SelectArticle);

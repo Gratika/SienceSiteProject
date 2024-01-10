@@ -22,7 +22,7 @@ namespace apiServer.Controllers.ForModels
         [HttpPost("AddReaction")]
         public ActionResult AddReaction(Reactions reaction)
         {
-            //reaction.article_id = "fec4ce59-2ce9-4398-a2a1-e36af2795af7";
+            //reaction.article_id = "da7df965-1419-4516-bae0-5b2dddf12bbb";
             //reaction.people_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
             //reaction.reaction_id = "1";
             //Пример
@@ -35,9 +35,9 @@ namespace apiServer.Controllers.ForModels
             return Ok("Реакция добавленна");
         }
         [HttpGet("GetReactionForArticle")]
-        public ArticleAndReactions GetReactionForArticle(string articleId, string emojiId, string peopleId)
+        public FullArticle GetReactionForArticle(string articleId, string emojiId, string peopleId)
         {
-            ArticleAndReactions articleAndReactions = new ArticleAndReactions();
+            FullArticle articleAndReactions = new FullArticle();
             articleAndReactions.CountReactions = _context.Reactions.Where(r => r.reaction_id == emojiId).Count(r => r.article_id == articleId);
             bool IsUserReact = _context.Reactions.Where(r => r.reaction_id == emojiId).Any(r => r.article_id == articleId && r.people_id == peopleId);
             if (IsUserReact == true)
@@ -46,7 +46,6 @@ namespace apiServer.Controllers.ForModels
             }
 
             return articleAndReactions;
-
         }
         [HttpGet("Delete")]
         public void Delete(string articleId)
