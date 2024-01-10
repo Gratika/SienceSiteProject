@@ -1,8 +1,11 @@
-﻿using apiServer.Controllers.Solr;
+﻿using apiServer.Controllers.ForModels;
+using apiServer.Controllers.Solr;
 using apiServer.Models;
+using apiServer.Models.ForUser;
 using CommonServiceLocator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SolrNet;
 using SolrNet.Commands.Parameters;
 
@@ -14,18 +17,25 @@ namespace apiServer.Controllers.Search
     [ApiController]
     public class MainTabArticlesController : ControllerBase
     {
-        ISolrOperations<Articles> solr;
-        SolrArticleController solrArticleController;
-        public MainTabArticlesController(SolrArticleController solrArticleControllerNew)
+        private readonly ArhivistDbContext _context;
+        private readonly ISolrOperations<Articles> solr;
+        private readonly SolrArticleController solrArticleController;
+        private readonly ReactionController _reactionController;
+        private readonly string emojiId;
+
+        public MainTabArticlesController(ArhivistDbContext context, SolrArticleController solrArticleControllerNew, ReactionController reactionController)
         {
+            _context = context;
             solr = ServiceLocator.Current.GetInstance<ISolrOperations<Articles>>();
             solrArticleController = solrArticleControllerNew;
+            _reactionController = reactionController;
+            emojiId = "1";
         }
         [HttpGet("NewArticle")]
         public async Task<ActionResult> NewArticle(int amount) // возвращение статей от новых к старым
         {
-           try
-           {
+           //try
+           //{
                 var options = new QueryOptions
                 {
                     OrderBy = new[] { new SortOrder("date_created", Order.DESC) },      
@@ -33,12 +43,20 @@ namespace apiServer.Controllers.Search
                 };
                 List<Articles> articles = solrArticleController.GetArticle("*:*", options);
 
-                return Ok(articles);
-           }
-           catch (Exception ex)
-           {
-               return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
-           }
+                List<FullArticle> articleAndReactions = new List<FullArticle>();
+            foreach (var article in articles)
+            {
+                FullArticle ar = _reactionController.GetReactionForArticle(article.Id, emojiId, article.author_id);
+                ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
+                articleAndReactions.Add(new FullArticle { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+            }
+
+            return Ok(articleAndReactions);
+           //}
+           //catch (Exception ex)
+           //{
+           //    return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+           //}
         }
         [HttpGet("PopularArticle")]
         public async Task<ActionResult> PopularArticle(int amount) // возвращение статей от новых к старым
@@ -52,7 +70,15 @@ namespace apiServer.Controllers.Search
                 };
                 List<Articles> articles = solrArticleController.GetArticle("*:*", options);
 
-                return Ok(articles);
+                List<FullArticle> articleAndReactions = new List<FullArticle>();
+                foreach (var article in articles)
+                {
+                    FullArticle ar = _reactionController.GetReactionForArticle(article.Id, emojiId, article.author_id);
+                    ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
+                    articleAndReactions.Add(new FullArticle { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+                }
+
+                return Ok(articleAndReactions);
             }
             catch (Exception ex)
             {

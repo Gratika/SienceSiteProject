@@ -4,6 +4,8 @@ using apiServer.Models;
 using apiServer.Models.ForUser;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Security.Cryptography.Xml;
 
 namespace apiServer.Controllers.Solr
@@ -16,27 +18,28 @@ namespace apiServer.Controllers.Solr
         private readonly OrderingController _orderingController;
         private readonly FiltersController _filtersController;
         private readonly ReactionController _reactionController;
+        private readonly ArhivistDbContext _context;
         private readonly string emojiId;
-        public MenuSearchingController(SearchController searchController, OrderingController orderingController, FiltersController filtersController, ReactionController reactionController)
+        public MenuSearchingController(SearchController searchController, OrderingController orderingController, FiltersController filtersController, ReactionController reactionController, ArhivistDbContext context)
         {
             _searchController = searchController;
             _orderingController = orderingController;
             _filtersController = filtersController;
             _reactionController = reactionController;
+            _context = context;
             emojiId = "1";
         }
 
         [HttpPost("SearchWithFilters")]
-        public ActionResult<List<Articles>> SearchWithFilters(string SearchString, int Pages,int? year, List<int>? Filters, int? TypeOrder,string? tags, string? peopleId) // возвращение по наибольшему числу просмотров
+        public async Task<ActionResult<List<Articles>>> SearchWithFilters( int Pages, string? SearchString, int? year, int? Filters, int? TypeOrder,string? tags, string? peopleId,string? scienceId) // возвращение по наибольшему числу просмотров
         {
-            try
-            {
+            //try
+            //{
                 //Filters = new List<int>();
                 //Filters.Add(1);
-                SearchResponse<Articles> searchResponse = SearchWithOrders(SearchString, Pages * 10, TypeOrder, tags, peopleId);
-                for (int i = 0; i < Filters.Count; i++)
-                {
-                    switch (Filters[i])
+                SearchResponse<Articles> searchResponse = await SearchWithOrders(Pages * 10, SearchString, TypeOrder, tags, peopleId);               
+
+                    switch (Filters)
                     {
                         case 1:
                             searchResponse.Articles = _filtersController.OnlySciensceArticles(searchResponse.Articles);
@@ -45,34 +48,43 @@ namespace apiServer.Controllers.Solr
                             searchResponse.Articles = _filtersController.SimpleArticles(searchResponse.Articles);
                             break;
                     }
-                }
                 if (year != null)
                 {
                     searchResponse.Articles = _filtersController.SelectYear(searchResponse.Articles, year);
                 }
-
-                SearchResponse<ArticleAndReactions> articlesAndReactions = new SearchResponse<ArticleAndReactions>();
-                articlesAndReactions.Articles = new List<ArticleAndReactions>();
-                articlesAndReactions.allPages = searchResponse.allPages;
-                foreach (var article in searchResponse.Articles)
+                if(!string.IsNullOrEmpty(scienceId))
                 {
-                    ArticleAndReactions ar = _reactionController.GetReactionForArticle(article.Id, emojiId, article.author_id);
-                    articlesAndReactions.Articles.Add(new ArticleAndReactions { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions});
+                    searchResponse.Articles = searchResponse.Articles.Where(a => a.theory_.science_id == scienceId).ToList();
                 }
 
-            return Ok(articlesAndReactions);
-        }
-            catch (Exception ex)
+                SearchResponse<FullArticle> articlesAndReactions = new SearchResponse<FullArticle>();
+                articlesAndReactions.Articles = new List<FullArticle>();
+                articlesAndReactions.allPages = searchResponse.allPages;
+            foreach (var article in searchResponse.Articles)
             {
-                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
-    }
-}
+                FullArticle ar = _reactionController.GetReactionForArticle(article.Id, emojiId, article.author_id);
+                ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
+                articlesAndReactions.Articles.Add(new FullArticle { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+            }
+
+            return Ok(articlesAndReactions);
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
+            //}
+        }
         [HttpGet("SearchWithOrdersAndTags")]
-        public SearchResponse<Articles> SearchWithOrders(string SearchString, int Pages, int? TypeOrder, string? tags,string? peopleId) // возвращение по наибольшему числу просмотров
+        public async Task<SearchResponse<Articles>> SearchWithOrders( int Pages, string? SearchString, int? TypeOrder, string? tags,string? peopleId) // возвращение по наибольшему числу просмотров
         {
             try
             {
+                if (string.IsNullOrEmpty(SearchString))
+                {
+                    SearchString = "*";
+                }
                 List<Articles> articles = _searchController.Search(SearchString, tags, peopleId);
+
                 switch (TypeOrder)
                 {
                     case 10:

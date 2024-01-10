@@ -30,6 +30,7 @@ builder.Services.AddScoped<SolrArticleController>();
 builder.Services.AddScoped<OrderingController>();
 builder.Services.AddScoped<FiltersController>();
 builder.Services.AddScoped<ReactionController>();
+builder.Services.AddScoped<ImagesController>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -59,6 +60,7 @@ if (app.Environment.IsDevelopment())
 Startup.Init<Articles>("http://solr:8983/solr/new_core");
 Startup.Init<People>("http://solr:8983/solr/new_core");
 Startup.Init<Scientific_theories>("http://solr:8983/solr/new_core");
+//Startup.Init<Selected_articles>("http://solr:8983/solr/new_core");
 app.UseAuthorization();
 
 app.MapControllers();
