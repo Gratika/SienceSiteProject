@@ -136,10 +136,8 @@ namespace apiServer.Controllers.ForModels
             return Ok("Статья удачно сохраненна");
         }
         [HttpPost("DeleteArticle")]
-        public async Task<ActionResult> DeleteArticle(/*Articles article*/ string articleId)
+        public async Task<ActionResult> DeleteArticle(Articles article)
         {
-            Articles article = _context.Articles.FirstOrDefault(a => a.Id == articleId);
-
             _searchController.DeleteArticle(article.Id);          
             //_redisArticleController.DeleteData(article.Id);
             if (!string.IsNullOrEmpty(article.urls))
