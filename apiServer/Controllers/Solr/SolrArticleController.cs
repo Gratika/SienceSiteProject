@@ -26,18 +26,6 @@ namespace apiServer.Controllers.Solr
             TheoriesSolr = ServiceLocator.Current.GetInstance<ISolrOperations<Scientific_theories>>();
             //SelectedArticlesSolr = ServiceLocator.Current.GetInstance<ISolrOperations<Selected_articles>>();
         }
-        [HttpPost("Check")]
-        public ActionResult Check()
-        {
-            Selected_articles sel = new Selected_articles();
-            sel.Id = Guid.NewGuid().ToString();
-            sel.article_id = "da7df965-1419-4516-bae0-5b2dddf12bbb";
-            sel.people_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
-            sel.Date_view = DateTime.Now;
-
-
-            return AddArticle(sel);
-        }
         [HttpPost("AddArticle")]
         public ActionResult AddArticle<T>(T model ) // возвращение конкретной статьи
         {
@@ -143,7 +131,7 @@ namespace apiServer.Controllers.Solr
                 throw new Exception();
             }
         }
-        [HttpGet("GetArticle")]
+        [HttpPost("GetArticle")]
         public List<Articles> GetArticle(string SearchStr, QueryOptions optionForSolr)
         {
             var queryOptions = new QueryOptions
@@ -151,9 +139,12 @@ namespace apiServer.Controllers.Solr
                 ExtraParams = new Dictionary<string, string>
                     {
                       { "defType", "edismax" },  // Используем расширенный запрос
-                      { "qf", "Id id" },           // Указываем поле для поиска
+                      { "qf", "Id id" },           // Указываем поле для поиска                     
                     }
             };
+            //var filterQueries = queryOptions.FilterQueries.ToList();
+            //filterQueries.Add(new SolrQuery($"IsActive:\"{true}\""));
+            //queryOptions.FilterQueries = filterQueries.ToArray();
             List<Articles> articles = ArticleSolr.Query(SearchStr, optionForSolr);
             foreach (var article in articles)
             {
@@ -164,5 +155,5 @@ namespace apiServer.Controllers.Solr
             }
             return articles;
         }
-    }
+     }
 }

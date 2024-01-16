@@ -32,6 +32,8 @@ namespace apiServer.Models
         public string? path_file { get; set; }
         [JsonIgnore]
         public string? urls { get; set; }
+        [SolrField("IsActive")]
+        public bool IsActive { get; set; }
 
         public void SetAuthor(People author)
         {

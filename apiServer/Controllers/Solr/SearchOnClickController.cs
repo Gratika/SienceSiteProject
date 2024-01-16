@@ -18,24 +18,7 @@ namespace apiServer.Controllers.Search
         {
             solrArticleController = solrArticleControllerNew;
         }
-        [HttpGet("ForScientificArticle")]
-        public ActionResult ForScientificArticle(string theory_id ,int amount) // возвращение статей от новых к старым
-        {
-            try
-            {
-                var options = new QueryOptions
-                {
-                    FilterQueries = new[] { new SolrQueryByField("theory_id", theory_id) },
-                    Rows = amount // Количество записей, которые вы хотите получить
-                };
-                List<Articles> articles = solrArticleController.GetArticle("*:*", options);
-               
-                return Ok(articles);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
-            }
-        }
+
+
     }
 }

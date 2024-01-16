@@ -1,8 +1,10 @@
-﻿using apiServer.Models;
+﻿using apiServer.Controllers.Redis;
+using apiServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,23 +14,24 @@ namespace apiServer.Controllers.Authentication
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class TokensController : Controller
     {
         private ArhivistDbContext _context;
+        private readonly RedisController _redisRepository;
         public readonly IConfiguration _configuration; // необходим для доступа к jwt ключу
         public TokensController(IConfiguration configuration, ArhivistDbContext context)
         {
             _configuration = configuration;
             _context = context;
+            _redisRepository = new RedisController("redis:6379,abortConnect=false");
         }
 
         [HttpGet("GenerateAccessToken")]
-        public string GenerateAccessToken(string email)
+        public string GenerateAccessToken(string id)
         {
             try
             {
-                var identity = GetIdentity(email);
+                var identity = GetIdentity(id);
 
                 var now = DateTime.UtcNow;
                 // создаем JWT-токен
@@ -49,11 +52,11 @@ namespace apiServer.Controllers.Authentication
             }
         }
         [HttpGet("GenerateRefreshToken")]
-        public string GenerateRefreshToken(string email)
+        public string GenerateRefreshToken(string id)
         {
             try
             {
-                var identity = GetIdentity(email);
+                var identity = GetIdentity(id);
 
                 var now = DateTime.UtcNow;
                 // создаем JWT-токен
@@ -62,7 +65,7 @@ namespace apiServer.Controllers.Authentication
                         audience: _configuration["Jwt:Audience"],
                         notBefore: now,
                         claims: identity.Claims,
-                        expires: now.Add(TimeSpan.FromMinutes(15)), // Срок действия токена в минутах (15)
+                        expires: now.Add(TimeSpan.FromDays(15)), // Срок действия токена в минутах (15)
                         signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"])), SecurityAlgorithms.HmacSha256));
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
@@ -75,7 +78,7 @@ namespace apiServer.Controllers.Authentication
         }
 
         [HttpGet("IsTokenExpired")]
-        // Метод для проверки срока действия Access Token
+        // Метод для проверки срока действия Token
         public bool IsTokenExpired(string accessToken)
         {
             // В данном примере считаем, что Access Token действителен в течение 15-20 минут
@@ -92,7 +95,7 @@ namespace apiServer.Controllers.Authentication
             }
             return false;
         }
-        [HttpGet("Check")]        
+        [HttpGet("Check")]
         public string Check()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -100,14 +103,14 @@ namespace apiServer.Controllers.Authentication
 
             return "userId - " + userId + ", Token - " + token;
         }
-        private ClaimsIdentity GetIdentity(string email)
+        private ClaimsIdentity GetIdentity(string id)
         {
-            Users person = _context.Users.FirstOrDefault(x => x.email == email);
+            Users person = _context.Users.FirstOrDefault(x => x.Id == id);
             if (person != null)
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.email),
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.Id),
                 };
                 ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
@@ -117,6 +120,50 @@ namespace apiServer.Controllers.Authentication
 
             // если пользователя не найдено
             return null;
+        }
+        [HttpGet("CheckTokens")]
+        public ActionResult CheckTokens(string id, string accessToken, string refreshToken)
+        {
+            //try
+            //{
+                Users user = new Users();
+                user = _redisRepository.GetData<Users>(id);// Проверка наличия данных в кэше
+                if (user == null) // Данные отсутствуют в кэше, выполняем запрос к базе данных
+                {
+                    user = _context.Users.FirstOrDefault(u => u.access_token == accessToken);
+                }
+                if (IsTokenExpired(accessToken) && user != null)
+                {
+                    if (IsTokenExpired(refreshToken))
+                    {
+                        return BadRequest(new { Error = "Введите заново емаил и пароль" });
+                    }
+                    else
+                    {
+                        _context.Users.Remove(user);
+                        _redisRepository.DeleteData("users:" + refreshToken);
+                        user.access_token = accessToken = GenerateAccessToken(user.Id);
+                        user.refresh_token = refreshToken = GenerateRefreshToken(user.Id);
+                        _context.Users.Update(user);
+                        _context.SaveChanges();
+                        // Сохранение/обновление данных в кэше на 10 минут
+                        _redisRepository.AddOneModel(user);
+                        return Ok(accessToken + " \n" + refreshToken); //Токены обновлены
+                    }
+                }
+                else if (user != null)
+                {
+                    return Ok(new { Message = "Токен НЕ нуждается в обновлении(Пользователю разрешают войти на страницу)" });
+                }
+                else
+                {
+                    return BadRequest(new { Error = "Пользователь не найден" });
+                }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest(new { ex.Message });
+            //}
         }
     }
 }

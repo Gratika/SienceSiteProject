@@ -1,6 +1,7 @@
 ﻿using apiServer.Controllers.Authentication;
 using apiServer.Models;
 using apiServer.Models.ForUser;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace apiServer.Controllers.ForModels
         {
             _context = context;
         }
-
+        //[Authorize]
         [HttpPost("AddReaction")]
         public ActionResult AddReaction(Reactions reaction)
         {
@@ -35,9 +36,9 @@ namespace apiServer.Controllers.ForModels
             return Ok("Реакция добавленна");
         }
         [HttpGet("GetReactionForArticle")]
-        public FullArticle GetReactionForArticle(string articleId, string emojiId, string peopleId)
+        public FullArticle<T> GetReactionForArticle<T>(string articleId, string emojiId, string peopleId)
         {
-            FullArticle articleAndReactions = new FullArticle();
+            FullArticle<T> articleAndReactions = new FullArticle<T>();
             articleAndReactions.CountReactions = _context.Reactions.Where(r => r.reaction_id == emojiId).Count(r => r.article_id == articleId);
             bool IsUserReact = _context.Reactions.Where(r => r.reaction_id == emojiId).Any(r => r.article_id == articleId && r.people_id == peopleId);
             if (IsUserReact == true)
@@ -47,6 +48,7 @@ namespace apiServer.Controllers.ForModels
 
             return articleAndReactions;
         }
+        //[Authorize]
         [HttpGet("Delete")]
         public void Delete(string articleId)
         {
