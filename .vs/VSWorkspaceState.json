@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\apiServer",
+    "\\apiServer\\Controllers",
+    "\\apiServer\\Controllers\\Authentication",
+    "\\apiServer\\Controllers\\Solr"
   ],
-  "SelectedNode": "\\apiServer.sln",
+  "SelectedNode": "\\apiServer\\Controllers\\Authentication\\UserController.cs",
   "PreviewInSolutionExplorer": false
 }

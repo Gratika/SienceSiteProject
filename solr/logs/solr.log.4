@@ -1,168 +1,51 @@
-2024-01-01 21:41:47.233 INFO  (main) [] o.e.j.s.Server jetty-10.0.17; built: 2023-10-09T18:22:21.150Z; git: af15f12297adf5c5083e1f2f8f4c5974438bca25; jvm 17.0.9+9
-2024-01-01 21:41:47.683 WARN  (main) [] o.e.j.u.DeprecationWarning Using @Deprecated Class org.eclipse.jetty.servlet.listener.ELContextCleaner
-2024-01-01 21:41:47.720 INFO  (main) [] o.a.s.s.CoreContainerProvider Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
-2024-01-01 21:41:47.730 INFO  (main) [] o.a.s.s.CoreContainerProvider  ___      _       Welcome to Apache Solr™ version 9.4.0
-2024-01-01 21:41:47.730 INFO  (main) [] o.a.s.s.CoreContainerProvider / __| ___| |_ _   Starting in standalone mode on port 8983
-2024-01-01 21:41:47.731 INFO  (main) [] o.a.s.s.CoreContainerProvider \__ \/ _ \ | '_|  Install dir: /opt/solr-9.4.0
-2024-01-01 21:41:47.731 INFO  (main) [] o.a.s.s.CoreContainerProvider |___/\___/_|_|    Start time: 2024-01-01T21:41:47.731125606Z
-2024-01-01 21:41:47.735 INFO  (main) [] o.a.s.s.CoreContainerProvider Solr started with "-XX:+CrashOnOutOfMemoryError" that will crash on any OutOfMemoryError exception. The cause of the OOME will be logged in the crash file at the following path: /var/solr/logs/jvm_crash_12.log
-2024-01-01 21:41:47.768 INFO  (main) [] o.a.s.s.CoreContainerProvider Solr Home: /var/solr/data (source: system property: solr.solr.home)
-2024-01-01 21:41:47.807 INFO  (main) [] o.a.s.c.SolrXmlConfig solr.xml not found in SOLR_HOME, using built-in default
-2024-01-01 21:41:47.807 INFO  (main) [] o.a.s.c.SolrXmlConfig Loading solr.xml from /opt/solr-9.4.0/server/solr/solr.xml
-2024-01-01 21:41:47.889 INFO  (main) [] o.a.s.c.SolrResourceLoader Added 1 libs to classloader, from paths: [/opt/solr-9.4.0/lib]
-2024-01-01 21:41:48.954 INFO  (main) [] o.a.s.u.t.SimplePropagator Always-on trace id generation enabled.
-2024-01-01 21:41:49.336 WARN  (main) [] o.a.s.u.StartupLoggingUtils Jetty request logging enabled. Will retain logs for last 3 days. See chapter "Configuring Logging" in reference guide for how to configure.
-2024-01-01 21:41:49.340 WARN  (main) [] o.a.s.c.CoreContainer Not all security plugins configured!  authentication=disabled authorization=disabled.  Solr is only as secure as you make it. Consider configuring authentication/authorization before exposing Solr to users internal or external.  See https://s.apache.org/solrsecurity for more info
-2024-01-01 21:41:49.606 INFO  (main) [] o.a.s.c.CorePropertiesLocator Found 1 core definitions underneath /var/solr/data
-2024-01-01 21:41:49.607 INFO  (main) [] o.a.s.c.CorePropertiesLocator Cores are: [new_core]
-2024-01-01 21:41:49.668 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.c.SolrConfig Using Lucene MatchVersion: 9.8.0
-2024-01-01 21:41:49.793 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.s.IndexSchema Schema name=default-config
-2024-01-01 21:41:49.852 WARN  (main) [] o.g.j.m.i.MessagingBinders A class javax.activation.DataSource for a default provider MessageBodyWriter<javax.activation.DataSource> was not found. The provider is not available.
-2024-01-01 21:41:49.862 WARN  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.D.s.TrieDateField Solr loaded a deprecated plugin/analysis class [solr.TrieDateField]. Please consult documentation how to replace it accordingly.
-2024-01-01 21:41:49.891 WARN  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.D.s.TrieIntField Solr loaded a deprecated plugin/analysis class [solr.TrieIntField]. Please consult documentation how to replace it accordingly.
-2024-01-01 21:41:50.275 INFO  (main) [] o.a.s.j.SolrRequestAuthorizer Creating a new SolrRequestAuthorizer
-2024-01-01 21:41:50.490 INFO  (main) [] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@1df98368{solr-jetty-context.xml,/solr,file:///opt/solr-9.4.0/server/solr-webapp/webapp/,AVAILABLE}{/opt/solr-9.4.0/server/solr-webapp/webapp}
-2024-01-01 21:41:50.505 INFO  (main) [] o.e.j.s.RequestLogWriter Opened /var/solr/logs/2024_01_01.request.log
-2024-01-01 21:41:50.510 INFO  (main) [] o.e.j.s.AbstractConnector Started ServerConnector@618c5d94{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
-2024-01-01 21:41:50.512 INFO  (main) [] o.e.j.s.Server Started Server@2c3dec30{STARTING}[10.0.17,sto=0] @5433ms
-2024-01-01 21:41:50.606 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.s.IndexSchema Loaded schema default-config/1.6 with uniqueid field id
-2024-01-01 21:41:50.606 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.c.CoreContainer Creating SolrCore 'new_core' using configuration from instancedir /var/solr/data/gettingstarted, trusted=true
-2024-01-01 21:41:50.640 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.c.SolrCore Opening new SolrCore at [/var/solr/data/gettingstarted], dataDir=[/var/solr/data/gettingstarted/data/]
-2024-01-01 21:41:51.277 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.j.SolrRequestAuthorizer Creating a new SolrRequestAuthorizer
-2024-01-01 21:41:51.298 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.u.UpdateHandler Using UpdateLog implementation: org.apache.solr.update.UpdateLog
-2024-01-01 21:41:51.299 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.u.UpdateLog Initializing UpdateLog: dataDir= defaultSyncLevel=FLUSH numRecordsToKeep=100 maxNumLogsToKeep=10 numVersionBuckets=65536
-2024-01-01 21:41:51.366 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.u.CommitTracker Hard AutoCommit: if uncommitted for 15000ms; 
-2024-01-01 21:41:51.367 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.u.CommitTracker Soft AutoCommit: if uncommitted for 3000ms; 
-2024-01-01 21:41:51.797 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.r.ManagedResourceStorage File-based storage initialized to use dir: /var/solr/data/gettingstarted/conf
-2024-01-01 21:41:51.817 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.s.DirectSolrSpellChecker init: {accuracy=0.5, maxQueryFrequency=0.01, maxEdits=2, minPrefix=1, maxInspections=5, minQueryLength=4, name=default, field=_text_, classname=solr.DirectSolrSpellChecker, distanceMeasure=internal}
-2024-01-01 21:41:51.825 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.h.ReplicationHandler Commits will be reserved for 10000 ms
-2024-01-01 21:41:51.849 INFO  (searcherExecutor-13-thread-1-processing-new_core) [ x:new_core] o.a.s.c.QuerySenderListener QuerySenderListener done.
-2024-01-01 21:41:51.849 INFO  (searcherExecutor-13-thread-1-processing-new_core) [ x:new_core] o.a.s.h.c.SpellCheckComponent Loading spell index for spellchecker: default
-2024-01-01 21:41:51.879 INFO  (searcherExecutor-13-thread-1-processing-new_core) [ x:new_core] o.a.s.c.SolrCore Registered new searcher autowarm time: 0 ms
-2024-01-01 21:44:39.492 INFO  (qtp693267461-27) [ x:new_core t:null-1] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=64
-2024-01-01 21:44:39.680 INFO  (qtp693267461-19) [ x:new_core t:null-2] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=24
-2024-01-01 21:44:39.689 INFO  (qtp693267461-26) [ x:new_core t:null-3] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 21:44:39.702 INFO  (qtp693267461-25) [ x:new_core t:null-4] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=7
-2024-01-01 21:44:39.709 INFO  (qtp693267461-26) [ x:new_core t:null-5] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 21:44:39.716 INFO  (qtp693267461-25) [ x:new_core t:null-6] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 21:44:39.722 INFO  (qtp693267461-26) [ x:new_core t:null-7] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 21:44:39.729 INFO  (qtp693267461-25) [ x:new_core t:null-8] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 21:44:39.735 INFO  (qtp693267461-26) [ x:new_core t:null-9] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:17:37.484 INFO  (qtp693267461-25) [ x:new_core t:null-10] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=1
-2024-01-01 22:17:37.502 INFO  (qtp693267461-26) [ x:new_core t:null-11] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:17:37.510 INFO  (qtp693267461-25) [ x:new_core t:null-12] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:17:37.518 INFO  (qtp693267461-26) [ x:new_core t:null-13] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:17:37.526 INFO  (qtp693267461-25) [ x:new_core t:null-14] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:17:37.534 INFO  (qtp693267461-26) [ x:new_core t:null-15] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:17:37.541 INFO  (qtp693267461-25) [ x:new_core t:null-16] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:17:37.549 INFO  (qtp693267461-26) [ x:new_core t:null-17] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:17:37.556 INFO  (qtp693267461-25) [ x:new_core t:null-18] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:36.710 INFO  (qtp693267461-27) [ x:new_core t:null-19] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=1
-2024-01-01 22:23:36.718 INFO  (qtp693267461-20) [ x:new_core t:null-20] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:36.723 INFO  (qtp693267461-26) [ x:new_core t:null-21] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:36.727 INFO  (qtp693267461-19) [ x:new_core t:null-22] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:36.731 INFO  (qtp693267461-26) [ x:new_core t:null-23] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:36.735 INFO  (qtp693267461-19) [ x:new_core t:null-24] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:36.739 INFO  (qtp693267461-26) [ x:new_core t:null-25] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:36.743 INFO  (qtp693267461-19) [ x:new_core t:null-26] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:36.747 INFO  (qtp693267461-26) [ x:new_core t:null-27] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:38.400 INFO  (qtp693267461-19) [ x:new_core t:null-28] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=0
-2024-01-01 22:23:38.406 INFO  (qtp693267461-26) [ x:new_core t:null-29] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:38.411 INFO  (qtp693267461-19) [ x:new_core t:null-30] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:38.415 INFO  (qtp693267461-26) [ x:new_core t:null-31] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:38.419 INFO  (qtp693267461-19) [ x:new_core t:null-32] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:38.423 INFO  (qtp693267461-26) [ x:new_core t:null-33] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:38.427 INFO  (qtp693267461-19) [ x:new_core t:null-34] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=0
-2024-01-01 22:23:38.431 INFO  (qtp693267461-26) [ x:new_core t:null-35] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:38.435 INFO  (qtp693267461-19) [ x:new_core t:null-36] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:44.798 INFO  (qtp693267461-26) [ x:new_core t:null-37] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=1
-2024-01-01 22:23:44.808 INFO  (qtp693267461-19) [ x:new_core t:null-38] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:23:44.815 INFO  (qtp693267461-26) [ x:new_core t:null-39] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:23:44.820 INFO  (qtp693267461-19) [ x:new_core t:null-40] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:44.827 INFO  (qtp693267461-26) [ x:new_core t:null-41] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:44.833 INFO  (qtp693267461-19) [ x:new_core t:null-42] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:23:44.839 INFO  (qtp693267461-26) [ x:new_core t:null-43] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:23:44.846 INFO  (qtp693267461-19) [ x:new_core t:null-44] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:23:44.853 INFO  (qtp693267461-26) [ x:new_core t:null-45] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:39:41.530 INFO  (qtp693267461-27) [ x:new_core t:null-46] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=5
-2024-01-01 22:39:41.546 INFO  (qtp693267461-21) [ x:new_core t:null-47] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:39:41.553 INFO  (qtp693267461-19) [ x:new_core t:null-48] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:41.559 INFO  (qtp693267461-20) [ x:new_core t:null-49] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:41.564 INFO  (qtp693267461-19) [ x:new_core t:null-50] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:41.569 INFO  (qtp693267461-20) [ x:new_core t:null-51] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:41.574 INFO  (qtp693267461-19) [ x:new_core t:null-52] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:41.578 INFO  (qtp693267461-20) [ x:new_core t:null-53] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:41.583 INFO  (qtp693267461-19) [ x:new_core t:null-54] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:43.901 INFO  (qtp693267461-20) [ x:new_core t:null-55] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=1
-2024-01-01 22:39:43.911 INFO  (qtp693267461-19) [ x:new_core t:null-56] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:39:43.917 INFO  (qtp693267461-20) [ x:new_core t:null-57] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:43.923 INFO  (qtp693267461-19) [ x:new_core t:null-58] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:39:43.928 INFO  (qtp693267461-20) [ x:new_core t:null-59] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:43.933 INFO  (qtp693267461-19) [ x:new_core t:null-60] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:43.939 INFO  (qtp693267461-20) [ x:new_core t:null-61] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:39:43.945 INFO  (qtp693267461-19) [ x:new_core t:null-62] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:39:43.952 INFO  (qtp693267461-20) [ x:new_core t:null-63] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:10.539 INFO  (qtp693267461-27) [ x:new_core t:null-64] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=1
-2024-01-01 22:52:10.551 INFO  (qtp693267461-22) [ x:new_core t:null-65] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:10.557 INFO  (qtp693267461-21) [ x:new_core t:null-66] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:10.564 INFO  (qtp693267461-19) [ x:new_core t:null-67] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:10.569 INFO  (qtp693267461-21) [ x:new_core t:null-68] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:10.575 INFO  (qtp693267461-19) [ x:new_core t:null-69] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:10.579 INFO  (qtp693267461-21) [ x:new_core t:null-70] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:10.584 INFO  (qtp693267461-19) [ x:new_core t:null-71] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:10.589 INFO  (qtp693267461-21) [ x:new_core t:null-72] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:13.536 INFO  (qtp693267461-19) [ x:new_core t:null-73] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=3
-2024-01-01 22:52:13.546 INFO  (qtp693267461-21) [ x:new_core t:null-74] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:13.553 INFO  (qtp693267461-19) [ x:new_core t:null-75] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:13.558 INFO  (qtp693267461-21) [ x:new_core t:null-76] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:13.564 INFO  (qtp693267461-19) [ x:new_core t:null-77] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:13.570 INFO  (qtp693267461-21) [ x:new_core t:null-78] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:13.575 INFO  (qtp693267461-19) [ x:new_core t:null-79] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:13.581 INFO  (qtp693267461-21) [ x:new_core t:null-80] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:13.589 INFO  (qtp693267461-19) [ x:new_core t:null-81] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:17.875 INFO  (qtp693267461-21) [ x:new_core t:null-82] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=1
-2024-01-01 22:52:17.885 INFO  (qtp693267461-19) [ x:new_core t:null-83] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:17.892 INFO  (qtp693267461-21) [ x:new_core t:null-84] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:17.899 INFO  (qtp693267461-19) [ x:new_core t:null-85] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:17.906 INFO  (qtp693267461-21) [ x:new_core t:null-86] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:17.911 INFO  (qtp693267461-19) [ x:new_core t:null-87] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:52:17.918 INFO  (qtp693267461-21) [ x:new_core t:null-88] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:17.925 INFO  (qtp693267461-19) [ x:new_core t:null-89] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:52:17.933 INFO  (qtp693267461-21) [ x:new_core t:null-90] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=3
-2024-01-01 22:58:34.400 INFO  (qtp693267461-27) [ x:new_core t:null-91] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=4
-2024-01-01 22:58:34.412 INFO  (qtp693267461-23) [ x:new_core t:null-92] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:34.420 INFO  (qtp693267461-22) [ x:new_core t:null-93] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:34.425 INFO  (qtp693267461-19) [ x:new_core t:null-94] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:34.430 INFO  (qtp693267461-22) [ x:new_core t:null-95] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:34.437 INFO  (qtp693267461-19) [ x:new_core t:null-96] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:34.442 INFO  (qtp693267461-22) [ x:new_core t:null-97] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:34.447 INFO  (qtp693267461-19) [ x:new_core t:null-98] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:34.451 INFO  (qtp693267461-22) [ x:new_core t:null-99] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:36.052 INFO  (qtp693267461-19) [ x:new_core t:null-100] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=1
-2024-01-01 22:58:36.059 INFO  (qtp693267461-22) [ x:new_core t:null-101] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:36.066 INFO  (qtp693267461-19) [ x:new_core t:null-102] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:58:36.070 INFO  (qtp693267461-22) [ x:new_core t:null-103] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:36.074 INFO  (qtp693267461-19) [ x:new_core t:null-104] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:36.079 INFO  (qtp693267461-19) [ x:new_core t:null-105] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:36.084 INFO  (qtp693267461-22) [ x:new_core t:null-106] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:36.089 INFO  (qtp693267461-19) [ x:new_core t:null-107] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:58:36.093 INFO  (qtp693267461-22) [ x:new_core t:null-108] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:38.255 INFO  (qtp693267461-19) [ x:new_core t:null-109] o.a.s.c.S.Request webapp=/solr path=/select params={q=*:*&sort=date_created+desc&rows=4&version=2.2&wt=xml} hits=6 status=0 QTime=1
-2024-01-01 22:58:38.263 INFO  (qtp693267461-22) [ x:new_core t:null-110] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:58:38.270 INFO  (qtp693267461-19) [ x:new_core t:null-111] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:38.276 INFO  (qtp693267461-22) [ x:new_core t:null-112] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:58:38.282 INFO  (qtp693267461-19) [ x:new_core t:null-113] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:58:38.288 INFO  (qtp693267461-22) [ x:new_core t:null-114] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:58:38.294 INFO  (qtp693267461-19) [ x:new_core t:null-115] o.a.s.c.S.Request webapp=/solr path=/select params={q=1&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 22:58:38.300 INFO  (qtp693267461-22) [ x:new_core t:null-116] o.a.s.c.S.Request webapp=/solr path=/select params={q=be9ce548-9436-43b5-87ca-2a909b3720d6&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=2
-2024-01-01 22:58:38.306 INFO  (qtp693267461-19) [ x:new_core t:null-117] o.a.s.c.S.Request webapp=/solr path=/select params={q=2&defType=edismax&qf=Id+id&rows=100000000&version=2.2&wt=xml} hits=0 status=0 QTime=1
-2024-01-01 23:03:03.561 INFO  (JettyShutdownThread) [] o.e.j.s.Server Stopped Server@2c3dec30{STOPPING}[10.0.17,sto=0]
-2024-01-01 23:03:03.584 INFO  (JettyShutdownThread) [] o.e.j.s.AbstractConnector Stopped ServerConnector@618c5d94{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
-2024-01-01 23:03:03.678 INFO  (JettyShutdownThread) [] o.a.s.c.CoreContainer Shutting down CoreContainer instance=934617920
-2024-01-01 23:03:03.687 INFO  (coreCloseExecutor-19-thread-1) [ x:new_core] o.a.s.c.SolrCore CLOSING SolrCore org.apache.solr.core.SolrCore@53e9d715 new_core
-2024-01-01 23:03:03.690 INFO  (coreCloseExecutor-19-thread-1) [ x:new_core] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.core.new_core tag=SolrCore@53e9d715
-2024-01-01 23:03:03.792 INFO  (coreCloseExecutor-19-thread-1) [ x:new_core] o.a.s.u.DirectUpdateHandler2 Committing on IndexWriter.close()  ... SKIPPED (unnecessary).
-2024-01-01 23:03:03.912 INFO  (JettyShutdownThread) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node tag=null
-2024-01-01 23:03:03.947 INFO  (JettyShutdownThread) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm tag=null
-2024-01-01 23:03:03.965 INFO  (JettyShutdownThread) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty tag=null
-2024-01-01 23:03:03.987 INFO  (JettyShutdownThread) [] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@1df98368{solr-jetty-context.xml,/solr,null,STOPPED}{/opt/solr-9.4.0/server/solr-webapp/webapp}
+2024-01-16 15:52:22.907 INFO  (main) [] o.e.j.s.Server jetty-10.0.17; built: 2023-10-09T18:22:21.150Z; git: af15f12297adf5c5083e1f2f8f4c5974438bca25; jvm 17.0.9+9
+2024-01-16 15:52:23.160 WARN  (main) [] o.e.j.u.DeprecationWarning Using @Deprecated Class org.eclipse.jetty.servlet.listener.ELContextCleaner
+2024-01-16 15:52:23.185 INFO  (main) [] o.a.s.s.CoreContainerProvider Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
+2024-01-16 15:52:23.193 INFO  (main) [] o.a.s.s.CoreContainerProvider  ___      _       Welcome to Apache Solr™ version 9.4.0
+2024-01-16 15:52:23.193 INFO  (main) [] o.a.s.s.CoreContainerProvider / __| ___| |_ _   Starting in standalone mode on port 8983
+2024-01-16 15:52:23.193 INFO  (main) [] o.a.s.s.CoreContainerProvider \__ \/ _ \ | '_|  Install dir: /opt/solr-9.4.0
+2024-01-16 15:52:23.193 INFO  (main) [] o.a.s.s.CoreContainerProvider |___/\___/_|_|    Start time: 2024-01-16T15:52:23.193565996Z
+2024-01-16 15:52:23.197 INFO  (main) [] o.a.s.s.CoreContainerProvider Solr started with "-XX:+CrashOnOutOfMemoryError" that will crash on any OutOfMemoryError exception. The cause of the OOME will be logged in the crash file at the following path: /var/solr/logs/jvm_crash_12.log
+2024-01-16 15:52:23.217 INFO  (main) [] o.a.s.s.CoreContainerProvider Solr Home: /var/solr/data (source: system property: solr.solr.home)
+2024-01-16 15:52:23.232 INFO  (main) [] o.a.s.c.SolrXmlConfig solr.xml not found in SOLR_HOME, using built-in default
+2024-01-16 15:52:23.232 INFO  (main) [] o.a.s.c.SolrXmlConfig Loading solr.xml from /opt/solr-9.4.0/server/solr/solr.xml
+2024-01-16 15:52:23.264 INFO  (main) [] o.a.s.c.SolrResourceLoader Added 1 libs to classloader, from paths: [/opt/solr-9.4.0/lib]
+2024-01-16 15:52:23.862 INFO  (main) [] o.a.s.u.t.SimplePropagator Always-on trace id generation enabled.
+2024-01-16 15:52:24.110 WARN  (main) [] o.a.s.u.StartupLoggingUtils Jetty request logging enabled. Will retain logs for last 3 days. See chapter "Configuring Logging" in reference guide for how to configure.
+2024-01-16 15:52:24.112 WARN  (main) [] o.a.s.c.CoreContainer Not all security plugins configured!  authentication=disabled authorization=disabled.  Solr is only as secure as you make it. Consider configuring authentication/authorization before exposing Solr to users internal or external.  See https://s.apache.org/solrsecurity for more info
+2024-01-16 15:52:24.302 INFO  (main) [] o.a.s.c.CorePropertiesLocator Found 1 core definitions underneath /var/solr/data
+2024-01-16 15:52:24.302 INFO  (main) [] o.a.s.c.CorePropertiesLocator Cores are: [new_core]
+2024-01-16 15:52:24.343 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.c.SolrConfig Using Lucene MatchVersion: 9.8.0
+2024-01-16 15:52:24.439 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.s.IndexSchema Schema name=default-config
+2024-01-16 15:52:24.477 WARN  (main) [] o.g.j.m.i.MessagingBinders A class javax.activation.DataSource for a default provider MessageBodyWriter<javax.activation.DataSource> was not found. The provider is not available.
+2024-01-16 15:52:24.484 WARN  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.D.s.TrieDateField Solr loaded a deprecated plugin/analysis class [solr.TrieDateField]. Please consult documentation how to replace it accordingly.
+2024-01-16 15:52:24.527 WARN  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.D.s.TrieIntField Solr loaded a deprecated plugin/analysis class [solr.TrieIntField]. Please consult documentation how to replace it accordingly.
+2024-01-16 15:52:25.012 INFO  (main) [] o.a.s.j.SolrRequestAuthorizer Creating a new SolrRequestAuthorizer
+2024-01-16 15:52:25.267 INFO  (main) [] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@1df98368{solr-jetty-context.xml,/solr,file:///opt/solr-9.4.0/server/solr-webapp/webapp/,AVAILABLE}{/opt/solr-9.4.0/server/solr-webapp/webapp}
+2024-01-16 15:52:25.289 INFO  (main) [] o.e.j.s.RequestLogWriter Opened /var/solr/logs/2024_01_16.request.log
+2024-01-16 15:52:25.295 INFO  (main) [] o.e.j.s.AbstractConnector Started ServerConnector@618c5d94{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
+2024-01-16 15:52:25.297 INFO  (main) [] o.e.j.s.Server Started Server@2c3dec30{STARTING}[10.0.17,sto=0] @3817ms
+2024-01-16 15:52:25.622 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.s.IndexSchema Loaded schema default-config/1.6 with uniqueid field id
+2024-01-16 15:52:25.622 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.c.CoreContainer Creating SolrCore 'new_core' using configuration from instancedir /var/solr/data/gettingstarted, trusted=true
+2024-01-16 15:52:25.695 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.c.SolrCore Opening new SolrCore at [/var/solr/data/gettingstarted], dataDir=[/var/solr/data/gettingstarted/data/]
+2024-01-16 15:52:26.741 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.j.SolrRequestAuthorizer Creating a new SolrRequestAuthorizer
+2024-01-16 15:52:26.791 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.u.UpdateHandler Using UpdateLog implementation: org.apache.solr.update.UpdateLog
+2024-01-16 15:52:26.792 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.u.UpdateLog Initializing UpdateLog: dataDir= defaultSyncLevel=FLUSH numRecordsToKeep=100 maxNumLogsToKeep=10 numVersionBuckets=65536
+2024-01-16 15:52:26.909 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.u.CommitTracker Hard AutoCommit: if uncommitted for 15000ms; 
+2024-01-16 15:52:26.910 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.u.CommitTracker Soft AutoCommit: if uncommitted for 3000ms; 
+2024-01-16 15:52:27.285 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.r.ManagedResourceStorage File-based storage initialized to use dir: /var/solr/data/gettingstarted/conf
+2024-01-16 15:52:27.306 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.s.DirectSolrSpellChecker init: {name=default, field=_text_, classname=solr.DirectSolrSpellChecker, distanceMeasure=internal, accuracy=0.5, maxQueryFrequency=0.01, maxEdits=2, minPrefix=1, maxInspections=5, minQueryLength=4}
+2024-01-16 15:52:27.319 INFO  (coreLoadExecutor-11-thread-1) [ x:new_core] o.a.s.h.ReplicationHandler Commits will be reserved for 10000 ms
+2024-01-16 15:52:27.351 INFO  (searcherExecutor-13-thread-1-processing-new_core) [ x:new_core] o.a.s.c.QuerySenderListener QuerySenderListener done.
+2024-01-16 15:52:27.351 INFO  (searcherExecutor-13-thread-1-processing-new_core) [ x:new_core] o.a.s.h.c.SpellCheckComponent Loading spell index for spellchecker: default
+2024-01-16 15:52:27.365 INFO  (searcherExecutor-13-thread-1-processing-new_core) [ x:new_core] o.a.s.c.SolrCore Registered new searcher autowarm time: 0 ms
+2024-01-16 15:53:43.100 INFO  (JettyShutdownThread) [] o.e.j.s.Server Stopped Server@2c3dec30{STOPPING}[10.0.17,sto=0]
+2024-01-16 15:53:43.103 INFO  (JettyShutdownThread) [] o.e.j.s.AbstractConnector Stopped ServerConnector@618c5d94{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
+2024-01-16 15:53:43.116 INFO  (JettyShutdownThread) [] o.a.s.c.CoreContainer Shutting down CoreContainer instance=934617920
+2024-01-16 15:53:43.118 INFO  (coreCloseExecutor-19-thread-1) [ x:new_core] o.a.s.c.SolrCore CLOSING SolrCore org.apache.solr.core.SolrCore@3a701c46 new_core
+2024-01-16 15:53:43.118 INFO  (coreCloseExecutor-19-thread-1) [ x:new_core] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.core.new_core tag=SolrCore@3a701c46
+2024-01-16 15:53:43.158 INFO  (coreCloseExecutor-19-thread-1) [ x:new_core] o.a.s.u.DirectUpdateHandler2 Committing on IndexWriter.close()  ... SKIPPED (unnecessary).
+2024-01-16 15:53:43.198 INFO  (JettyShutdownThread) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node tag=null
+2024-01-16 15:53:43.207 INFO  (JettyShutdownThread) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm tag=null
+2024-01-16 15:53:43.212 INFO  (JettyShutdownThread) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty tag=null
+2024-01-16 15:53:43.219 INFO  (JettyShutdownThread) [] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@1df98368{solr-jetty-context.xml,/solr,null,STOPPED}{/opt/solr-9.4.0/server/solr-webapp/webapp}
