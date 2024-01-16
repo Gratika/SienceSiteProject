@@ -3,6 +3,9 @@ import type {IArticle} from "@/api/type";
 import {useRouter} from "vue-router";
 import {useArticleStore} from "@/stores/articleStore";
 import moment from "moment/moment";
+import {boolean} from "zod";
+import {computed, ref} from "vue";
+import Like from "@/components/Like.vue";
 
 //пропси від батьківського елементу
 const props = defineProps<{
@@ -10,8 +13,12 @@ const props = defineProps<{
   showSelected:boolean,
   showMenu:boolean
 }>()
+const setReaction = computed(()=>{
+  return props.article.reaction !== null;
+})
 const router = useRouter();
 const articleStore = useArticleStore();
+//const isSelected = ref<boolean>(props.article.selected);
 // меню
 const location= 'top'; //позиція меню
 const menuItems = [
@@ -31,7 +38,7 @@ const author_=():string|undefined=>{
   if( props.article.author_ !=null){
       if(props.article.author_.surname!=null ){
         console.log('surname=',props.article.author_.surname)
-        return props.article.author_.surname +' '+ props.article.author_.name;
+        return (props.article.author_.surname +' '+ props.article.author_.name).trim();
       }
 
   }else{
@@ -84,12 +91,24 @@ function formatDate(date: null | string): string {
         </v-col>
         <v-col cols="1">
           <div v-if="props.showSelected">
-            <v-btn
-                icon="mdi-bookmark-outline"
-                class="style-btn-article-card flex-grow-1"
-                variant="text"
+            <v-icon
+                class="flex-grow-1"
                 @click="changeArticleSelect"
-            />
+            >
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="40"
+                  height="40"
+                  viewBox="0 0 40 40"
+                  :fill="props.article.selected ? '#778FD2' : '#FFFFFF'"
+                  stroke="#778FD2"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+              >
+                <path d="M30.8574 37.6429L20.0002 26.7857L9.14307 37.6429V5.07146C9.14307 4.35158 9.42904 3.6612 9.93805 3.15217C10.4471 2.64315 11.1375 2.35718 11.8574 2.35718H28.1431C28.8629 2.35718 29.5534 2.64315 30.0623 3.15217C30.5713 3.6612 30.8574 4.35158 30.8574 5.07146V37.6429Z" />
+              </svg>
+            </v-icon>
 
           </div>
           <div v-else-if="props.showMenu" class="text-center">
@@ -153,7 +172,7 @@ function formatDate(date: null | string): string {
         </v-col>
         <v-col cols="1">
           <div class="d-flex justify-space-between">
-            <v-icon icon="mdi-thumb-up-outline"/>
+            <Like :is-selected="setReaction"/>
             <span>{{props.article.countLike}}</span>
           </div>
 

@@ -28,7 +28,7 @@ let page = 0;
 onMounted(()=>{
   if (typeof search === "string"){
     searchSrt.value = search;
-    articleStore.searchArticlesByParam(searchSrt.value, currentPage.value-1,selectedYear.value,
+    articleStore.searchArticlesByParam( currentPage.value-1,searchSrt.value, selectedYear.value,
         filterDoi.value,sortedValue.value,tags.value);
     console.log('Pages=', articleStore.totalPage)
   }
@@ -49,7 +49,7 @@ watch(
         tags.value='';
         selectedYear.value=null;
         filterDoi.value=null;
-        articleStore.searchArticlesByParam(searchSrt.value, currentPage.value-1,selectedYear.value,
+        articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value, selectedYear.value,
             filterDoi.value,sortedValue.value,tags.value);
       }
 
@@ -57,7 +57,7 @@ watch(
 );
 function selectSortParam(){
   console.log("sortedValue=", sortedValue.value)
-  articleStore.searchArticlesByParam(searchSrt.value, currentPage.value-1,selectedYear.value,
+  articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value, selectedYear.value,
       filterDoi.value,sortedValue.value,tags.value);
 }
 //функції фільтрації
@@ -69,26 +69,29 @@ function tagFiltered(focused:boolean){ //по тегу
     })
     tags.value = tags.value? tags.value?.substring(1):'';
     console.log('tags =', tags.value)
-    articleStore.searchArticlesByParam(searchSrt.value, currentPage.value-1,selectedYear.value,
+    articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value,selectedYear.value,
         filterDoi.value,sortedValue.value,tags.value);
   }
 
 }
 
 function updateYear(focused:boolean){
-  console.log("updateYearVal=", selectedYearStr.value)
-  if(selectedYearStr.value!=null && selectedYearStr.value!='')
-  {selectedYear.value = parseInt(selectedYearStr.value,10);
-  console.log("selectedYear=", selectedYearStr.value)}
-  console.log("updateYearFocused=",focused)
-  articleStore.searchArticlesByParam(searchSrt.value, currentPage.value-1,selectedYear.value,
-      filterDoi.value,sortedValue.value,tags.value);
+  //console.log("updateYearVal=", selectedYearStr.value)
+  if(!focused){
+    if(selectedYearStr.value!=null && selectedYearStr.value!=''){
+      selectedYear.value = parseInt(selectedYearStr.value,10);
+      //console.log("selectedYear=", selectedYearStr.value)}
+      //console.log("updateYearFocused=",focused)
+      articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value,selectedYear.value,
+          filterDoi.value,sortedValue.value,tags.value);
+    }
+  }
 }
 function selectFilter(focused:boolean){//по типу статті (наукові, ненаукові)
   console.log("selectFilterFocused=",focused)
   if (!focused){
     console.log("filterDoi=",filterDoi.value)
-   articleStore.searchArticlesByParam(searchSrt.value, currentPage.value-1,selectedYear.value,
+    articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value, selectedYear.value,
         filterDoi.value,sortedValue.value,tags.value);
 
   }
@@ -99,7 +102,7 @@ function clearFilters(){ //скинути фільтри
   selectedYear.value=null;
   tags.value=null;
 
-  articleStore.searchArticlesByParam(searchSrt.value, currentPage.value-1,selectedYear.value,
+  articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value, selectedYear.value,
       filterDoi.value,sortedValue.value,tags.value);
 }
 //пагінація
@@ -107,6 +110,8 @@ const currentPage = ref(1); // Поточна сторінка
 const onPageChange = () => {
   // Оновлення поточної сторінки при зміні
   console.log('currentPage =',currentPage.value)
+  articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value, selectedYear.value,
+      filterDoi.value,sortedValue.value,tags.value);
 };
 
 </script>
@@ -202,28 +207,22 @@ const onPageChange = () => {
 
       </v-col>
     </v-row>
-    <v-row class="justify-center">
+    <v-row v-if="articleStore.totalPage>0" class="justify-center">
       <v-pagination
           v-model="currentPage"
           :length="articleStore.totalPage"
           @update:model-value="onPageChange"
       ></v-pagination>
     </v-row>
+    <v-row>
+      <div class="footer-distance"></div>
+    </v-row>
   </v-container>
 </template>
 
 <style scoped>
-  .btn_clear{
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    min-height: 75%;
+  .footer-distance{
+  min-height: 100px;
   }
-  .search-header{
-    font-family: "Mariupol",serif;
-    font-size: 28px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-  }
+
 </style>

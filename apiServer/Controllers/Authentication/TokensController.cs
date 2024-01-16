@@ -1,7 +1,9 @@
 ﻿using apiServer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -10,36 +12,36 @@ namespace apiServer.Controllers.Authentication
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TokensController : Controller
     {
+        private ArhivistDbContext _context;
         public readonly IConfiguration _configuration; // необходим для доступа к jwt ключу
-        public TokensController(IConfiguration configuration)
+        public TokensController(IConfiguration configuration, ArhivistDbContext context)
         {
             _configuration = configuration;
+            _context = context;
         }
 
         [HttpGet("GenerateAccessToken")]
-        public string GenerateAccessToken()
+        public string GenerateAccessToken(string email)
         {
             try
             {
+                var identity = GetIdentity(email);
 
+                var now = DateTime.UtcNow;
+                // создаем JWT-токен
+                var jwt = new JwtSecurityToken(
+                        issuer: _configuration["Jwt:Issuer"],
+                        audience: _configuration["Jwt:Audience"],
+                        notBefore: now,
+                        claims: identity.Claims,
+                        expires: now.Add(TimeSpan.FromMinutes(15)), // Срок действия токена в минутах (15)
+                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"])), SecurityAlgorithms.HmacSha256));
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
-
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[]
-                    {
-                    new Claim(ClaimTypes.Name, "username") // Здесь вы можете добавить дополнительные данные пользователя
-                }),
-                    Expires = DateTime.UtcNow.AddMinutes(1), // Срок действия токена в минутах(15)
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                        SecurityAlgorithms.HmacSha256Signature)
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
+                return encodedJwt;
             }
             catch (Exception ex)
             {
@@ -47,22 +49,24 @@ namespace apiServer.Controllers.Authentication
             }
         }
         [HttpGet("GenerateRefreshToken")]
-        public string GenerateRefreshToken()
+        public string GenerateRefreshToken(string email)
         {
             try
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
+                var identity = GetIdentity(email);
 
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Expires = DateTime.UtcNow.AddDays(7), // Срок действия токена в днях
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                        SecurityAlgorithms.HmacSha256Signature)
-                };
+                var now = DateTime.UtcNow;
+                // создаем JWT-токен
+                var jwt = new JwtSecurityToken(
+                        issuer: _configuration["Jwt:Issuer"],
+                        audience: _configuration["Jwt:Audience"],
+                        notBefore: now,
+                        claims: identity.Claims,
+                        expires: now.Add(TimeSpan.FromMinutes(15)), // Срок действия токена в минутах (15)
+                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"])), SecurityAlgorithms.HmacSha256));
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
+                return encodedJwt;
             }
             catch (Exception ex)
             {
@@ -79,7 +83,7 @@ namespace apiServer.Controllers.Authentication
             // В противном случае, токен считается действительным
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.ReadJwtToken(accessToken);
+            var token = tokenHandler.ReadJwtToken(accessToken); 
 
             if (token.ValidTo < DateTime.UtcNow)
             {
@@ -87,6 +91,32 @@ namespace apiServer.Controllers.Authentication
                 return true;
             }
             return false;
+        }
+        [HttpGet("Check")]        
+        public string Check()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            return "userId - " + userId + ", Token - " + token;
+        }
+        private ClaimsIdentity GetIdentity(string email)
+        {
+            Users person = _context.Users.FirstOrDefault(x => x.email == email);
+            if (person != null)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.email),
+                };
+                ClaimsIdentity claimsIdentity =
+                new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
+                    ClaimsIdentity.DefaultRoleClaimType);
+                return claimsIdentity;
+            }
+
+            // если пользователя не найдено
+            return null;
         }
     }
 }

@@ -128,6 +128,8 @@ export const sendRequest = async <T>(
         params,
         data,
     });
+    console.log('response.status',response.status);
+    //console.log('response.statusText',response.statusText);
     return response.data;
 
 };

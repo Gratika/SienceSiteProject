@@ -10,11 +10,9 @@ export interface ILoginInput {
 }
 
 export interface ISignUpInput {
-    surname:string;
-    name:string;
-    birthday:Date|string;
     email: string;
     password: string;
+    people:IPeople;
 
 }
 
@@ -81,7 +79,7 @@ export interface IArticle {
     tagItems:Array<string>;
     reaction: IEmotion|null;
     countLike:number;
-
+    selected:boolean;
 }
 export interface IComment {
     id: string;
@@ -96,11 +94,12 @@ export interface  IEmotion{
     id: string;
     Name: string;
     Emoji: string
+    isSelected:boolean;
 }
 export interface IReaction
 {
-    id: string;
-    user_id: string;
+    id: string|null;
+    people_id: string|null;
     article_id: string;
     reaction_id: string;
     date_create: string|null;
@@ -142,4 +141,5 @@ export interface IArticleAndReactions{
     articles: IArticle;
     emotion: IEmotion;
     countReactions:number;
+    selected:boolean;
 }

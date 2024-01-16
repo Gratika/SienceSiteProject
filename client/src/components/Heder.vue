@@ -14,7 +14,7 @@ function onSearch(){
   <v-container>
     <v-row class="justify-center">
       <v-col cols="7">
-        <h1 class="mb-7">Discovery Science, Uncover Knowledge with SciFindHub</h1>
+        <div class="text-h3 font-weight-bold mb-7">Discovery Science, Uncover Knowledge with SciFindHub</div>
         <div class="py-7">
           <v-text-field
               label="Пошук за назвою, автором, темою..."
@@ -32,7 +32,7 @@ function onSearch(){
       </v-col>
       <v-col cols="5">
         <v-img
-            :width="350"
+            :width="500"
             aspect-ratio="1/1"
             cover
             src="mainFrame.png"

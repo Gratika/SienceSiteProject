@@ -173,8 +173,6 @@ const editorConfig = {
 #sample {
   display: flex;
   flex-direction: column;
-  background-color: indianred;
-  justify-content: center;
   flex-grow: 1;
 
 }

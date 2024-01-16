@@ -4,19 +4,21 @@
   import ArticleItem from "@/components/ArticleItem.vue";
   import NewArticleForm from "@/components/NewArticleForm.vue";
   import MyLocalStorage from "@/services/myLocalStorage";
+  import FilterForMyArticle from "@/components/FilterForMyArticle.vue";
 
   const articleStore = useArticleStore();
   const showDialog = ref(false);
   const showSelected = false;//не показуємо в кабінеті користувача
   const showMenu = true; //меню показуємо тільки в кабінеті користувача
   const peopleId=MyLocalStorage.getItem('peopleId');
-  const selectedTag = ref<Array<string>>([])//модель для фільтру Теги
-  const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 
-  const sortedValue = ref<number>(0);
+  let tags = ref<string|null>('');
+  let sortParam = ref<number|null>(0)
 
   onMounted(() => {
-    articleStore.getMyArticleList(peopleId); //список моїх статей
+    //articleStore.getMyArticleList(peopleId); //список моїх статей
+    articleStore.searchArticlesByParam(currentPage.value-1,undefined,undefined,
+         undefined,undefined,undefined,peopleId);
     articleStore.getScienceList(); //отримуємо список наукових сфер
     articleStore.getScienceSectionList(); //отримуємо список підкатегорій
 
@@ -28,42 +30,43 @@
   function closeDialog(show:boolean){
     showDialog.value=show;
   }
-  function tagFiltered(focused:boolean){ //по тегу
-    if (!focused)
-      console.log('selectedTag =', selectedTag.value)
-    // articleStore.searchArticlesByParam()
+  function tagChoose(data:Array<string>|undefined){ //по тегу
+    tags.value='';
+    if(data!==undefined){
+      data.map((item) => {
+        tags.value = tags.value + ',' + item.trim();
+      })
+      tags.value = tags.value ? tags.value?.substring(1) : '';
+    }
+    console.log('tags =', tags.value)
+    articleStore.searchArticlesByParam(currentPage.value-1,undefined,undefined,
+        undefined,sortParam.value,tags.value,peopleId);
   }
-  function selectSortParam(){
-    console.log("sortedValue=", sortedValue)
+  function sortParamChoose(data:number){
+    sortParam.value = data;
+    console.log("sortedParam=", sortParam.value)
+    articleStore.searchArticlesByParam(currentPage.value-1,undefined,undefined,
+        undefined,sortParam.value,tags.value,peopleId);
   }
+
+  //пагінація
+  const currentPage = ref(1); // Поточна сторінка
+  const onPageChange = () => {
+    // Оновлення поточної сторінки при зміні
+    console.log('currentPage =',currentPage.value)
+  };
 </script>
 
 <template>
   <!--відкрити діалог створення нової статті-->
   <v-row class="py-10 justify-space-between align-content-center">
       <v-col cols="6" class="ps-0">
-        <div class="d-flex">
-          <v-combobox
-              class="mx-3 w-50"
-              label="Теги"
-              :items="articleStore.tagItems"
-              :delimiters="delimiters"
-              v-model="selectedTag"
-              multiple
-              chips
-              @update:focused="tagFiltered"
-          ></v-combobox>
-          <v-select
-              class="mx-3 w-50"
-              v-model="sortedValue"
-              hint="Оберіть параметр сортування"
-              :items="articleStore.sortedOptions"
-              item-title="value"
-              item-value="key"
-              label="Впорядкувати"
-              @update:modelValue= "selectSortParam"
-          ></v-select>
-        </div>
+        <FilterForMyArticle
+            :sorted-options="articleStore.sortedOptions"
+            :tag-items="articleStore.tagItems"
+            @choose-sorted="sortParamChoose"
+            @choose-tag="tagChoose"
+        />
 
       </v-col>
 
@@ -113,15 +116,15 @@
       />
     </v-col>
   </v-row>
-
+  <v-row v-if="articleStore.totalPage>0" class="justify-center">
+    <v-pagination
+        v-model="currentPage"
+        :length="articleStore.totalPage"
+        @update:model-value="onPageChange"
+    ></v-pagination>
+  </v-row>
 </template>
 
 <style scoped>
- .filter-zone{
-   display: flex;
-   flex-direction: row;
-   justify-content: flex-start;
-   width: 100%;
- }
 
 </style>

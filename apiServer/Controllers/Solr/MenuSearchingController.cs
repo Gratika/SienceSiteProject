@@ -30,7 +30,7 @@ namespace apiServer.Controllers.Solr
             emojiId = "1";
         }
 
-        [HttpPost("SearchWithFilters")]
+        [HttpGet("SearchWithFilters")]
         public async Task<ActionResult<List<Articles>>> SearchWithFilters( int Pages, string? SearchString, int? year, int? Filters, int? TypeOrder,string? tags, string? peopleId,string? scienceId) // возвращение по наибольшему числу просмотров
         {
             //try

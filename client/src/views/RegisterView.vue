@@ -6,16 +6,25 @@ import { useField, useForm } from 'vee-validate'
 //типи користувача
 import type {ISignUpInput} from "@/api/type";
 import {useAuthStore} from "@/stores/authStore";
+import moment from "moment";
+const userBirthday = ref('');
 
 const userRegister: Ref<ISignUpInput>  = ref({
-  surname:'',
-  name:'',
-  birthday:'',
+  people:{
+    id:'',
+    surname:'',
+    name:'',
+    birthday:'',
+    path_bucket:'',
+    date_create: (new Date()).toISOString(),
+    modified_date:(new Date()).toISOString()
+  },
   email:'',
   password:'',
   //passwordConfirm:''
 });
 const authStore = useAuthStore();
+
 /*валідація форм*/
 const { handleSubmit, handleReset } = useForm({
   validationSchema: {
@@ -24,6 +33,11 @@ const { handleSubmit, handleReset } = useForm({
 
       return 'Введіть валідну електронну адресу'
     },
+    /*birthDate (value:string) {
+       if (/^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/.test(value) || value?.length==0) return true
+
+       return 'Дата повина відповідати вказаному формату, або лишитися пустою'
+    },*/
     password (value:string) {
       if (value?.length >= 8) return true
 
@@ -38,6 +52,23 @@ const { handleSubmit, handleReset } = useForm({
 const email= useField('email');
 const  password = useField('password');
 const passwordConfirm = useField('passwordConfirm');
+//const birthDate = useField('birthDate');
+
+function formatDate(input: null | string): string {
+  //console.log('date=',date)
+  // console.log('typeof date=',typeof date)
+  if (input == null) return '';
+  const parts = input.split('.');
+ // return parts[2] +'-'+ parts[1]+'-'+parts[0];
+  // Перетворення компонентів дати на числа
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const year = parseInt(parts[2], 10);
+
+  // Створення нового об'єкта Date
+  const date = new Date(year, month - 1, day);
+  return date.toISOString()
+}
 
 const submitRegister = handleSubmit(values => {
   if (typeof email.value.value === "string") {
@@ -46,11 +77,16 @@ const submitRegister = handleSubmit(values => {
   if (typeof password.value.value === "string") {
     userRegister.value.password = password.value.value;
   }
+  /*if (typeof birthDate.value.value === "string") {
+    console.log('birthDate=', birthDate.value.value)
+    userRegister.value.people.birthday=formatDate(birthDate.value.value);
+  }*/
   /*if (typeof passwordConfirm.value.value === "string") {
     userRegister.value.passwordConfirm = passwordConfirm.value.value;
   }*/
+  userRegister.value.people.birthday=formatDate(userBirthday.value)
   console.log('userRegister = ',userRegister.value)
-  authStore.onRegistration(userRegister.value)
+  authStore.onRegistration(userRegister.value);
 
 })
 
@@ -75,7 +111,7 @@ const submitRegister = handleSubmit(values => {
               </div>
               <v-text-field
                   clearable
-                  v-model.trim="userRegister.name"
+                  v-model.trim="userRegister.people.name"
                   label="Ім'я"
                   id="userName"
               />
@@ -84,9 +120,10 @@ const submitRegister = handleSubmit(values => {
               </div>
               <v-text-field
                   clearable
-                  v-model.trim="userRegister.birthday"
+                  v-model="userBirthday"
                   label="01.01.2000"
-                  id="birthday"
+                  id="birthDate"
+
 
               />
               <div class="mt-2 mb-3">
@@ -110,7 +147,7 @@ const submitRegister = handleSubmit(values => {
               </div>
               <v-text-field
                   clearable
-                  v-model.trim="userRegister.surname"
+                  v-model.trim="userRegister.people.surname"
                   label="Прізвище"
                   id="surname"
               />

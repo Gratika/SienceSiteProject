@@ -34,7 +34,8 @@ const article = ref<IArticle>({
   author_: getAuthor(),
   tagItems:[],
   reaction: null,
-  countLike:0
+  countLike:0,
+  selected:false,
 });
 let scienceTheory = ref<IScientificTheory|undefined>({
   id: '',

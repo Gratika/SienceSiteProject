@@ -56,9 +56,11 @@ namespace apiServer.Controllers.Authentication
         public async Task<ActionResult> CreateUser(/*string pas, string email*/UserRequest userRequest) //Регистрация
         {
             try
-            {                
-
-                People people = _people.CreatePeople();
+            {
+                People peopleOn = _people.CreatePeople();
+                peopleOn.birthday = userRequest.people.birthday;
+                peopleOn.name = userRequest.people.name;
+                peopleOn.surname = userRequest.people.surname;
 
                 Users FirstEx = new Users();
                 FirstEx.Id = Guid.NewGuid().ToString();
@@ -69,7 +71,7 @@ namespace apiServer.Controllers.Authentication
                 FirstEx.modified_date = DateTime.Now;
                 FirstEx.role_id = "1";
 
-                FirstEx.people_id = people.Id;
+                FirstEx.people_id = peopleOn.Id;
                 //Проверка уникальности пользователя по паролю и email
                 if (await IsUserUnique(FirstEx) == 0)
                 {
@@ -82,10 +84,10 @@ namespace apiServer.Controllers.Authentication
                     {
                         //// Почта прошла проверку, продолжаем регистрацию
                         ////генерируем токены
-                        FirstEx.access_token = _tokens.GenerateAccessToken();
-                        FirstEx.refresh_token = _tokens.GenerateRefreshToken();
+                        FirstEx.access_token = _tokens.GenerateAccessToken(FirstEx.email);
+                        FirstEx.refresh_token = _tokens.GenerateRefreshToken(FirstEx.email);
                         //// Сохранение пользователя в базе данных
-                        _people.AddPeopleToDb(people);
+                        _people.AddPeopleToDb(peopleOn);
                         _context.Users.Add(FirstEx);
                         _context.SaveChanges();
                         ////Добавляем в редис               
@@ -128,8 +130,8 @@ namespace apiServer.Controllers.Authentication
                     {
                         _context.Users.Remove(user);
                         _redisRepository.DeleteData("users:" + refreshToken);
-                        user.access_token = accessToken = _tokens.GenerateAccessToken();
-                        user.refresh_token = refreshToken = _tokens.GenerateRefreshToken();
+                        user.access_token = accessToken = _tokens.GenerateAccessToken(user.email);
+                        user.refresh_token = refreshToken = _tokens.GenerateRefreshToken(user.email);
                         _context.Users.Update(user);
                         _context.SaveChanges();
                         // Сохранение/обновление данных в кэше на 10 минут                  

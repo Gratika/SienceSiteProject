@@ -56,7 +56,7 @@ const next = () => {
 <template>
   <div class="slide-group">
     <div class="header">
-      <div class="sub-title">{{ props.title }}</div>
+      <div class="text-h4 font-weight-bold">{{ props.title }}</div>
       <div class="navigation">
         <v-btn
             icon="mdi-chevron-left"
@@ -106,14 +106,6 @@ const next = () => {
   display: flex;
   margin-top: 20px;
   transition: all ease .5s;
-}
-.sub-title{
-  color: #000;
-  font-family: Mariupol;
-  font-size: 38px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
 }
 .wrapper{
   overflow: hidden;

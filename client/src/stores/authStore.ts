@@ -14,9 +14,6 @@ import { createToast } from 'mosha-vue-toastify';
 import router from '@/router'
 
 
-
-
-
 export type AuthStoreState ={
     authUser:IUser|null;
     token:string|'';
@@ -57,20 +54,15 @@ export const useAuthStore = defineStore({
             signUpUserFn(user).then(
                 res=>{
                     this.isLoading = false;
-                    createToast(res.message, {
-                        position: 'top-right',
-                    });
                     MyLocalStorage.setItem('email', user.email);
                    router.push('/verify_email');
                 }
-            ).catch(error => {
+            ).catch((error) => {
                 this.isLoading = false;
-                console.log('error from onRegistration: ',error);
-
-                showErrorMessage(error);
+                console.log('error=',error);
             })
         },
-        onLogin(user:ILoginInput){
+        onLogin(user:ILoginInput, previousRoute:string){
             loginUserFn(user).then(
                 res=>{
                     this.token = res.user.access_token;
@@ -88,11 +80,13 @@ export const useAuthStore = defineStore({
                         MyLocalStorage.setItem('bucketName', this.authUser.people_!.path_bucket);
                     }
                     if(res.user.email_is_checked ===0){
-                        router.push('/verify_email');
+                        router.push({path:'/verify_email'}).then((res)=>{
+                            console.log('push_res=',res);
+                        });
+                    }else{
+                        router.push({path: previousRoute});
                     }
-                    createToast("Log in!", {
-                        position: 'bottom-center',
-                    });
+
                 }
             ).catch(error => {
                 console.log('error=', error)
@@ -187,6 +181,17 @@ export const useAuthStore = defineStore({
             }).catch(error => {
                 //showErrorMessage(error);
             })*/
+        },
+        async test() {
+            try{
+                const res = await sendRequest<string>(
+                    'GET',
+                    'Tokens/Check'
+                );
+                console.log("test=", res);
+            }catch (error) {
+                console.error(error);
+            }
         },
 
     }

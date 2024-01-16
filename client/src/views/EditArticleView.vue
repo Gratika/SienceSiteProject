@@ -27,7 +27,8 @@ const article = ref<IArticle>({
   author_: null,
   tagItems:[],
   reaction: null,
-  countLike:0
+  countLike:0,
+  selected:false,
 })
 const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 const articleStore = useArticleStore();
@@ -187,6 +188,9 @@ const uploadFiles = () => {
         </v-card>
       </v-col>
     </v-row>
+    <v-row>
+      <div class="footer-distance"></div>
+    </v-row>
   </v-container>
 </template>
 
@@ -194,6 +198,8 @@ const uploadFiles = () => {
  .card-shadow{
    border-radius: 5px;
    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
-
+ }
+ .footer-distance{
+   min-height: 100px;
  }
 </style>

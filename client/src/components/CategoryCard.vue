@@ -1,13 +1,19 @@
 <script setup lang="ts">
   import type {IScience} from "@/api/type";
+  import {useRouter} from "vue-router";
 
   const props=defineProps<{
     science: IScience
   }>()
+
+  const router = useRouter();
+  function searchScienceCategoryArticle(){
+    router.push({ name: 'search_science_article', params: { scienceId: props.science.id} });
+  }
 </script>
 
 <template>
-  <div class="card-box">
+  <div class="card-box" @click="searchScienceCategoryArticle">
     <v-sheet
         height="180"
         width="200"

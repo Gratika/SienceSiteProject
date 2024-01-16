@@ -3,13 +3,18 @@ import type {IArticle} from "@/api/type";
 import {useRouter} from "vue-router";
 import {useArticleStore} from "@/stores/articleStore";
 import moment from 'moment';
+import {computed} from "vue";
+import Like from "@/components/Like.vue";
 
 //пропси від батьківського елементу
 const props = defineProps<{
   article:IArticle
-}>()
+}>();
+const setReaction = computed(()=>{
+  return props.article.reaction !== null;
+})
 const router = useRouter();
-const articleStore = useArticleStore();
+
 
 //функція для виводу автора
 const author_=():string|undefined=>{
@@ -77,8 +82,8 @@ function readArticle(){
         </div>
 
         <div class=" d-flex flex-row justify-end mt-2">
-          <v-icon icon="mdi-thumb-up-outline"/>
-          <span class="d-inline text-subtitle-2 font-weight-bold">{{article.countLike}}</span>
+          <Like :is-selected="setReaction"/>
+          <span class="d-inline text-subtitle-2 font-weight-bold ms-3">{{article.countLike}}</span>
         </div>
 
 

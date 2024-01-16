@@ -1,15 +1,24 @@
 <script setup lang="ts">
-  import {ref} from "vue";
+import {computed, ref} from "vue";
   import { useField, useForm } from "vee-validate"
   import type { Ref } from "vue";
   import type {ILoginInput}  from "@/api/type";
   import {useAuthStore} from "@/stores/authStore";
+import {useRouter} from "vue-router";
 
   const userLogin: Ref<ILoginInput> = ref({
     email:'',
     password:'',
   })
-  const authStore = useAuthStore();;
+
+  const authStore = useAuthStore();
+  const router = useRouter();
+  const previousRoute = computed(()=>{
+    const lastPath = router.options.history.state['back'];
+    return (lastPath ? lastPath : '/') as string;
+
+  })
+
 
   /*валідація форм*/
   const { handleSubmit, handleReset } = useForm({
@@ -38,7 +47,8 @@
     if (typeof password.value.value === "string") {
       userLogin.value.password = password.value.value;
     }
-    authStore.onLogin(userLogin.value);
+
+    authStore.onLogin(userLogin.value, previousRoute.value);
     //alert(JSON.stringify(userLogin.value));
   })
 </script>
