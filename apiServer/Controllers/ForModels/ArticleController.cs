@@ -43,7 +43,7 @@ namespace apiServer.Controllers.ForModels
         }
         //[Authorize]
         [HttpGet("GetArticlesForUser")]
-        public async Task<ActionResult>/*Task<List<FullArticle<Articles>>>*/ GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
+        public async Task<List<FullArticle<Articles>>> GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
         {
             //try
             //{
@@ -67,7 +67,7 @@ namespace apiServer.Controllers.ForModels
                 });
                 }
 
-                return Ok(articleAndReactions);
+                return articleAndReactions;
             //}
             //catch (Exception ex)
             //{
