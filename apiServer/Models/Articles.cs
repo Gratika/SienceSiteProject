@@ -30,6 +30,10 @@ namespace apiServer.Models
         public Scientific_theories? theory_ {  get; private set; }
         [SolrField("path_file")]
         public string? path_file { get; set; }
+        [JsonIgnore]
+        public string? urls { get; set; }
+        [SolrField("IsActive")]
+        public bool IsActive { get; set; }
 
         public void SetAuthor(People author)
         {

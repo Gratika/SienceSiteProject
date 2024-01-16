@@ -1,5 +1,6 @@
 ﻿using apiServer.Controllers.Redis;
 using apiServer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,6 +66,15 @@ namespace apiServer.Controllers.ForModels
             People people = _redisController.GetData<People>(id);
 
             return people;
+        }
+        //[Authorize]
+        [HttpGet("RedactPeople")]
+        public ActionResult RedactPeople(People people)
+        {
+            _context.people.Update(people);
+            _context.SaveChanges();
+
+            return Ok("Данные пользователя удачно обновленны");
         }
     }
 }

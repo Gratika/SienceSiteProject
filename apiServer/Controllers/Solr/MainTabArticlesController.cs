@@ -39,16 +39,17 @@ namespace apiServer.Controllers.Search
                 var options = new QueryOptions
                 {
                     OrderBy = new[] { new SortOrder("date_created", Order.DESC) },      
-                    Rows = amount // Количество записей, которые вы хотите получить
+                    Rows = amount, // Количество записей, которые вы хотите получить
+                    FilterQueries = new[] { new SolrQuery("IsActive:true") }
                 };
                 List<Articles> articles = solrArticleController.GetArticle("*:*", options);
 
-                List<FullArticle> articleAndReactions = new List<FullArticle>();
+                List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
             foreach (var article in articles)
             {
-                FullArticle ar = _reactionController.GetReactionForArticle(article.Id, emojiId, article.author_id);
+                FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
                 ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
-                articleAndReactions.Add(new FullArticle { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+                articleAndReactions.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
             }
 
             return Ok(articleAndReactions);
@@ -66,16 +67,17 @@ namespace apiServer.Controllers.Search
                 var options = new QueryOptions
                 {
                     OrderBy = new[] { new SortOrder("views", Order.DESC) },
-                    Rows = amount // Количество записей, которые вы хотите получить
+                    Rows = amount, // Количество записей, которые вы хотите получить
+                    FilterQueries = new[] { new SolrQuery("IsActive:true") }
                 };
                 List<Articles> articles = solrArticleController.GetArticle("*:*", options);
 
-                List<FullArticle> articleAndReactions = new List<FullArticle>();
+                List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
                 foreach (var article in articles)
                 {
-                    FullArticle ar = _reactionController.GetReactionForArticle(article.Id, emojiId, article.author_id);
+                    FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
                     ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
-                    articleAndReactions.Add(new FullArticle { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+                    articleAndReactions.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
                 }
 
                 return Ok(articleAndReactions);

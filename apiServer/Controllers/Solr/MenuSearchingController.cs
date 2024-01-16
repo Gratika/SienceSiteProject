@@ -30,8 +30,8 @@ namespace apiServer.Controllers.Solr
             emojiId = "1";
         }
 
-        [HttpPost("SearchWithFilters")]
-        public async Task<ActionResult<List<Articles>>> SearchWithFilters( int Pages, string? SearchString, int? year, int? Filters, int? TypeOrder,string? tags, string? peopleId,string? scienceId) // возвращение по наибольшему числу просмотров
+        [HttpGet("SearchWithFilters")]
+        public async Task<ActionResult<List<Articles>>> SearchWithFilters( int Pages, string? SearchString, int? year, int? Filters, int? TypeOrder,string? tags, string? peopleId,string? scienceId, string? theoryId) // возвращение по наибольшему числу просмотров
         {
             //try
             //{
@@ -54,17 +54,21 @@ namespace apiServer.Controllers.Solr
                 }
                 if(!string.IsNullOrEmpty(scienceId))
                 {
-                    searchResponse.Articles = searchResponse.Articles.Where(a => a.theory_.science_id == scienceId).ToList();
+                searchResponse.Articles = searchResponse.Articles.Where(a => a.theory_.science_id == scienceId).ToList();
                 }
+            if (!string.IsNullOrEmpty(theoryId))
+            {
+                searchResponse.Articles = searchResponse.Articles.Where(a => a.theory_id == theoryId).ToList();
+            }
 
-                SearchResponse<FullArticle> articlesAndReactions = new SearchResponse<FullArticle>();
-                articlesAndReactions.Articles = new List<FullArticle>();
+            SearchResponse<FullArticle<Articles>> articlesAndReactions = new SearchResponse<FullArticle<Articles>>();
+                articlesAndReactions.Articles = new List<FullArticle<Articles>>();
                 articlesAndReactions.allPages = searchResponse.allPages;
             foreach (var article in searchResponse.Articles)
             {
-                FullArticle ar = _reactionController.GetReactionForArticle(article.Id, emojiId, article.author_id);
+                FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
                 ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
-                articlesAndReactions.Articles.Add(new FullArticle { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+                articlesAndReactions.Articles.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
             }
 
             return Ok(articlesAndReactions);

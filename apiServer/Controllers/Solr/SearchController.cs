@@ -54,6 +54,13 @@ namespace apiServer.Controllers.Search
                     filterQueries.Add(new SolrQuery($"author_id:\"{peopleId}\""));
                     queryOptions.FilterQueries = filterQueries.ToArray();
                 }
+                else
+                {
+                    var filterQueries = queryOptions.FilterQueries.ToList();
+                    filterQueries.Add(new SolrQuery($"IsActive:\"{true}\""));
+                    queryOptions.FilterQueries = filterQueries.ToArray();
+
+                }
 
                 List<Articles> articles = solrArticleController.GetArticle(SearchString + "~", queryOptions);
                 return articles;
@@ -63,43 +70,43 @@ namespace apiServer.Controllers.Search
                 throw new Exception("Ошибка, ничего не было найденно - " + ex.Message);
             }
         }
-        [HttpGet("SearchSelectedArtciles")]
-        public ActionResult SearchSelectedArtciles(string SearchString, string? peopleId)
-        {
-            var queryOptions = new QueryOptions
-            {
-                ExtraParams = new Dictionary<string, string>
-                {
-           //{ "defType", "edismax" },  // Используем расширенный запрос
-           //{ "qf", "title text tag author_id" },           // Указываем поле для поиска text tag author_id
-           //{ "mm", "5%" },           // Минимальное количество слов, которые должны совпадать   
-           //{ "pf", "title^2 text^1 tag^2 author_id^2" },          // Указываем вес полям
-           //{ "spellcheck", "true" }, // Включение компонента автокоррекции
-           //{ "spellcheck.dictionary", "default" }, // Использование словаря по умолчанию
-           //{ "spellcheck.q", SearchString }, // Передача текста для проверки
+        //[HttpGet("SearchSelectedArtciles")]
+        //public ActionResult SearchSelectedArtciles(string SearchString, string? peopleId)
+        //{
+        //    var queryOptions = new QueryOptions
+        //    {
+        //        ExtraParams = new Dictionary<string, string>
+        //        {
+        //   //{ "defType", "edismax" },  // Используем расширенный запрос
+        //   //{ "qf", "title text tag author_id" },           // Указываем поле для поиска text tag author_id
+        //   //{ "mm", "5%" },           // Минимальное количество слов, которые должны совпадать   
+        //   //{ "pf", "title^2 text^1 tag^2 author_id^2" },          // Указываем вес полям
+        //   //{ "spellcheck", "true" }, // Включение компонента автокоррекции
+        //   //{ "spellcheck.dictionary", "default" }, // Использование словаря по умолчанию
+        //   //{ "spellcheck.q", SearchString }, // Передача текста для проверки
 
-           { "q", "*:*" },  // Запрос "все документы"
-           //{ "fq", "{!join from=id to=article_id}id:*" }
+        //   { "q", "*:*" },  // Запрос "все документы"
+        //   //{ "fq", "{!join from=id to=article_id}id:*" }
 
-           { "fq", $"people_id:\"{peopleId}\""}, // AND article_id:\"id\"
+        //   { "fq", $"people_id:\"{peopleId}\""}, // AND article_id:\"id\"
 
-           //{ "fq", "article_id:\"id\"" }
-           //{ "author_id", peopleId },
-           //{ "article_id", "id" }
-                }
-            };
-            //if (string.IsNullOrEmpty(peopleId) == false)
-            //{
-            //    var filterQueries = queryOptions.FilterQueries.ToList();
-            //    filterQueries.Add(new SolrQuery($"author_id:{peopleId}"));
-            //    queryOptions.FilterQueries = filterQueries.ToArray();
-            //}
+        //   //{ "fq", "article_id:\"id\"" }
+        //   //{ "author_id", peopleId },
+        //   //{ "article_id", "id" }
+        //        }
+        //    };
+        //    //if (string.IsNullOrEmpty(peopleId) == false)
+        //    //{
+        //    //    var filterQueries = queryOptions.FilterQueries.ToList();
+        //    //    filterQueries.Add(new SolrQuery($"author_id:{peopleId}"));
+        //    //    queryOptions.FilterQueries = filterQueries.ToArray();
+        //    //}
 
-            var articles = solr.Query(SolrQuery.All, queryOptions);
-            //
-            //var articles = solr.Query($"title:\"{SearchString}\"");
+        //    var articles = solr.Query(SolrQuery.All, queryOptions);
+        //    //
+        //    //var articles = solr.Query($"title:\"{SearchString}\"");
 
-            return Ok(articles);
-        }
+        //    return Ok(articles);
+        //}
     }
 }

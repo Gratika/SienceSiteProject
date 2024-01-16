@@ -1,7 +1,11 @@
-﻿using apiServer.Models;
+﻿using apiServer.Controllers.Redis;
+using apiServer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,34 +16,35 @@ namespace apiServer.Controllers.Authentication
     [ApiController]
     public class TokensController : Controller
     {
+        private ArhivistDbContext _context;
+        private readonly RedisController _redisRepository;
         public readonly IConfiguration _configuration; // необходим для доступа к jwt ключу
-        public TokensController(IConfiguration configuration)
+        public TokensController(IConfiguration configuration, ArhivistDbContext context)
         {
             _configuration = configuration;
+            _context = context;
+            _redisRepository = new RedisController("redis:6379,abortConnect=false");
         }
 
         [HttpGet("GenerateAccessToken")]
-        public string GenerateAccessToken()
+        public string GenerateAccessToken(string id)
         {
             try
             {
+                var identity = GetIdentity(id);
 
+                var now = DateTime.UtcNow;
+                // создаем JWT-токен
+                var jwt = new JwtSecurityToken(
+                        issuer: _configuration["Jwt:Issuer"],
+                        audience: _configuration["Jwt:Audience"],
+                        notBefore: now,
+                        claims: identity.Claims,
+                        expires: now.Add(TimeSpan.FromMinutes(15)), // Срок действия токена в минутах (15)
+                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"])), SecurityAlgorithms.HmacSha256));
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
-
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[]
-                    {
-                    new Claim(ClaimTypes.Name, "username") // Здесь вы можете добавить дополнительные данные пользователя
-                }),
-                    Expires = DateTime.UtcNow.AddMinutes(1), // Срок действия токена в минутах(15)
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                        SecurityAlgorithms.HmacSha256Signature)
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
+                return encodedJwt;
             }
             catch (Exception ex)
             {
@@ -47,22 +52,24 @@ namespace apiServer.Controllers.Authentication
             }
         }
         [HttpGet("GenerateRefreshToken")]
-        public string GenerateRefreshToken()
+        public string GenerateRefreshToken(string id)
         {
             try
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
+                var identity = GetIdentity(id);
 
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Expires = DateTime.UtcNow.AddDays(7), // Срок действия токена в днях
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                        SecurityAlgorithms.HmacSha256Signature)
-                };
+                var now = DateTime.UtcNow;
+                // создаем JWT-токен
+                var jwt = new JwtSecurityToken(
+                        issuer: _configuration["Jwt:Issuer"],
+                        audience: _configuration["Jwt:Audience"],
+                        notBefore: now,
+                        claims: identity.Claims,
+                        expires: now.Add(TimeSpan.FromDays(15)), // Срок действия токена в минутах (15)
+                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"])), SecurityAlgorithms.HmacSha256));
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
+                return encodedJwt;
             }
             catch (Exception ex)
             {
@@ -71,7 +78,7 @@ namespace apiServer.Controllers.Authentication
         }
 
         [HttpGet("IsTokenExpired")]
-        // Метод для проверки срока действия Access Token
+        // Метод для проверки срока действия Token
         public bool IsTokenExpired(string accessToken)
         {
             // В данном примере считаем, что Access Token действителен в течение 15-20 минут
@@ -79,7 +86,7 @@ namespace apiServer.Controllers.Authentication
             // В противном случае, токен считается действительным
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.ReadJwtToken(accessToken);
+            var token = tokenHandler.ReadJwtToken(accessToken); 
 
             if (token.ValidTo < DateTime.UtcNow)
             {
@@ -87,6 +94,76 @@ namespace apiServer.Controllers.Authentication
                 return true;
             }
             return false;
+        }
+        [HttpGet("Check")]
+        public string Check()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            return "userId - " + userId + ", Token - " + token;
+        }
+        private ClaimsIdentity GetIdentity(string id)
+        {
+            Users person = _context.Users.FirstOrDefault(x => x.Id == id);
+            if (person != null)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.Id),
+                };
+                ClaimsIdentity claimsIdentity =
+                new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
+                    ClaimsIdentity.DefaultRoleClaimType);
+                return claimsIdentity;
+            }
+
+            // если пользователя не найдено
+            return null;
+        }
+        [HttpGet("CheckTokens")]
+        public ActionResult CheckTokens(string id, string accessToken, string refreshToken)
+        {
+            //try
+            //{
+                Users user = new Users();
+                user = _redisRepository.GetData<Users>(id);// Проверка наличия данных в кэше
+                if (user == null) // Данные отсутствуют в кэше, выполняем запрос к базе данных
+                {
+                    user = _context.Users.FirstOrDefault(u => u.access_token == accessToken);
+                }
+                if (IsTokenExpired(accessToken) && user != null)
+                {
+                    if (IsTokenExpired(refreshToken))
+                    {
+                        return BadRequest(new { Error = "Введите заново емаил и пароль" });
+                    }
+                    else
+                    {
+                        _context.Users.Remove(user);
+                        _redisRepository.DeleteData("users:" + refreshToken);
+                        user.access_token = accessToken = GenerateAccessToken(user.Id);
+                        user.refresh_token = refreshToken = GenerateRefreshToken(user.Id);
+                        _context.Users.Update(user);
+                        _context.SaveChanges();
+                        // Сохранение/обновление данных в кэше на 10 минут
+                        _redisRepository.AddOneModel(user);
+                        return Ok(accessToken + " \n" + refreshToken); //Токены обновлены
+                    }
+                }
+                else if (user != null)
+                {
+                    return Ok(new { Message = "Токен НЕ нуждается в обновлении(Пользователю разрешают войти на страницу)" });
+                }
+                else
+                {
+                    return BadRequest(new { Error = "Пользователь не найден" });
+                }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest(new { ex.Message });
+            //}
         }
     }
 }

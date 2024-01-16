@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
+using System.Text;
 
 namespace apiServer.Controllers.Minio
 {
@@ -38,8 +40,8 @@ namespace apiServer.Controllers.Minio
         [HttpPost("AddImages")]
         public async Task<ActionResult<string>> AddImages([FromForm] List<IFormFile> upload, string articleId) // обращаемся в minio для взятия url файлов
         {
-            try
-            {
+            //try
+            //{
                 if (upload.Count == 0)
             {
                 return Ok("Файлы пустые");
@@ -64,29 +66,25 @@ namespace apiServer.Controllers.Minio
                          .WithObjectSize(fileInWebp.Length)
                          .WithStreamData(fileInWebp.OpenReadStream());
             await _minio.PutObjectAsync(putObjectArgs);
-            var url = await GetUrl(NewFileName);
+            var url = await GetUrl(NewFileName, articleId);
 
-                Articles article = _context.Articles.FirstOrDefault(a => a.Id == articleId);
-                article.urls += url + ",";
-                _context.Articles.Update(article);
-                _context.SaveChanges();
 
             return url;
-            }
-            catch
-            {
-                throw new Exception();
-            }
+            //}
+            //catch
+            //{
+            //    throw new Exception();
+            //}
         }
         [HttpGet("GetUrl")]
-        public async Task<string> GetUrl(string path_files) // обращаемся в minio для взятия url файлов
+        public async Task<string> GetUrl(string path_files, string articleId) // обращаемся в minio для взятия url файлов
         {
-            try
-            {
-                PresignedGetObjectArgs args = new PresignedGetObjectArgs()
-                                                     .WithBucket(bucket)
-                                                     .WithObject(path_files)
-                                                     .WithExpiry(3600);
+            //try
+            //{
+            PresignedGetObjectArgs args = new PresignedGetObjectArgs()
+                                                 .WithBucket(bucket)
+                                                 .WithObject(path_files)
+                                                 .WithExpiry(3600);
 
                 IMinioClient minio = new MinioClient()
                 .WithEndpoint("localhost:9000") //localhost:9090
@@ -94,6 +92,11 @@ namespace apiServer.Controllers.Minio
                 .WithSSL(false)
                 .Build();
                 string downloadUrl = await minio.PresignedGetObjectAsync(args);
+
+                Articles article = _context.Articles.FirstOrDefault(a => a.Id == articleId);
+                article.urls += downloadUrl + ",";
+                _context.Articles.Update(article);
+                _context.SaveChanges();
 
                 // Создание объекта JSON
                 var json = new
@@ -105,15 +108,16 @@ namespace apiServer.Controllers.Minio
                 string jsonResult = JsonConvert.SerializeObject(json);
 
                 return jsonResult;
-            }
-            catch
-            {
-                throw new Exception();
-            }
+            //}
+            //catch
+            //{
+            //    throw new Exception();
+            //}
         }
         [HttpPost("Delete")]
         public async void Delete(Articles article) // обращаемся в minio для взятия url файлов
         {
+
             string[] urls = article.urls.Split(',');
             foreach (string url in urls)
             {
@@ -123,7 +127,8 @@ namespace apiServer.Controllers.Minio
                                                          .WithBucket(bucket)
                                                          .WithObject(FileName);
                 await _minio.RemoveObjectAsync(args);
-            }           
+            }
         }
+        
     }
 }

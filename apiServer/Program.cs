@@ -6,17 +6,39 @@ using apiServer.Controllers.Redis;
 using apiServer.Controllers.Search;
 using apiServer.Controllers.Solr;
 using apiServer.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Minio;
 using SolrNet;
 using StackExchange.Redis;
 using System.Configuration;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-
 // Add services to the container.
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+   .AddJwtBearer(options =>
+   {
+       options.TokenValidationParameters = new TokenValidationParameters
+       {
+           ValidateIssuer = true,
+           ValidateAudience = true,
+           ValidateLifetime = true,
+           ValidateIssuerSigningKey = true,
+           IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
+           ValidIssuer = builder.Configuration["Jwt:Issuer"],
+           ValidAudience = builder.Configuration["Jwt:Audience"]
+       };
+   });
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
@@ -62,6 +84,7 @@ Startup.Init<People>("http://solr:8983/solr/new_core");
 Startup.Init<Scientific_theories>("http://solr:8983/solr/new_core");
 //Startup.Init<Selected_articles>("http://solr:8983/solr/new_core");
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 app.UseCors("CorsPolicy"); //CorsPolicy AllowAll

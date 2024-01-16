@@ -15,6 +15,7 @@ using ImageMagick;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 
 namespace apiServer.Controllers.Minio
 {
@@ -39,6 +40,7 @@ namespace apiServer.Controllers.Minio
                 .Build();
             _hostingEnvironment = hostingEnvironment;
         }
+        //[Authorize]
         [HttpPost("AddFiles")]
         public async Task<ActionResult<List<string>>> AddFiles([FromForm] string id, [FromForm] List<IFormFile> files)
         {
@@ -220,6 +222,7 @@ namespace apiServer.Controllers.Minio
             //    return BadRequest("Ошибка, не удалось выгрузить файлы - " + ex.Message);
             //}
         }
+        //[Authorize]
         [HttpPost("RedactFiles")]
         public async Task<ActionResult<List<string>>> RedactFiles(string id, List<IFormFile>? files) // создаем файлы из url и записываем в архив
         {
@@ -233,6 +236,7 @@ namespace apiServer.Controllers.Minio
             //    throw new Exception();
             //}
         }
+        //[Authorize]
         [HttpPost("DeleteFiles")]
         public async Task<ActionResult> DeleteFiles(string id) // создаем файлы из url и записываем в архив
         {
