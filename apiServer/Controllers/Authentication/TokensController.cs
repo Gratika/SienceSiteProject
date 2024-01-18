@@ -32,6 +32,10 @@ namespace apiServer.Controllers.Authentication
             try
             {
                 var identity = GetIdentity(id);
+            if(identity == null)
+            {
+                throw new Exception();
+            }
 
                 var now = DateTime.UtcNow;
                 // создаем JWT-токен
@@ -45,12 +49,12 @@ namespace apiServer.Controllers.Authentication
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
                 return encodedJwt;
-            }
+        }
             catch (Exception ex)
             {
                 throw new Exception();
-            }
-        }
+    }
+}
         [HttpGet("GenerateRefreshToken")]
         public string GenerateRefreshToken(string id)
         {
@@ -98,28 +102,22 @@ namespace apiServer.Controllers.Authentication
         [HttpGet("Check")]
         public string Check()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
             var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var userId = GetUserIdFromToken(token);
 
             return "userId - " + userId + ", Token - " + token;
         }
         private ClaimsIdentity GetIdentity(string id)
         {
-            Users person = _context.Users.FirstOrDefault(x => x.Id == id);
-            if (person != null)
-            {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.Id),
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, id),
                 };
                 ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
                 return claimsIdentity;
-            }
-
-            // если пользователя не найдено
-            return null;
         }
         [HttpGet("CheckTokens")]
         public ActionResult CheckTokens(string id, string accessToken, string refreshToken)
@@ -164,6 +162,31 @@ namespace apiServer.Controllers.Authentication
             //{
             //    return BadRequest(new { ex.Message });
             //}
+        }
+       private string GetUserIdFromToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+                if (jsonToken?.Claims != null)
+                {
+                    var userIdClaim = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimsIdentity.DefaultNameClaimType);
+
+                    if (userIdClaim != null)
+                    {
+                        return userIdClaim.Value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions if necessary
+            }
+
+            // If unable to extract the user id, return null or throw an exception
+            return null;
         }
     }
 }

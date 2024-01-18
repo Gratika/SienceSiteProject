@@ -43,7 +43,7 @@ namespace apiServer.Controllers.ForModels
         }
         //[Authorize]
         [HttpGet("GetArticlesForUser")]
-        public async Task<List<FullArticle<Articles>>> GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
+        public async /*Task<ActionResult>*/Task<List<FullArticle<Articles>>> GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
         {
             //try
             //{
@@ -103,7 +103,16 @@ namespace apiServer.Controllers.ForModels
 
                 _searchController.AddArticle(article);
 
-                return Ok();
+                ArticlerResponse articlerResponse = new ArticlerResponse();
+                articlerResponse.Articles = await GetArticlesForUser(article.author_id);
+                if (article.DOI != null)
+                {
+                    articlerResponse.Response = "Вы успешно добавили статью ";
+                    return Ok(articlerResponse);
+                }
+
+                articlerResponse.Response = "Вы успешно добавили статью, но DOI-идентификатор не прошел проверку";
+                return Ok(articlerResponse);
             }
             catch (Exception ex)
             {

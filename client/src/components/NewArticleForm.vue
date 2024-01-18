@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type {IArticle, IEmotion, IPeople, IScience, IScientificTheory, IUser} from "@/api/type";
+import type {IArticle, IPeople, IScience, IScientificTheory, IUser} from "@/api/type";
 import {ref, watch} from "vue";
 import {useField, useForm} from "vee-validate";
 import {useArticleStore} from "@/stores/articleStore";
 import MyLocalStorage from "@/services/myLocalStorage";
-import {object} from "zod";
+import {createToast} from "mosha-vue-toastify";
+
 
 const props = defineProps<{
   scienceList:IScience[],
@@ -36,6 +37,7 @@ const article = ref<IArticle>({
   reaction: null,
   countLike:0,
   selected:false,
+  isActive: false,
 });
 let scienceTheory = ref<IScientificTheory|undefined>({
   id: '',
@@ -51,11 +53,9 @@ function  getAuthorId():string|null {
   return peopleId;
 }
 function  getAuthor():IPeople|null {
-  let userStr:string|null = MyLocalStorage.getItem('user');
-  console.log('userStr=',userStr)
   let res: null|IPeople = null;
-  if(userStr !=null){
-    let user:IUser =  MyLocalStorage.getItem('user')
+  let user =  MyLocalStorage.getItem('user')
+  if(user!==null && user.people_!==undefined){
     res = user.people_;
   }
   return res;
@@ -111,11 +111,10 @@ const submitArticle= handleSubmit(()=>{
     if (!tagString.includes(item+',')){
       tagString = tagString.concat(item+',');
     }
-  })
-  article.value.tag = tagString;
-  /*if (typeof tag.value.value === "string") {
-    article.value.tag = tag.value.value;
-  }*/
+  });
+
+  article.value.tag = processTags(tagString);//прибираємо в кінці рядка можливі розділові знаки
+
   if (typeof theory_id.value.value === "string") {
     article.value.theory_id = theory_id.value.value;
   }
@@ -123,9 +122,26 @@ const submitArticle= handleSubmit(()=>{
   article.value.date_created= (new Date()).toISOString();
   article.value.modified_date= (new Date()).toISOString();
   console.log('article=', article.value);
-  articleStore.saveArticle(article.value);
-  emits('close', dialogShow.value);
+  articleStore.saveArticle(article.value)
+      .then(()=>{
+
+        createToast('Усе ок', {
+          position: 'bottom-center',
+          type: 'danger',
+        });
+        emits('close', dialogShow.value);
+      })
+      .catch((err)=>console.log('Axios Error: ', err));
+
 })
+function processTags(data:string|null):string|null {
+  if (data !== null) {
+    if (data.endsWith(',') || data.endsWith('#'))
+      return data.substring(0, data.length - 1);
+    else return data;
+  }
+  return null
+}
 function closeDialog() {
   emits('close', dialogShow.value);
 }

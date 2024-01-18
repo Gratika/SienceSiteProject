@@ -49,7 +49,7 @@ function formatDate(date: null | string): string {
   console.log('typeof date=',typeof date)
   if (date == null) return '';
   const formattedDate: Date = new Date(date);
-  return (moment(formattedDate)).format('DD.MM.YYYY HH:mm')
+  return (moment(formattedDate)).format('DD.MM.YYYY')
 }
 function getName():string {
   if (user.value.people_ ==null) return '';

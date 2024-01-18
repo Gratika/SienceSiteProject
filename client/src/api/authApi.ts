@@ -10,6 +10,7 @@ import type {
 } from './type';
 import MyLocalStorage from "@/services/myLocalStorage";
 import { createToast } from 'mosha-vue-toastify'
+import {HttpError, ServerBadRequestError} from "@/api/appException";
 
 
 const BASE_URL:string = '/api/';
@@ -31,7 +32,11 @@ const authApi = axios.create({
 //функція для оновлення токену, у випадку якщо його термін сплив
 export const refreshAccessTokenFn = async () => {
     const response = await authApi.get<ILoginResponse>('auth/refresh');
-    return response.data;
+    if(response.status==200)return response.data;
+    else {
+        console.log("BadRequest=",response.data)
+        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
+    }
 };
 //перехоплювач (interceptors) відповідей чи запитів axios (до того як вони будуть опрацьована then або catch)
 //автоматично виконується до запитів та після отримання відповіді
@@ -82,13 +87,21 @@ authApi.interceptors.request.use(
 //створюємо(реєструємо нового користувача)
 export const signUpUserFn = async (user: ISignUpInput) => {
     const response = await authApi.post<GenericResponse>('/User/CreateUser', user);
-    return response.data;
+    if(response.status==200)return response.data;
+    else {
+        console.log("BadRequest=",response.data)
+        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
+    }
 };
 
 //авторизація, вхід в систему
 export const loginUserFn = async (user: ILoginInput) => {
     const response = await authApi.post<ILoginResponse>('auth/AuthUser', user);
-    return response.data;
+    if(response.status==200)return response.data;
+    else {
+        console.log("BadRequest=",response.data)
+        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
+    }
 };
 
 
@@ -98,7 +111,11 @@ export const verifyEmailFn = async (verificationCode: string) => {
             code:verificationCode
         }
     });
-    return response.data;
+    if(response.status==200)return response.data;
+    else {
+        console.log("BadRequest=",response.data)
+        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
+    }
 };
 export const getRepeatCodeFn = async (email: string) => {
     const response = await authApi.get<string>('email/SentCode', {
@@ -106,13 +123,21 @@ export const getRepeatCodeFn = async (email: string) => {
             email : email
         }
     });
-    return response.data;
+    if(response.status==200)return response.data;
+    else {
+        console.log("BadRequest=",response.data)
+        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
+    }
 };
 
 //вихід з системи
 export const logoutUserFn = async () => {
     const response = await authApi.get<GenericResponse>('auth/logout');
-    return response.data;
+    if(response.status==200)return response.data;
+    else {
+        console.log("BadRequest=",response.data)
+        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
+    }
 };
 
 // Универсальная функция для отправки запроса
@@ -128,16 +153,20 @@ export const sendRequest = async <T>(
         params,
         data,
     });
-    console.log('response.status',response.status);
+    //console.log('response.status',response.status);
     //console.log('response.statusText',response.statusText);
-    return response.data;
+    if(response.status==200)return response.data;
+    else {
+        console.log("BadRequest=",response.data)
+        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
+    }
 
 };
 
 export const showErrorMessage = function( error : AxiosError){
     if (error && error.response && error.response.data && error.response.data) {
         createToast(error.response.data, {
-            position: 'top-right',
+            position: 'bottom-center',
             type: 'danger',
         });
     } else {

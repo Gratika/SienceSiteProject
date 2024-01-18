@@ -17,7 +17,7 @@ const showSelected = ref(false);
 const showMenu = false; //меню показуємо тільки в кабінеті користувача
 const filterDoi = ref<number|null>(null);
 const selectedTag = ref<Array<string>>([])//модель для фільтру Теги
-let tags = ref<string|null>('');//склеєні теги для відправки запиту
+let tags = ref<string|null>(null);//склеєні теги для відправки запиту
 const selectedYearStr = ref<string|null>(null);
 let selectedYear = ref<number|null>(null);
 const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
@@ -46,7 +46,7 @@ watch(
       if (typeof search === 'string') {
         searchSrt.value = search;
         selectedTag.value=[];
-        tags.value='';
+        tags.value=null;
         selectedYear.value=null;
         filterDoi.value=null;
         articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value, selectedYear.value,
@@ -62,10 +62,11 @@ function selectSortParam(){
 }
 //функції фільтрації
 function tagFiltered(focused:boolean){ //по тегу
-  console.log("tagFilteredFocused=",focused)
+  //console.log("tagFilteredFocused=",focused)
   if (!focused){
     selectedTag.value.map((item)=>{
-      tags.value= tags.value+','+item.trim();
+      if (tags.value==null) tags.value=item.trim();
+      else tags.value= tags.value+','+item.trim();
     })
     tags.value = tags.value? tags.value?.substring(1):'';
     console.log('tags =', tags.value)

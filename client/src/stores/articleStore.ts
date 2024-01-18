@@ -2,15 +2,15 @@ import { defineStore } from 'pinia';
 import type {
     ArticleResponse,
     GenericResponse,
-    IArticle, IArticleAndReactions,
-    IPeople, IReaction,
+    IArticle, IFullArticle,
     IScience,
     IScientificTheory,
-    ISearchResponse,
-    ISelectedArticle
+    ISearchResponse
 } from '@/api/type';
 import { sendRequest} from '@/api/authApi';
 import MyLocalStorage from "@/services/myLocalStorage";
+import type {AxiosError} from "axios";
+import {ServerBadRequestError} from "@/api/appException";
 
 export type ArticleStoreState = {
     popularArticles: IArticle[] ;
@@ -56,12 +56,12 @@ export const useArticleStore = defineStore({
             try {
                 let newArticles:Array<IArticle>=[];
                 this.isLoading=true;
-                const res = await sendRequest<Array<IArticleAndReactions>>(
+                const res = await sendRequest<Array<IFullArticle<IArticle>>>(
                     'GET',
                     'mainTabArticles/newArticle',
                     {amount:amount}
                 );
-               // console.log("NewArticle=", res);
+                console.log("NewArticle=", res);
                 //цей метод буде повертати свій результат одразу в компонент
                 res?.map((item)=>{
                     let article = this.parseArticleAndReaction(item);
@@ -84,12 +84,12 @@ export const useArticleStore = defineStore({
             try{
                 this.popularArticles=[];
                 this.isLoading=true;
-                const res = await sendRequest<Array<IArticleAndReactions>>(
+                const res = await sendRequest<Array<IFullArticle<IArticle>>>(
                     'GET',
                     'mainTabArticles/popularArticle',
                     {amount:amount}
                 );
-                //console.log("PopularArticle=", res);
+                console.log("PopularArticle=", res);
                 //цей метод виключення, для нього не підходить використання методу
                 // this.transformArticleAndReactionToListArticle(res);
                 // бо тут масив отриманних статей буде писатися в інший масив
@@ -113,7 +113,7 @@ export const useArticleStore = defineStore({
                 this.cntRec=0;
                 this.articles=[];
                 this.isLoading=true;
-                const res = await sendRequest<Array<IArticleAndReactions>>('GET',
+                const res = await sendRequest<Array<IFullArticle<IArticle>>>('GET',
                     'article/GetArticlesForUser',
                     {id_people: peopleId}
                 );
@@ -129,7 +129,7 @@ export const useArticleStore = defineStore({
 
         },
         //отримати список моїх статей
-        async getMySelectedArticleList(peopleId:string) {
+         async getMySelectedArticleList(peopleId:string) {
             try{
                 this.cntRec=0;
                 this.articles=[];
@@ -142,7 +142,8 @@ export const useArticleStore = defineStore({
                 /*this.transformArticleAndReactionToListArticle( res);*/
                 this.articles = res;
                 this.articles?.forEach(item=>{
-                    item.tagItems = item.tag?.split(',').filter(Boolean);
+                    if (item.tag!==undefined && item.tag!==null)
+                    item.tagItems = item.tag.split(',').filter(Boolean);
 
                 });
                 console.log("mySelectedArticles[]=", this.articles.values());
@@ -168,7 +169,8 @@ export const useArticleStore = defineStore({
                 /*this.transformArticleAndReactionToListArticle( res);*/
                 this.articles = res;
                 this.articles?.forEach(item=>{
-                    item.tagItems = item.tag?.split(',').filter(Boolean);
+                    if (item.tag!==undefined && item.tag!=null)
+                        item.tagItems = item.tag.split(',').filter(Boolean);
 
                 });
                 console.log("ScienceSectionArticleList[]=", this.articles.values());
@@ -183,7 +185,7 @@ export const useArticleStore = defineStore({
         async getArticle(articleId:string, peopleId:string):Promise<IArticle|undefined> {
             try{
                 this.isLoading=true;
-                const res = await sendRequest<IArticleAndReactions>(
+                const res = await sendRequest<IFullArticle<IArticle>>(
                     'GET',
                     'Article/GetArticle',
                     {id: articleId,
@@ -259,19 +261,16 @@ export const useArticleStore = defineStore({
                     undefined,
                     newArticle
                 );
-                this.articles = res.Articles;
-                this.articles?.map(item=>{
-                    item.tagItems = item.tag?.split(',').filter(Boolean);
-
-                });
-                this.cntRec=this.articles.length;
-                //console.log("saveArticles =", res);
-            }catch (error) {
+                console.log("saveArticles =", res);
                 this.articles=[];
-                this.cntRec=0;
-                console.error(error);
+                this.transformArticleAndReactionToListArticle(res.articles);
+                this.cntRec=this.articles?.length;
+
+            }catch (error) {
+                if(error instanceof ServerBadRequestError)throw error;
+                else console.log('error from SaveArticle:', error,"type error = ", typeof error);
             }finally {
-                this.isLoading =false;
+                this.isLoading=false;
             }
 
         },
@@ -322,7 +321,7 @@ export const useArticleStore = defineStore({
                 this.cntRec=0;
                 this.isLoading=true;
                 this.totalPage=0;
-                const res = await sendRequest<ISearchResponse<IArticleAndReactions>>(
+                const res = await sendRequest<ISearchResponse<IFullArticle<IArticle>>>(
                     'GET',
                     'MenuSearching/SearchWithFilters',
                     {
@@ -412,18 +411,19 @@ export const useArticleStore = defineStore({
             b.name = fileName;
             return theBlob as File;
         },
-        parseArticleAndReaction(item:IArticleAndReactions):IArticle|undefined{
+        parseArticleAndReaction(item:IFullArticle<IArticle>):IArticle|undefined{
             let article = item?.articles;
-            console.log("article=", article);
+            //console.log("article=", article);
             if (article!==undefined){
-                article.tagItems = item.articles?.tag?.split(',').filter(Boolean);
+                if(item.articles?.tag!==undefined && item.articles?.tag!==null)
+                   article.tagItems = item.articles.tag.split(',').filter(Boolean);
                 article.reaction = item.emotion;
                 article.countLike = item.countReactions;
                 article.selected = item.selected;
                 return article;
             }
         },
-        transformArticleAndReactionToListArticle(data?:Array<IArticleAndReactions>){
+        transformArticleAndReactionToListArticle(data?:Array<IFullArticle<IArticle>>){
             data?.map((item)=>{
                 let article = this.parseArticleAndReaction(item);
                 if (article!==undefined){

@@ -68,7 +68,7 @@ export interface IArticle {
     author_id: string|null;
     author_: IPeople|null;
     title: string;
-    tag: string;
+    tag: string|null;
     text: string;
     views: number;
     date_created: string|null;
@@ -80,6 +80,7 @@ export interface IArticle {
     reaction: IEmotion|null;
     countLike:number;
     selected:boolean;
+    isActive:boolean;
 }
 export interface IComment {
     id: string;
@@ -133,12 +134,12 @@ export interface ISearchResponse<T>{
     allPages: number;
 }
 export interface ArticleResponse{
-    Articles: Array<IArticle>;
-    Response: string;
+    articles: Array<IFullArticle<IArticle>>;
+    response: string;
 }
 
-export interface IArticleAndReactions{
-    articles: IArticle;
+export interface IFullArticle<T>{
+    articles: T;
     emotion: IEmotion;
     countReactions:number;
     selected:boolean;

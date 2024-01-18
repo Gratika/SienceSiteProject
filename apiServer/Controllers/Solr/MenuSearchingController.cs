@@ -113,7 +113,7 @@ namespace apiServer.Controllers.Solr
                 }
                 SearchResponse<Articles> searchResponse = new SearchResponse<Articles>();
                 searchResponse.allPages = (double)Math.Ceiling((decimal)articles.Count / 10);
-                searchResponse.Articles = articles;
+                searchResponse.Articles = tenArticle;
 
                 return searchResponse;
             }

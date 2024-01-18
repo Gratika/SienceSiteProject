@@ -54,6 +54,8 @@
   const onPageChange = () => {
     // Оновлення поточної сторінки при зміні
     console.log('currentPage =',currentPage.value)
+    articleStore.searchArticlesByParam(currentPage.value-1,undefined,undefined,
+        undefined,sortParam.value,tags.value,peopleId);
   };
 </script>
 

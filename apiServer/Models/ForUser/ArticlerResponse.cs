@@ -2,7 +2,7 @@
 {
     public class ArticlerResponse
     {
-        public List<Articles> Articles { get; set; }
+        public List<FullArticle<Articles>> Articles { get; set; }
         public string Response { get; set; }
     }
 }

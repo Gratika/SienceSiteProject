@@ -29,6 +29,7 @@ const article = ref<IArticle>({
   reaction: null,
   countLike:0,
   selected:false,
+  isActive:false,
 })
 const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 const articleStore = useArticleStore();
@@ -80,6 +81,7 @@ const submitArticle= handleSubmit(()=>{
     }
   })
   article.value.tag = tagString;
+  article.value.isActive=true;
   console.log(JSON.stringify(article))
   articleStore.updateArticle(article.value);
 

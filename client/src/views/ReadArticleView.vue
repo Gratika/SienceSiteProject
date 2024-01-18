@@ -44,6 +44,7 @@ const article = ref<IArticle>({
   reaction: null,
   countLike:0,
   selected:false,
+  isActive:false,
 });
 const articleLikeTag=ref<Array<IArticle>>([]);
 const initContent = ref('');
