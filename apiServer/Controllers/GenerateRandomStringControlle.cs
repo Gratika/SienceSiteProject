@@ -25,7 +25,7 @@ namespace apiServer.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception();
+                throw ex;
             }
         }
     }

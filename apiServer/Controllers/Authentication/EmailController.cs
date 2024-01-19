@@ -46,7 +46,7 @@ namespace apiServer.Controllers.Authentication
             }
             catch (Exception ex)
             {
-                ex.ToString();
+                throw ex;
             }
             return "0";
         }
@@ -74,7 +74,7 @@ namespace apiServer.Controllers.Authentication
             }
             catch (Exception ex)
             {
-                BadRequest(new { Error = "Вы не вошли - " + ex.Message });
+                throw ex;
             }
             return BadRequest("Вы не вошли");
         }

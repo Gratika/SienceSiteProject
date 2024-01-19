@@ -43,18 +43,17 @@ namespace apiServer.Controllers.ForModels
         }
         //[Authorize]
         [HttpGet("GetArticlesForUser")]
-        public async Task<ActionResult>/*Task<List<FullArticle<Articles>>>*/ GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
+        public async /*Task<ActionResult>*/Task<List<FullArticle<Articles>>> GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
         {
-            //try
-            //{
+            try
+            {
+                //string id = "20a6f9b0-f0dc-44b3-b505-662bd0156104";
+                //var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                //if (_tokensController.IsTokenExpired(acessToken))
+                //{
+                //    return _tokensController.CheckTokens(id, acessToken, refreshToken);
 
-            //string id = "20a6f9b0-f0dc-44b3-b505-662bd0156104";
-            //var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-            //if (_tokensController.IsTokenExpired(acessToken))
-            //{
-            //    return _tokensController.CheckTokens(id, acessToken, refreshToken);
-                
-            //}
+                //}
 
                 List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
                 List<Articles> articles = await _context.Articles.Where(a => a.author_id == id_people).Include(a => a.author_).Include(a => a.theory_).ToListAsync();
@@ -67,22 +66,22 @@ namespace apiServer.Controllers.ForModels
                 });
                 }
 
-                return Ok(articleAndReactions);
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw ex;
-            //}
+                return articleAndReactions;
+            }
+            catch (Exception ex)
+            {
+               throw ex;
+            }
         }
         //[Authorize]
         [HttpPost("CreateArticle")]
         public async Task<ActionResult> CreateArticle(Articles? article) // Создание статьи
         {
             //article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
-            //article.title = "Science";
-            //article.tag = "All";
-            //article.text = "This science article is very interesting.To my mind its article will be helpful for everyone.";
-            //article.views = 150;
+            //article.title = "12Atrticle";
+            //article.tag = "FullNew";
+            //article.text = "Example for everyone";
+            //article.views = 70;
             //article.theory_id = "2";
             //article.path_file = "";
             try
@@ -103,11 +102,20 @@ namespace apiServer.Controllers.ForModels
 
                 _searchController.AddArticle(article);
 
-                return Ok();
+                ArticlerResponse articlerResponse = new ArticlerResponse();
+                articlerResponse.Articles = await GetArticlesForUser(article.author_id);
+                if (article.DOI != null)
+                {
+                    articlerResponse.Response = "Вы успешно добавили статью ";
+                    return Ok(articlerResponse);
+                }
+
+                articlerResponse.Response = "Вы успешно добавили статью, но DOI-идентификатор не прошел проверку";
+                return Ok(articlerResponse);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Error = $"Вы не добавили статью - {ex.Message}" });
+                throw ex;
             }
         }
         [HttpGet("GetArticle")]
@@ -124,45 +132,58 @@ namespace apiServer.Controllers.ForModels
             }
             catch (Exception ex)
             {
-                return Ok("Ошибка, не удалось найти статью - " + ex.Message);
+                throw ex;
             }
         }
         //[Authorize]
         [HttpPost("RedactArticle")]
         public async Task<ActionResult> RedactArticle(/*IFormFile? file1, IFormFile? file2,*/ Articles article/*, string id, string title, string pathFile, string pathBucket*/)
         {
-            article.modified_date = DateTime.Now;
+            try
+            {
+                article.modified_date = DateTime.Now;
 
-            _redisArticleController.AddOneModel(article);
-            _searchController.RedactArticle(article);
+                _redisArticleController.AddOneModel(article);
+                _searchController.RedactArticle(article);
 
-            //List<string> FieldsDb = await _minioController.RedactFiles(article.path_file, pathBucket, files);
+                //List<string> FieldsDb = await _minioController.RedactFiles(article.path_file, pathBucket, files);
 
-            //article.path_file = FieldsDb[1];
-            _context.Articles.Update(article);
-            _context.SaveChanges();
+                //article.path_file = FieldsDb[1];
+                _context.Articles.Update(article);
+                _context.SaveChanges();
 
-            return Ok("Статья удачно сохраненна");
+                return Ok("Статья удачно сохраненна");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }        
         }
         //[Authorize]
         [HttpPost("DeleteArticle")]
         public async Task<ActionResult> DeleteArticle(Articles article)
         {
-
-            _searchController.DeleteArticle(article.Id);          
-            //_redisArticleController.DeleteData(article.Id);
-            if (!string.IsNullOrEmpty(article.urls))
+            try
             {
-                _imagesController.Delete(article);
-            }
-            if (!string.IsNullOrEmpty(article.path_file))
-            {
-                await _minioController.DeleteFiles(article.Id);
-            }
-            _context.Articles.Remove(article);
-            _context.SaveChanges();
+                _searchController.DeleteArticle(article.Id);
+                //_redisArticleController.DeleteData(article.Id);
+                if (!string.IsNullOrEmpty(article.urls))
+                {
+                    _imagesController.Delete(article);
+                }
+                if (!string.IsNullOrEmpty(article.path_file))
+                {
+                    await _minioController.DeleteFiles(article.Id);
+                }
+                _context.Articles.Remove(article);
+                _context.SaveChanges();
 
-            return Ok("Статья удачно удаленна");
+                return Ok("Статья удачно удаленна");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }       
         }
         [HttpGet("CheckDoiValidity")]
         public bool CheckDoiValidity(string doi)
@@ -191,25 +212,39 @@ namespace apiServer.Controllers.ForModels
             }
             catch (Exception ex)
             {
-                return false; // Произошла ошибка при проверке DOI
+                throw ex;
             }
         }
         [HttpGet("AddView")]
         public void AddView(string articleId)
         {
-            Articles articles = _context.Articles.FirstOrDefault(a => a.Id == articleId);
-            articles.views++;
-            _context.Articles.Update(articles);
-            _context.SaveChanges();
+            try
+            {
+                Articles articles = _context.Articles.FirstOrDefault(a => a.Id == articleId);
+                articles.views++;
+                _context.Articles.Update(articles);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }          
         }
         //[Authorize]
         [HttpGet("PublicationArticle")]
         public void PublicationArticle(string articleId)
         {
-            Articles articles = _context.Articles.FirstOrDefault(a => a.Id == articleId);
-            articles.IsActive = true;
-            _context.Articles.Update(articles);
-            _context.SaveChanges();
+            try
+            {
+                Articles articles = _context.Articles.FirstOrDefault(a => a.Id == articleId);
+                articles.IsActive = true;
+                _context.Articles.Update(articles);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }          
         }
     }
 }

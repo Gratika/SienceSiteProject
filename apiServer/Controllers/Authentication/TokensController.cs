@@ -32,6 +32,10 @@ namespace apiServer.Controllers.Authentication
             try
             {
                 var identity = GetIdentity(id);
+                if (identity == null)
+                {
+                    throw new Exception();
+                }
 
                 var now = DateTime.UtcNow;
                 // создаем JWT-токен
@@ -48,7 +52,7 @@ namespace apiServer.Controllers.Authentication
             }
             catch (Exception ex)
             {
-                throw new Exception();
+                throw ex;
             }
         }
         [HttpGet("GenerateRefreshToken")]
@@ -73,7 +77,7 @@ namespace apiServer.Controllers.Authentication
             }
             catch (Exception ex)
             {
-                throw new Exception();
+                throw ex;
             }
         }
 
@@ -84,86 +88,115 @@ namespace apiServer.Controllers.Authentication
             // В данном примере считаем, что Access Token действителен в течение 15-20 минут
             // Если текущее время минус время создания токена больше 20 минут, считаем токен просроченным
             // В противном случае, токен считается действительным
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.ReadJwtToken(accessToken); 
-
-            if (token.ValidTo < DateTime.UtcNow)
+            try
             {
-                // Токен истек
-                return true;
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var token = tokenHandler.ReadJwtToken(accessToken);
+
+                if (token.ValidTo < DateTime.UtcNow)
+                {
+                    // Токен истек
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         [HttpGet("Check")]
         public string Check()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var userId = GetUserIdFromToken(token);
 
             return "userId - " + userId + ", Token - " + token;
         }
         private ClaimsIdentity GetIdentity(string id)
         {
-            Users person = _context.Users.FirstOrDefault(x => x.Id == id);
-            if (person != null)
+            try
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.Id),
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, id),
                 };
                 ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
                 return claimsIdentity;
             }
-
-            // если пользователя не найдено
-            return null;
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         [HttpGet("CheckTokens")]
         public ActionResult CheckTokens(string id, string accessToken, string refreshToken)
         {
-            //try
-            //{
+            try
+            {
                 Users user = new Users();
-                user = _redisRepository.GetData<Users>(id);// Проверка наличия данных в кэше
-                if (user == null) // Данные отсутствуют в кэше, выполняем запрос к базе данных
+            user = _redisRepository.GetData<Users>(id);// Проверка наличия данных в кэше
+            if (user == null) // Данные отсутствуют в кэше, выполняем запрос к базе данных
+            {
+                user = _context.Users.FirstOrDefault(u => u.access_token == accessToken);
+            }
+            if (IsTokenExpired(accessToken) && user != null)
+            {
+                if (IsTokenExpired(refreshToken))
                 {
-                    user = _context.Users.FirstOrDefault(u => u.access_token == accessToken);
-                }
-                if (IsTokenExpired(accessToken) && user != null)
-                {
-                    if (IsTokenExpired(refreshToken))
-                    {
-                        return BadRequest(new { Error = "Введите заново емаил и пароль" });
-                    }
-                    else
-                    {
-                        _context.Users.Remove(user);
-                        _redisRepository.DeleteData("users:" + refreshToken);
-                        user.access_token = accessToken = GenerateAccessToken(user.Id);
-                        user.refresh_token = refreshToken = GenerateRefreshToken(user.Id);
-                        _context.Users.Update(user);
-                        _context.SaveChanges();
-                        // Сохранение/обновление данных в кэше на 10 минут
-                        _redisRepository.AddOneModel(user);
-                        return Ok(accessToken + " \n" + refreshToken); //Токены обновлены
-                    }
-                }
-                else if (user != null)
-                {
-                    return Ok(new { Message = "Токен НЕ нуждается в обновлении(Пользователю разрешают войти на страницу)" });
+                    return BadRequest(new { Error = "Введите заново емаил и пароль" });
                 }
                 else
                 {
-                    return BadRequest(new { Error = "Пользователь не найден" });
+                    _context.Users.Remove(user);
+                    _redisRepository.DeleteData("users:" + refreshToken);
+                    user.access_token = accessToken = GenerateAccessToken(user.Id);
+                    //user.refresh_token = refreshToken = GenerateRefreshToken(user.Id);
+                    _context.Users.Update(user);
+                    _context.SaveChanges();
+                    // Сохранение/обновление данных в кэше на 10 минут
+                    _redisRepository.AddOneModel(user);
+                    return Ok(accessToken + " \n" + refreshToken); //Токены обновлены
                 }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest(new { ex.Message });
-            //}
+            }
+            else if (user != null)
+            {
+                return Ok(new { Message = "Токен НЕ нуждается в обновлении(Пользователю разрешают войти на страницу)" });
+            }
+            else
+            {
+                return BadRequest(new { Error = "Пользователь не найден" });
+            }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        private string GetUserIdFromToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+                if (jsonToken?.Claims != null)
+                {
+                    var userIdClaim = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimsIdentity.DefaultNameClaimType);
+
+                    if (userIdClaim != null)
+                    {
+                        return userIdClaim.Value;
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

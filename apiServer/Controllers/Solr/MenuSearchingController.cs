@@ -33,8 +33,8 @@ namespace apiServer.Controllers.Solr
         [HttpGet("SearchWithFilters")]
         public async Task<ActionResult<List<Articles>>> SearchWithFilters( int Pages, string? SearchString, int? year, int? Filters, int? TypeOrder,string? tags, string? peopleId,string? scienceId, string? theoryId) // возвращение по наибольшему числу просмотров
         {
-            //try
-            //{
+            try
+            {
                 //Filters = new List<int>();
                 //Filters.Add(1);
                 SearchResponse<Articles> searchResponse = await SearchWithOrders(Pages * 10, SearchString, TypeOrder, tags, peopleId);               
@@ -66,17 +66,21 @@ namespace apiServer.Controllers.Solr
                 articlesAndReactions.allPages = searchResponse.allPages;
             foreach (var article in searchResponse.Articles)
             {
+
                 FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
                 ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
                 articlesAndReactions.Articles.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+                if (!string.IsNullOrEmpty(scienceId))
+                articlesAndReactions.Sciences = _context.Sciences.FirstOrDefault(a => a.Id == scienceId);
+                articlesAndReactions.Theories = await _context.Scientific_theories.Where(t => t.science_id == scienceId).ToListAsync();
             }
 
             return Ok(articlesAndReactions);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
-            //}
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         [HttpGet("SearchWithOrdersAndTags")]
         public async Task<SearchResponse<Articles>> SearchWithOrders( int Pages, string? SearchString, int? TypeOrder, string? tags,string? peopleId) // возвращение по наибольшему числу просмотров
@@ -102,9 +106,8 @@ namespace apiServer.Controllers.Solr
                         break;
                 }
                 List<Articles> tenArticle = new List<Articles>();            
-                for (int i = Pages; i < 10; i++)
+                for (int i = Pages; i < Pages + 10; i++)
                 {
-
                     if (articles.Count > i)
                     {
                         tenArticle.Add(articles[i]);
@@ -113,14 +116,14 @@ namespace apiServer.Controllers.Solr
                 }
                 SearchResponse<Articles> searchResponse = new SearchResponse<Articles>();
                 searchResponse.allPages = (double)Math.Ceiling((decimal)articles.Count / 10);
-                searchResponse.Articles = articles;
+                searchResponse.Articles = tenArticle;
 
                 return searchResponse;
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
     }
-}
+}   

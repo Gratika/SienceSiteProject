@@ -23,18 +23,12 @@ namespace apiServer.Controllers.ForModels
         {
             try
             {
-                //List<Sciences> sciences = _redisSciences.GetAllData<Sciences>();
-                //if (sciences.Count == 0)
-                //{
                     List<Sciences> sciences = await _context.Sciences.ToListAsync();
-                    //_redisSciences.AddData(sciences);
                     return Ok(sciences);
-                //}
-                //return Ok(sciences);
             }
             catch (Exception ex)
             {
-                return BadRequest("Ошибка, науки не были найденны - " + ex.Message);
+                throw ex;
             }
         }
     }

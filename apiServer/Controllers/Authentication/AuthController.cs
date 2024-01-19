@@ -30,15 +30,18 @@ namespace apiServer.Controllers.Authentication
             {
                 //UserRequest userRequest = new UserRequest();
                 //userRequest.email = email;
-                //userRequest.password = pas;           
+                //userRequest.password = pas;
 
-                List<Users> users = _redisRepository.GetAllData<Users>();
+                List<Users> users = _context.Users.ToList();
                 // проверка данных в редис  
                 for (int i = 0; i < 2; i++)
                 {
                     Response.user = await CheckUserUnique(users, userRequest.password, userRequest.email);
                     if (Response.user != null)
                     {
+                        Response.user.access_token = _tokens.GenerateAccessToken(Response.user.Id);
+                        _context.Users.Update(Response.user);
+                        _context.SaveChanges();
                         _redisRepository.AddOneModel(Response.user);
                         Response.answer = "Вы вошли";                      
                         return Ok(Response);
@@ -47,10 +50,9 @@ namespace apiServer.Controllers.Authentication
                 }
                 return Ok("Вы не вошли");
             }
-            catch
+            catch (Exception ex)
             {
-                Response.answer = "Вы не вошли";
-                return Ok(new { Message = Response });
+                throw ex;
             }
         }
         [HttpGet("CheckUserUnique")]
