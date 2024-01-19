@@ -67,6 +67,7 @@ const { handleSubmit, handleReset } = useForm({
 })
 const title= useField('title');
 const  tag = useField('tag');
+
 function saveContent(articleText: string){
   article.value.text = articleText
 
@@ -85,7 +86,7 @@ const validateArticle=()=>{
   article.value.tag = tagString;
 }
 //збереження відредагованної статті
-const submitArticle= handleSubmit(()=>{
+const submitArticle= handleSubmit(()=>{//публікація
   validateArticle();
   article.value.isActive=true;
   console.log(JSON.stringify(article))
@@ -94,7 +95,7 @@ const submitArticle= handleSubmit(()=>{
   });
 
 })
-const saveDraftArticle = handleSubmit(()=>{
+const saveDraftArticle = handleSubmit(()=>{//зберегти чернетку
   validateArticle();
   article.value.isActive=false;
   console.log(JSON.stringify(article))
