@@ -55,7 +55,7 @@ namespace apiServer.Controllers.ForModels
             }
         }
         [HttpPost("AddSelectArticle")]
-        public async Task<ActionResult> AddSelectArticle(string ArticleId, string PeopleId) //добавление в избранное
+        public async Task<ActionResult> AddSelectArticle([FromForm] string ArticleId, [FromForm] string PeopleId) //добавление в избранное
         {
             try
             {

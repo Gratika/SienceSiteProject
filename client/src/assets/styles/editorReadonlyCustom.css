@@ -1,6 +1,0 @@
-:root {
-    /* Overrides the border radius setting in the theme. */
-    --ck-border-radius: 0px;
-    --ck-color-base-background: hsl(0, 0%, 98%);
-    --ck-color-base-border: hsl(0, 0%, 98%);
-}

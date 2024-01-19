@@ -1,64 +1,115 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import {ref, onMounted, computed, getCurrentInstance} from 'vue';
 
 const props = defineProps<{
-  title:String
+  title:String,
+  sladeWidth:number;
+  countSlade:number;
+  countChildElement:number;
 }>();
-const currentIndex = ref(0);
-const prev = () => {
-  if (currentIndex.value > 0) {
-    currentIndex.value -= 1;
+const currentSlideIndex = ref(0);
+//const currentSlideIndex = ref(props.countSlade);
+const isWhiteL = ref(true);
+const isWhiteR = ref(false);
+/*const prev = () => {
+  if (currentSlideIndex.value > 0) {
+    isWhiteR.value = false;
+    currentSlideIndex.value -= 1;
+    if (currentSlideIndex.value == 0) isWhiteL.value = true;
   }
+  console.log('currentSlideIndex=',currentSlideIndex.value)
 };
 const next = () => {
-  // Отримання кількості дочірніх елементів
-  const childrenCount = document.querySelectorAll('.slide-group .content > *').length;
-  if (currentIndex.value < childrenCount - 1) {
-    currentIndex.value += 1;
-  }
-};
+  // Отримання кількості дочірніх елементів каруселі
+  const childrenCount = document.querySelectorAll('.wrapper .content > *').length;
+  console.log('childrenCount=',childrenCount)
 
+  if (currentSlideIndex.value < childrenCount/props.countSlade) {
+    currentSlideIndex.value += 1;
+    isWhiteL.value = false;
+    if (currentSlideIndex.value == childrenCount/props.countSlade) isWhiteR.value = true;
+  }
+  console.log('currentSlideIndex=',currentSlideIndex.value)
+};*/
+const prev = () => {
+  if (currentSlideIndex.value > 0) {
+    isWhiteR.value = false;
+    currentSlideIndex.value -= 1;
+    if (currentSlideIndex.value == 0) isWhiteL.value = true;
+  }
+  console.log('currentSlideIndex=',currentSlideIndex.value)
+};
+const next = () => {
+  // Отримання кількості дочірніх елементів каруселі
+
+  console.log('childrenCount=',props.countChildElement)
+
+  if (currentSlideIndex.value < props.countChildElement-props.countSlade) {
+    currentSlideIndex.value += 1;
+    isWhiteL.value = false;
+    if (currentSlideIndex.value == props.countChildElement-props.countSlade) isWhiteR.value = true;
+  }
+  console.log('currentSlideIndex=',currentSlideIndex.value)
+};
 </script>
+
 <template>
   <div class="slide-group">
     <div class="header">
-      <h2>{{ title }}</h2>
+      <div class="text-h4 font-weight-bold">{{ props.title }}</div>
       <div class="navigation">
-        <v-btn icon="mdi-chevron-left" size="small" @click="prev"/>
-        <v-btn icon="mdi-chevron-right" size="small" @click="next"/>
+        <v-btn
+            icon="mdi-chevron-left"
+            :color="isWhiteL ? 'white' : 'black'"
+            size="small"
+            @click="prev"
+        />
+        <v-btn
+            icon="mdi-chevron-right"
+            :color="isWhiteR ? 'white' : 'black'"
+            size="small"
+            @click="next"/>
       </div>
     </div>
-    <div class="content">
-      <slot></slot>
+    <div class="wrapper" :style="{'max-width': (sladeWidth*countSlade)+'px'}">
+      <div
+          class="content"
+          :style="{'margin-left':'-'+(100/countSlade*currentSlideIndex)+'%'}"
+      >
+        <slot></slot>
+      </div>
     </div>
+
   </div>
 </template>
 
 <style>
 .slide-group {
-  /* Стилі для контейнера */
+  padding: 25px 0;
 }
 
 .header {
+  align-items: center;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  /* Стилі для заголовка та навігації */
+  padding: 10px 0;
 }
 
 .navigation {
+  /* Стилі для блоку з кнопками навігації */
   display: flex;
   gap: 10px;
-  /* Стилі для блоку з кнопками навігації */
+
 }
 
 .content {
   display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  flex-wrap: wrap;
-  overflow-wrap: break-word;
-  overflow-x: hidden;
-
+  margin-top: 20px;
+  transition: all ease .5s;
+}
+.wrapper{
+  overflow: hidden;
+  margin: 20px auto;
+  padding: 20px 0;
 }
 </style>

@@ -15,7 +15,7 @@ import {BlockQuote} from "@ckeditor/ckeditor5-block-quote";
 import {Image,  ImageResizeEditing, ImageResizeHandles, ImageInsert, AutoImage} from "@ckeditor/ckeditor5-image";
 import {SimpleUploadAdapter} from "@ckeditor/ckeditor5-upload";
 import MyLocalStorage from "@/services/myLocalStorage";
-import '@/assets/styles/editorReadonlyCustom.css'
+import '@/styles/editorReadonlyCustom.css'
 
 const props = defineProps({
   isReadOnly:{
@@ -81,6 +81,7 @@ onMounted(()=>{
          }
            if (editorInstance && editorInstance.ui.view.toolbar.element) {
            editorInstance.ui.view.toolbar.element.style.display = props.isReadOnly ? 'none' : 'flex';
+           console.log('props.isReadOnly=',props.isReadOnly)
            if (props.isReadOnly) {
              editorInstance.enableReadOnlyMode('editor');
            }
@@ -93,7 +94,7 @@ onMounted(()=>{
            editorData.value=editorInstance.getData();
            emits('save-content', editorData.value);
          });
-         editorInstance.enableReadOnlyMode('editor');
+         //editorInstance.enableReadOnlyMode('editor');
          //editorInstance.model.document.isReadOnly=props.isReadOnly;
 
        })
@@ -172,8 +173,6 @@ const editorConfig = {
 #sample {
   display: flex;
   flex-direction: column;
-  background-color: indianred;
-  justify-content: center;
   flex-grow: 1;
 
 }

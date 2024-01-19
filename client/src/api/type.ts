@@ -12,6 +12,7 @@ export interface ILoginInput {
 export interface ISignUpInput {
     email: string;
     password: string;
+    people:IPeople;
 
 }
 
@@ -35,16 +36,16 @@ export interface IUserResponse {
 export interface IRole{
     id:string;
     role_name:string;
-    modified_date: Date|number;
+    modified_date: string|null;
 }
 export interface IPeople{
     id:string;
     surname:string;
     name:string;
-    birthday:Date;
+    birthday:string|null;
     path_bucket:string;
-    date_create: Date|number;
-    modified_date: Date|number;
+    date_create: string|null;
+    modified_date: string|null;
 }
 
 export interface IUser{
@@ -54,8 +55,8 @@ export interface IUser{
     email:string;
     access_token:string;
     refresh_token:string;
-    date_create: Date|number;
-    modified_date: Date|number;
+    date_create: string|null;
+    modified_date: string|null;
     role_id:number;
     email_is_checked:number;
     people_id: string;
@@ -67,18 +68,19 @@ export interface IArticle {
     author_id: string|null;
     author_: IPeople|null;
     title: string;
-    tag: string;
+    tag: string|null;
     text: string;
     views: number;
-    date_created: Date|null;
-    modified_date: Date|null;
+    date_created: string|null;
+    modified_date: string|null;
     theory_id: string;
     theory_:IScientificTheory|null;
     path_file: string;
     tagItems:Array<string>;
     reaction: IEmotion|null;
     countLike:number;
-
+    selected:boolean;
+    isActive:boolean;
 }
 export interface IComment {
     id: string;
@@ -86,22 +88,23 @@ export interface IComment {
     user_id: string;
     article_id: string;
     text: string;
-    date_create: Date|number;
-    modified_date: Date|number;
+    date_create: string|null;
+    modified_date: string|null;
 }
 export interface  IEmotion{
     id: string;
     Name: string;
     Emoji: string
+    isSelected:boolean;
 }
 export interface IReaction
 {
-    id: string;
-    user_id: string;
+    id: string|null;
+    people_id: string|null;
     article_id: string;
     reaction_id: string;
-    date_create: Date|number;
-    modified_date: Date|number;
+    date_create: string|null;
+    modified_date: string|null;
 }
 
 export interface IScience {
@@ -123,20 +126,21 @@ export interface ISelectedArticle{
     user_: IUser|null;
     article_id: string;
     article_:IArticle|null;
-    Date_view: Date|null;
+    Date_view: string|null;
 
 }
-export interface ISearchResponse{
-    articles: Array<IArticle>;
+export interface ISearchResponse<T>{
+    articles: Array<T>;
     allPages: number;
 }
 export interface ArticleResponse{
-    Articles: Array<IArticle>;
-    Response: string;
+    articles: Array<IFullArticle<IArticle>>;
+    response: string;
 }
 
-export interface IArticleAndReactions{
-    articles: IArticle;
+export interface IFullArticle<T>{
+    articles: T;
     emotion: IEmotion;
     countReactions:number;
+    selected:boolean;
 }
