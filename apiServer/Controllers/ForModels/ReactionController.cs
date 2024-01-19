@@ -28,33 +28,54 @@ namespace apiServer.Controllers.ForModels
             //reaction.reaction_id = "1";
             //Пример
 
-            reaction.Id = Guid.NewGuid().ToString();
-            reaction.date_create = DateTime.Now;
-            reaction.modified_date = DateTime.Now;
-            _context.Reactions.Add(reaction);
-            _context.SaveChanges();
-            return Ok("Реакция добавленна");
+            try
+            {
+                reaction.Id = Guid.NewGuid().ToString();
+                reaction.date_create = DateTime.Now;
+                reaction.modified_date = DateTime.Now;
+                _context.Reactions.Add(reaction);
+                _context.SaveChanges();
+                return Ok("Реакция добавленна");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }         
         }
         [HttpGet("GetReactionForArticle")]
         public FullArticle<T> GetReactionForArticle<T>(string articleId, string emojiId, string peopleId)
         {
-            FullArticle<T> articleAndReactions = new FullArticle<T>();
-            articleAndReactions.CountReactions = _context.Reactions.Where(r => r.reaction_id == emojiId).Count(r => r.article_id == articleId);
-            bool IsUserReact = _context.Reactions.Where(r => r.reaction_id == emojiId).Any(r => r.article_id == articleId && r.people_id == peopleId);
-            if (IsUserReact == true)
+            try
             {
-                articleAndReactions.Emotion = _context.Emotions.FirstOrDefault(e => e.Id == emojiId);
-            }
+                FullArticle<T> articleAndReactions = new FullArticle<T>();
+                articleAndReactions.CountReactions = _context.Reactions.Where(r => r.reaction_id == emojiId).Count(r => r.article_id == articleId);
+                bool IsUserReact = _context.Reactions.Where(r => r.reaction_id == emojiId).Any(r => r.article_id == articleId && r.people_id == peopleId);
+                if (IsUserReact == true)
+                {
+                    articleAndReactions.Emotion = _context.Emotions.FirstOrDefault(e => e.Id == emojiId);
+                }
 
-            return articleAndReactions;
+                return articleAndReactions;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }          
         }
         //[Authorize]
         [HttpGet("Delete")]
         public void Delete(string articleId)
         {
-            var RemoveData = _context.Reactions.Where(r => r.article_id == articleId);
-            _context.Reactions.RemoveRange(RemoveData);
-            _context.SaveChanges();
+            try
+            {
+                var RemoveData = _context.Reactions.Where(r => r.article_id == articleId);
+                _context.Reactions.RemoveRange(RemoveData);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }           
         }
     }
 }

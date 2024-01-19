@@ -67,7 +67,7 @@ namespace apiServer.Controllers.Search
             }
             catch (Exception ex)
             {
-                throw new Exception("Ошибка, ничего не было найденно - " + ex.Message);
+                throw ex;
             }
         }
         //[HttpGet("SearchSelectedArtciles")]

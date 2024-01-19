@@ -53,21 +53,21 @@ namespace apiServer.Controllers.Authentication
             }
         }
         [HttpPost("CreateUser")]
-        public async Task<ActionResult> CreateUser(/*string pas, string emai*/ UserRequest userRequest) //Регистрация
+        public async Task<ActionResult> CreateUser(string password, string email /*UserRequest userRequest*/) //Регистрация
         {
-            //try
-            //{
+            try
+            {
                 People peopleOn = _people.CreatePeople();
             peopleOn.Id = Guid.NewGuid().ToString();
-            peopleOn.name = userRequest.people.name;
-            peopleOn.surname = userRequest.people.surname;
-            peopleOn.birthday = userRequest.people.birthday;
+            peopleOn.name = /*userRequest.people.name*/ "sadas";
+            peopleOn.surname = /*userRequest.people.surname*/ "dasdas";
+            peopleOn.birthday = /*userRequest.people.birthday*/ DateTime.Now;
 
                 Users FirstEx = new Users();
                 FirstEx.Id = Guid.NewGuid().ToString();
-                FirstEx.login = userRequest.email;
-                FirstEx.password = userRequest.password;
-                FirstEx.email = userRequest.email;
+                FirstEx.login = /*userRequest.*/email;
+                FirstEx.password = /*userRequest.*/password;
+                FirstEx.email = /*userRequest.*/email;
                 FirstEx.date_create = DateTime.Now;
                 FirstEx.modified_date = DateTime.Now;
                 FirstEx.role_id = "1";
@@ -80,12 +80,12 @@ namespace apiServer.Controllers.Authentication
                 }
                 else
                 {
-                    var response = await _em.SentCode(userRequest.email); //Отправляем письмо пользователю для проверки почты
+                    var response = await _em.SentCode(/*userRequest.*/email); //Отправляем письмо пользователю для проверки почты
                     if (response == "1")
                     {
                     //// Почта прошла проверку, продолжаем регистрацию
                     FirstEx.access_token = _tokens.GenerateAccessToken(FirstEx.Id);
-                    FirstEx.refresh_token = _tokens.GenerateRefreshToken(FirstEx.Id);
+                    //FirstEx.refresh_token = _tokens.GenerateRefreshToken(FirstEx.Id);
                     //// Сохранение пользователя в базе данных
                     _people.AddPeopleToDb(peopleOn);
                         _context.Users.Add(FirstEx);
@@ -103,11 +103,11 @@ namespace apiServer.Controllers.Authentication
 
                     //return Ok("Вы успешно зарегистрировались");
                 }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest(ex.Message);
-            //}
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         [HttpGet("CheckPasswordAndEmail")]
         public bool CheckPasswordAndEmail(List<Users> users,string password, string email)

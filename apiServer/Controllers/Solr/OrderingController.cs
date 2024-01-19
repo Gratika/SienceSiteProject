@@ -28,10 +28,8 @@ namespace apiServer.Controllers.Search
             }
             catch (Exception ex)
             {
-
-                throw ;
+                throw ex;
             }
-            
         }
         [HttpGet("FromOldToNew")]
         public List<Articles> FromOldToNew(List<Articles> articles) // возвращение статей от старых к новым
@@ -41,9 +39,9 @@ namespace apiServer.Controllers.Search
                 articles.Sort((x, y) => x.date_created.CompareTo(y.date_created));
                 return articles;
             }
-           catch(Exception ex)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
         [HttpGet("ForViews")]
@@ -56,7 +54,7 @@ namespace apiServer.Controllers.Search
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
     }

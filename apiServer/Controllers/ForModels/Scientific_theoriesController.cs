@@ -23,18 +23,12 @@ namespace apiServer.Controllers.ForModels
         {
             try
             {
-                //List<Scientific_theories> sciences = _redis.GetAllData<Scientific_theories>();
-                //if (sciences.Count == 0)
-                //{
                      List<Scientific_theories> sciences = await _context.Scientific_theories.Include(a => a.science_).ToListAsync();
-                    //_redis.AddData(sciences);
                     return sciences;
-                //}
-                //return sciences;
             }
-           catch (Exception ex)
+            catch (Exception ex)
             {
-                return BadRequest("Ошибка, поднауки не были найденны - " + ex.Message);
+                throw ex;
             }
         }
     }

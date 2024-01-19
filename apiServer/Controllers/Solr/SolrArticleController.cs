@@ -56,7 +56,7 @@ namespace apiServer.Controllers.Solr
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                throw ex;
             }
         }
         [HttpPost("AddAllFromDb")]
@@ -85,7 +85,7 @@ namespace apiServer.Controllers.Solr
             }
             catch (Exception ex)
             {
-                return BadRequest("Ошибка, данные не добавлены" + ex.Message);
+                throw ex;
             }
         }
         [HttpPost("RedactArticle")]
@@ -96,9 +96,9 @@ namespace apiServer.Controllers.Solr
                 ArticleSolr.Add(article, new AddParameters { Overwrite = true });
                 ArticleSolr.Commit();
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception();
+                throw ex;
             }
         }
         [HttpPost("DeleteArticle")]
@@ -108,10 +108,10 @@ namespace apiServer.Controllers.Solr
             {
                 ArticleSolr.Delete(Id);
                 ArticleSolr.Commit();
-            }          
-            catch 
+            }
+            catch (Exception ex)
             {
-                throw new Exception();
+                throw ex;
             }
         }
         [HttpPost("DeleteAllFromSolr")]
@@ -125,35 +125,39 @@ namespace apiServer.Controllers.Solr
                 ArticleSolr.Commit();
                 PeopleSolr.Commit();
                 TheoriesSolr.Commit();
-            }         
-             catch 
+            }
+            catch (Exception ex)
             {
-                throw new Exception();
+                throw ex;
             }
         }
         [HttpPost("GetArticle")]
         public List<Articles> GetArticle(string SearchStr, QueryOptions optionForSolr)
         {
-            var queryOptions = new QueryOptions
+            try
             {
-                ExtraParams = new Dictionary<string, string>
+                var queryOptions = new QueryOptions
+                {
+                    ExtraParams = new Dictionary<string, string>
                     {
                       { "defType", "edismax" },  // Используем расширенный запрос
                       { "qf", "Id id" },           // Указываем поле для поиска                     
                     }
-            };
-            //var filterQueries = queryOptions.FilterQueries.ToList();
-            //filterQueries.Add(new SolrQuery($"IsActive:\"{true}\""));
-            //queryOptions.FilterQueries = filterQueries.ToArray();
-            List<Articles> articles = ArticleSolr.Query(SearchStr, optionForSolr);
-            foreach (var article in articles)
-            {
-                var peopleData = PeopleSolr.Query(new SolrQuery(article.author_id), queryOptions).FirstOrDefault();
-                article.SetAuthor(peopleData);
-                var TheoriesData = TheoriesSolr.Query(new SolrQuery(article.theory_id), queryOptions).FirstOrDefault();
-                article.SetTheory(TheoriesData);
+                };
+                List<Articles> articles = ArticleSolr.Query(SearchStr, optionForSolr);
+                foreach (var article in articles)
+                {
+                    var peopleData = PeopleSolr.Query(new SolrQuery(article.author_id), queryOptions).FirstOrDefault();
+                    article.SetAuthor(peopleData);
+                    var TheoriesData = TheoriesSolr.Query(new SolrQuery(article.theory_id), queryOptions).FirstOrDefault();
+                    article.SetTheory(TheoriesData);
+                }
+                return articles;
             }
-            return articles;
+            catch (Exception ex)
+            {
+                throw ex;
+            }           
         }
      }
 }

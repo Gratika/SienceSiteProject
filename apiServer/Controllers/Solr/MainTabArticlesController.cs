@@ -34,30 +34,30 @@ namespace apiServer.Controllers.Search
         [HttpGet("NewArticle")]
         public async Task<ActionResult> NewArticle(int amount) // возвращение статей от новых к старым
         {
-           //try
-           //{
+            try
+            {
                 var options = new QueryOptions
                 {
-                    OrderBy = new[] { new SortOrder("date_created", Order.DESC) },      
+                    OrderBy = new[] { new SortOrder("date_created", Order.DESC) },
                     Rows = amount, // Количество записей, которые вы хотите получить
                     FilterQueries = new[] { new SolrQuery("IsActive:true") }
                 };
                 List<Articles> articles = solrArticleController.GetArticle("*:*", options);
 
                 List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
-            foreach (var article in articles)
-            {
-                FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
-                ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
-                articleAndReactions.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
-            }
+                foreach (var article in articles)
+                {
+                    FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
+                    ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
+                    articleAndReactions.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+                }
 
-            return Ok(articleAndReactions);
-           //}
-           //catch (Exception ex)
-           //{
-           //    return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
-           //}
+                return Ok(articleAndReactions);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         [HttpGet("PopularArticle")]
         public async Task<ActionResult> PopularArticle(int amount) // возвращение статей от новых к старым
@@ -84,8 +84,8 @@ namespace apiServer.Controllers.Search
             }
             catch (Exception ex)
             {
-                return BadRequest("Ошибка, не удалось найти статьи - " + ex.Message);
-            }          
+                throw ex;
+            }
         }
     }
 }

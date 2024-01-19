@@ -51,14 +51,14 @@ namespace apiServer.Controllers.ForModels
             }
             catch (Exception ex)
             {
-                return BadRequest("Ошибка, статья не была найденна! - " + ex.Message);
+                throw ex;
             }
         }
         [HttpPost("AddSelectArticle")]
         public async Task<ActionResult> AddSelectArticle([FromForm] string ArticleId, [FromForm] string PeopleId) //добавление в избранное
         {
             try
-            {              
+            {
                 Selected_articles SelectArticle = new Selected_articles();
                 SelectArticle.article_id = ArticleId;
                 SelectArticle.people_id = PeopleId;
@@ -70,12 +70,12 @@ namespace apiServer.Controllers.ForModels
                 _redis.AddOneModel(SelectArticle);
 
                 return Ok("Статья успешно добавленна в избранное");
-        }
+            }
             catch (Exception ex)
             {
-                return BadRequest("Ошибка, статья не была добавлена! - " + ex.Message);
-    }
-}
+                throw ex;
+            }
+        }
         [HttpPost("DeleteSelectArticle")]
         public async Task<ActionResult> DeleteSelectArticle(string articleId, string peopleId) //добавление в избранное
         {
@@ -94,7 +94,7 @@ namespace apiServer.Controllers.ForModels
             }
             catch (Exception ex)
             {
-                return BadRequest("Ошибка, статья не была удаленна из избранного - " + ex.Message);
+                throw ex;
             }
         }
     }

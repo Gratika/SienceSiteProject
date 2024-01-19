@@ -26,11 +26,11 @@ namespace apiServer.Controllers.Search
             {
                 var filteredModels = articles.Where(m => !string.IsNullOrEmpty(m.DOI)).ToList();
                 return filteredModels;
-            }   
+            }
             catch (Exception ex)
             {
-                throw;
-            }      
+                throw ex;
+            }
         }
         [HttpGet("SimpleArticles")]
         public List<Articles> SimpleArticles(List<Articles> articles) // возвращение статей от новых к старым
@@ -42,8 +42,8 @@ namespace apiServer.Controllers.Search
             }
             catch (Exception ex)
             {
-                throw;
-            }          
+                throw ex;
+            }
         }
         [HttpGet("SelectYear")]
         public List<Articles> SelectYear(List<Articles> articles, int? year) // возвращение статей от новых к старым
@@ -55,7 +55,7 @@ namespace apiServer.Controllers.Search
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }     
     }
