@@ -5,12 +5,13 @@ import type {
     IArticle, IFullArticle,
     IScience,
     IScientificTheory,
-    ISearchResponse
+    ISearchResponse, ISelectedArticle
 } from '@/api/type';
 import { sendRequest} from '@/api/authApi';
 import MyLocalStorage from "@/services/myLocalStorage";
-import type {AxiosError} from "axios";
+
 import {ServerBadRequestError} from "@/api/appException";
+
 
 export type ArticleStoreState = {
     popularArticles: IArticle[] ;
@@ -134,20 +135,29 @@ export const useArticleStore = defineStore({
                 this.cntRec=0;
                 this.articles=[];
                 this.isLoading=true;
-                const res = await sendRequest<Array<IArticle>>('GET',
+                const res = await sendRequest<Array<IFullArticle<ISelectedArticle>>>('GET',
                     'selected_articles/getSelectedArticle',
                     {idPeople: peopleId}
                 );
                 console.log("mySelectedArticles=", res);
-                /*this.transformArticleAndReactionToListArticle( res);*/
-                this.articles = res;
-                this.articles?.forEach(item=>{
-                    if (item.tag!==undefined && item.tag!==null)
-                    item.tagItems = item.tag.split(',').filter(Boolean);
+                this.articles=[];
+                res?.map(item=>{
+                    //перетворюємо IFullArticle<ISelectedArticle> в IFullArticle<IArticle>
+                    let newItem:IFullArticle<IArticle> = {
+                        articles:item.articles.article_,
+                        selected:item.selected,
+                        emotion:item.emotion,
+                        countReactions:item.countReactions
+                    }
+                    console.log('newItem=',newItem)
+                    let article = this.parseArticleAndReaction(newItem);
+                    if (article!==undefined){
+                        this.articles.push(article);
+                    }
+                })
 
-                });
-                console.log("mySelectedArticles[]=", this.articles.values());
-                this.cntRec=this.articles.length;
+                console.log("mySelectedArticles[]=", this.articles);
+                this.cntRec=this.articles?.length;
             }catch (error) {
                 console.error(error);
             }finally {
@@ -412,8 +422,8 @@ export const useArticleStore = defineStore({
             return theBlob as File;
         },
         parseArticleAndReaction(item:IFullArticle<IArticle>):IArticle|undefined{
-            let article = item?.articles;
-            //console.log("article=", article);
+           let article = item?.articles;
+            console.log("article=", article);
             if (article!==undefined){
                 if(item.articles?.tag!==undefined && item.articles?.tag!==null)
                    article.tagItems = item.articles.tag.split(',').filter(Boolean);
@@ -423,10 +433,11 @@ export const useArticleStore = defineStore({
                 return article;
             }
         },
-        transformArticleAndReactionToListArticle(data?:Array<IFullArticle<IArticle>>){
+        transformArticleAndReactionToListArticle(data:Array<IFullArticle<IArticle>>){
             data?.map((item)=>{
                 let article = this.parseArticleAndReaction(item);
                 if (article!==undefined){
+                    console.log(article);
                     this.articles.push(article);
                 }
             })

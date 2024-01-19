@@ -122,10 +122,10 @@ export interface IScientificTheory {
 }
 export interface ISelectedArticle{
     id: string;
-    user_id: string;
-    user_: IUser|null;
+    people_id: string;
+    people_: IPeople;
     article_id: string;
-    article_:IArticle|null;
+    article_:IArticle;
     Date_view: string|null;
 
 }

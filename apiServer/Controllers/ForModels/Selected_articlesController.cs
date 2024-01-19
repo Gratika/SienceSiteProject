@@ -47,7 +47,7 @@ namespace apiServer.Controllers.ForModels
                     });
                 }
 
-                return Ok(SelectArticle);
+                return Ok(articleAndReactions);
             }
             catch (Exception ex)
             {

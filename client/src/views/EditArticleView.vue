@@ -2,13 +2,14 @@
 import {isReadonly, onBeforeMount, ref} from "vue";
 import {useArticleStore} from "@/stores/articleStore";
 import RichTextEditor from "@/components/RichTextEditor.vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import type {IArticle} from "@/api/type";
 import type { Ref} from "vue"
 import {useField, useForm} from "vee-validate";
 import MyLocalStorage from "@/services/myLocalStorage";
  //отримуємо id статті з роута
 const  route = useRoute();
+const router = useRouter();
 const {id} = route.params;
 //модель статті
 const article = ref<IArticle>({
@@ -35,6 +36,7 @@ const delimiters = ['#',','] //масив рядків, що будуть ств
 const articleStore = useArticleStore();
  const editorReadOnly = false;
  const initContent = ref('');
+ const listFile=ref<string|null>(null);
  onBeforeMount(()=>{
    const data = articleStore.articles.find(art => art.id ===id);
    if (data){
@@ -44,6 +46,7 @@ const articleStore = useArticleStore();
      console.log('initContent_Edit =',initContent.value)
      title.value.value = data.title;
      tag.value.value= data.tagItems;
+     listFile.value=data.path_file;
    }
  })
 
@@ -68,8 +71,7 @@ function saveContent(articleText: string){
   article.value.text = articleText
 
 }
-//збереження відредагованної статті
-const submitArticle= handleSubmit(()=>{
+const validateArticle=()=>{
   if (typeof title.value.value === "string") {
     article.value.title = title.value.value;
   }
@@ -81,17 +83,29 @@ const submitArticle= handleSubmit(()=>{
     }
   })
   article.value.tag = tagString;
+}
+//збереження відредагованної статті
+const submitArticle= handleSubmit(()=>{
+  validateArticle();
   article.value.isActive=true;
   console.log(JSON.stringify(article))
-  articleStore.updateArticle(article.value);
+  articleStore.updateArticle(article.value).then(()=>{
+    router.push({ name: 'read_article', params: { id: article.value.id } });
+  });
 
 })
-const saveDraftArticle = handleSubmit(()=>{});
+const saveDraftArticle = handleSubmit(()=>{
+  validateArticle();
+  article.value.isActive=false;
+  console.log(JSON.stringify(article))
+  articleStore.updateArticle(article.value);
+});
 
 //файли
 const filesToUpload: Ref<FileList | null> = ref(null);
 const handleFileChange = (event: Event & { target: HTMLInputElement & { files: FileList }}) => {
   filesToUpload.value = event.target.files;
+  console.log('filesToUpload=',filesToUpload.value)
 };
 
 const uploadFiles = () => {
@@ -101,11 +115,19 @@ const uploadFiles = () => {
   }
   const id:string = article.value.id;
   const formData = new FormData();
+  let newFileName:string='';
   formData.append('id', id);
   for (let i = 0; i < filesToUpload.value.length; i++) {
     formData.append('files', filesToUpload.value[i]);
+    newFileName = newFileName.concat(filesToUpload.value[i].name,'; ')
   }
-  articleStore.saveFile(formData);
+  articleStore.saveFile(formData).then(()=>{
+    if (listFile.value===null){
+      listFile.value=newFileName;
+    }else{
+      listFile.value=listFile.value+newFileName;
+    }
+  })
 
 }
 </script>
@@ -158,6 +180,12 @@ const uploadFiles = () => {
                   </v-sheet>
                 </v-col>
               </v-row>
+              <v-row v-if="listFile!=null">
+                <v-col cols="12">
+                  <div class="text-h6">Прикріпленні файли:</div>
+                  <div class="text-subtitle-1 mt-2 ps-4 py-2 pe-1 border-file">{{listFile}}</div>
+                </v-col>
+              </v-row>
               <v-row>
                 <v-col cols="6">
                   <div class="d-flex align-content-center">
@@ -197,6 +225,9 @@ const uploadFiles = () => {
 </template>
 
 <style scoped>
+.border-file{
+  border: solid 1px rgba(var(--v-border-color),var(--v-border-opacity));
+}
  .card-shadow{
    border-radius: 5px;
    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
