@@ -43,16 +43,16 @@ namespace apiServer.Controllers.ForModels
             }         
         }
         [HttpGet("GetReactionForArticle")]
-        public FullArticle<T> GetReactionForArticle<T>(string articleId, string emojiId, string peopleId)
+        public async Task<FullArticle<T>> GetReactionForArticle<T>(string articleId, string emojiId, string peopleId)
         {
             try
             {
                 FullArticle<T> articleAndReactions = new FullArticle<T>();
-                articleAndReactions.CountReactions = _context.Reactions.Where(r => r.reaction_id == emojiId).Count(r => r.article_id == articleId);
-                bool IsUserReact = _context.Reactions.Where(r => r.reaction_id == emojiId).Any(r => r.article_id == articleId && r.people_id == peopleId);
+                articleAndReactions.CountReactions = await _context.Reactions.Where(r => r.reaction_id == emojiId).CountAsync(r => r.article_id == articleId);
+                bool IsUserReact = await _context.Reactions.Where(r => r.reaction_id == emojiId).AnyAsync(r => r.article_id == articleId && r.people_id == peopleId);
                 if (IsUserReact == true)
                 {
-                    articleAndReactions.Emotion = _context.Emotions.FirstOrDefault(e => e.Id == emojiId);
+                    articleAndReactions.Emotion = await _context.Emotions.FirstOrDefaultAsync(e => e.Id == emojiId);
                 }
 
                 return articleAndReactions;
@@ -60,7 +60,7 @@ namespace apiServer.Controllers.ForModels
             catch (Exception ex)
             {
                 throw ex;
-            }          
+            }
         }
         //[Authorize]
         [HttpGet("Delete")]

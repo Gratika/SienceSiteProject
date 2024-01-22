@@ -59,7 +59,7 @@ namespace apiServer.Controllers.ForModels
                 List<Articles> articles = await _context.Articles.Where(a => a.author_id == id_people).Include(a => a.author_).Include(a => a.theory_).ToListAsync();
                 foreach (var article in articles)
                 {
-                    FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, id_people);
+                    FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, id_people);
                 ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
                 articleAndReactions.Add(new FullArticle<Articles>
                 { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected
@@ -124,7 +124,7 @@ namespace apiServer.Controllers.ForModels
             try
             {
                 FullArticle<Articles> article = new FullArticle<Articles>();
-            article = _reactionController.GetReactionForArticle<Articles>(id, emojiId, peopleId);
+            article = await _reactionController.GetReactionForArticle<Articles>(id, emojiId, peopleId);
             article.Articles = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);
             article.Selected = _context.Selected_articles.Any(a => a.article_id == article.Articles.Id && a.people_id == article.Articles.author_id);
 
