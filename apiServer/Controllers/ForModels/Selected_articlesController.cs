@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace apiServer.Controllers.ForModels
 {
@@ -27,27 +28,25 @@ namespace apiServer.Controllers.ForModels
             emojiId = "1";
         }
         [HttpGet("GetSelectedArticle")]
-        public async Task<ActionResult> GetSelectedArticle(string idPeople) //добавление в избранное
+        public async Task<ActionResult> GetSelectedArticle(string idPeople, int page) //добавление в избранное
         {
             try
             {
-                var SelectArticle = await _context.Selected_articles.Where(a => a.people_id == idPeople).Include(a => a.people_).Include(a => a.article_).ToListAsync();
+                var selArticle = await _context.Selected_articles.Where(a => a.people_id == idPeople).Include(a => a.people_).Include(a => a.article_).Skip(page * 10).Take(10).ToListAsync();
 
-                List<FullArticle<Selected_articles>> articleAndReactions = new List<FullArticle<Selected_articles>>();
-                foreach (var article in SelectArticle)
+                SearchResponse<FullArticle<Selected_articles>> articlesAndReactions = new SearchResponse<FullArticle<Selected_articles>>();
+                articlesAndReactions.Articles = new List<FullArticle<Selected_articles>>();
+                articlesAndReactions.allPages =  (double)Math.Ceiling((decimal)await _context.Selected_articles.Where(a => a.people_id == idPeople).CountAsync() / 10);  
+
+                foreach (var oneSelectArticles in selArticle)
                 {
-                    FullArticle<Selected_articles> ar = _reactionController.GetReactionForArticle<Selected_articles>(article.Id, emojiId, idPeople);
-                    ar.Selected = true;
-                    articleAndReactions.Add(new FullArticle<Selected_articles>
-                    {
-                        Articles = article,
-                        Emotion = ar.Emotion,
-                        CountReactions = ar.CountReactions,
-                        Selected = ar.Selected
-                    });
-                }
 
-                return Ok(articleAndReactions);
+                    FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(oneSelectArticles.Id, emojiId, oneSelectArticles.article_.author_id);
+                    ar.Selected = _context.Selected_articles.Any(a => a.article_id == oneSelectArticles.Id && a.people_id == oneSelectArticles.article_.author_id);
+                    articlesAndReactions.Articles.Add(new FullArticle<Selected_articles> { Articles = oneSelectArticles, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+
+                }
+                return Ok(articlesAndReactions);
             }
             catch (Exception ex)
             {

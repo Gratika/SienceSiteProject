@@ -13,10 +13,7 @@ namespace apiServer.Models
         public DbSet<Sciences> Sciences { get; set; }
         public DbSet<Scientific_theories> Scientific_theories { get; set; }
         public DbSet<Selected_articles> Selected_articles { get; set; }
-        public DbSet<Reactions> Reactions { get; set; }
-        public ArhivistDbContext(DbContextOptions<ArhivistDbContext> options) : base(options)
-        {
-        }
+        public DbSet<Reactions> Reactions { get; set; }      
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;

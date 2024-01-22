@@ -47,7 +47,7 @@ namespace apiServer.Controllers.Search
                 List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
                 foreach (var article in articles)
                 {
-                    FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
+                    FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
                     ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
                     articleAndReactions.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
                 }
@@ -75,7 +75,7 @@ namespace apiServer.Controllers.Search
                 List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
                 foreach (var article in articles)
                 {
-                    FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
+                    FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
                     ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
                     articleAndReactions.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
                 }

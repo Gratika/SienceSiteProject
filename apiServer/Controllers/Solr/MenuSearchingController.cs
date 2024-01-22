@@ -67,7 +67,7 @@ namespace apiServer.Controllers.Solr
             foreach (var article in searchResponse.Articles)
             {
 
-                FullArticle<Articles> ar = _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
+                FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
                 ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
                 articlesAndReactions.Articles.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
                 if (!string.IsNullOrEmpty(scienceId))
@@ -82,7 +82,7 @@ namespace apiServer.Controllers.Solr
                 throw ex;
             }
         }
-        [HttpGet("SearchWithOrdersAndTags")]
+        [HttpGet("SearchWithOrders")]
         public async Task<SearchResponse<Articles>> SearchWithOrders( int Pages, string? SearchString, int? TypeOrder, string? tags,string? peopleId) // возвращение по наибольшему числу просмотров
         {
             try
