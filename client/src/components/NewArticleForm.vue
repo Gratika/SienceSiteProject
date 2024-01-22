@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type {IArticle, IPeople, IScience, IScientificTheory, IUser} from "@/api/type";
-import {ref, watch} from "vue";
+import type {IArticleResponse, IArticle, IPeople, IScience, IScientificTheory, IUser} from "@/api/type";
+import {onMounted, ref, watch} from "vue";
 import {useField, useForm} from "vee-validate";
 import {useArticleStore} from "@/stores/articleStore";
 import MyLocalStorage from "@/services/myLocalStorage";
 import {createToast} from "mosha-vue-toastify";
+import MySnackbars from "@/components/MySnackbars.vue";
 
 
 const props = defineProps<{
@@ -17,7 +18,7 @@ const dialogShow = ref(false);//відображення діалогового 
 const scienceId = ref('');//id обраної наукової сфери
 const  isEditing = ref(false); //autocomplete з розділами наукової сфери недоступний
 const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
-let scienceSectionList_: IScientificTheory[] //відфільтрований масив з розділами наукової сфери
+let scienceSectionList_=ref <Array<IScientificTheory>>([]) //відфільтрований масив з розділами наукової сфери
 //нова стаття
 const article = ref<IArticle>({
   id: '',
@@ -46,6 +47,7 @@ let scienceTheory = ref<IScientificTheory|undefined>({
   name: '',
   note: ''
 })
+
 //отримуємо значення author_id  з localStorage
 function  getAuthorId():string|null {
   let peopleId = MyLocalStorage.getItem('peopleId');
@@ -90,9 +92,9 @@ watch([scienceId],([newScienceId])=>{
   if (newScienceId!=null && newScienceId!=''){
     isEditing.value = true;
     console.log('props.scienceSectionList=',props.scienceSectionList)
-    scienceSectionList_ = props.scienceSectionList.filter(s=>s.science_id.trim()==newScienceId.trim())
-    console.log('scienceSectionList_=',scienceSectionList_)
-  }
+    scienceSectionList_.value = props.scienceSectionList.filter(s=>s.science_id.trim()==newScienceId.trim())
+    console.log('scienceSectionList_=',scienceSectionList_.value)
+  }else isEditing.value = false;
 })
 watch([theory_id],([newTheory_id])=>{
   if (newTheory_id && newTheory_id.value.value!=null && newTheory_id.value.value!=''){
@@ -101,6 +103,7 @@ watch([theory_id],([newTheory_id])=>{
     console.log('scienceTheory=',scienceTheory.value)
   }
 })
+//збереження статті
 const submitArticle= handleSubmit(()=>{
   if (typeof title.value.value === "string") {
     article.value.title = title.value.value;
@@ -123,13 +126,8 @@ const submitArticle= handleSubmit(()=>{
   article.value.modified_date= (new Date()).toISOString();
   console.log('article=', article.value);
   articleStore.saveArticle(article.value)
-      .then(()=>{
-
-        createToast('Усе ок', {
-          position: 'bottom-center',
-          type: 'danger',
-        });
-        emits('close', dialogShow.value);
+      .then((res:IArticleResponse|undefined)=>{
+        emits('close', dialogShow.value, res?.articleId);
       })
       .catch((err)=>console.log('Axios Error: ', err));
 

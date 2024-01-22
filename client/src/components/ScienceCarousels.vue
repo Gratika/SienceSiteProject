@@ -17,7 +17,7 @@ const title = "Виберіть категорію";
 <template>
   <v-row class="justify-center pt-5">
     <v-container>
-      <MyCarousels :title="title" :count-slade=4 :slade-width=240 :count-child-element="props.science?.length">
+      <MyCarousels :title="title" :count-slade=5 :slade-width=230 :count-child-element="props.science?.length">
         <CategoryCard
             v-for="item in props.science"
             :key= "item?.id"

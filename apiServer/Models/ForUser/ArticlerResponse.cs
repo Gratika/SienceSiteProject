@@ -2,7 +2,8 @@
 {
     public class ArticlerResponse
     {
-        public List<FullArticle<Articles>> Articles { get; set; }
+       // public List<FullArticle<Articles>> Articles { get; set; }
+        public string articleId {  get; set; }
         public string Response { get; set; }
     }
 }

@@ -132,9 +132,13 @@ export interface ISelectedArticle{
 export interface ISearchResponse<T>{
     articles: Array<T>;
     allPages: number;
+    sciences?:IScience;
+    theories?:Array<IScientificTheory>
+
 }
-export interface ArticleResponse{
-    articles: Array<IFullArticle<IArticle>>;
+export interface IArticleResponse{
+   // articles: Array<IFullArticle<IArticle>>;
+    articleId: string;
     response: string;
 }
 

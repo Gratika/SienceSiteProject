@@ -143,12 +143,12 @@ const router = createRouter({
       }
 
     },
-    /*{
+    {
       path: '/in_development',
       name: 'developmentPage',
       component: ()=>import('../views/DevelopmentPageView.vue'),
 
-    },*/
+    },
     {
       path: '/test',
       name: 'test',

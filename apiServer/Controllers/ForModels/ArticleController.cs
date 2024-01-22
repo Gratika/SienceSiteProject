@@ -103,7 +103,8 @@ namespace apiServer.Controllers.ForModels
                 _searchController.AddArticle(article);
 
                 ArticlerResponse articlerResponse = new ArticlerResponse();
-                articlerResponse.Articles = await GetArticlesForUser(article.author_id);
+                //articlerResponse.Articles = await GetArticlesForUser(article.author_id);
+                articlerResponse.articleId = article.Id;
                 if (article.DOI != null)
                 {
                     articlerResponse.Response = "Вы успешно добавили статью ";

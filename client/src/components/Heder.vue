@@ -7,6 +7,12 @@ const searchStr = ref('');
 function onSearch(){
   router.push({ name: 'search_article', params: { search: searchStr.value } });
 }
+function handleKeyDown(event:KeyboardEvent) {
+  if (event.key === 'Enter') {
+    console.log('Key pressed:', event.key);
+    onSearch();
+  }
+}
 </script>
 
 <template>
@@ -14,21 +20,24 @@ function onSearch(){
   <v-container>
     <v-row class="justify-center">
       <v-col cols="7">
-        <div class="text-h3 font-weight-bold mb-7">Discovery Science, Uncover Knowledge with SciFindHub</div>
-        <div class="py-7">
+        <div class="text-h3 font-weight-bold pb-12 mb-12">Discovery Science, Uncover Knowledge with SciFindHub</div>
+        <div class="mb-8">
           <v-text-field
               label="Пошук за назвою, автором, темою..."
               class="custom-text-field"
               single-line
               hide-details
               v-model="searchStr"
+              @keydown="handleKeyDown"
 
           ></v-text-field>
         </div>
 
         <v-btn
-            class="round-btn px-6"
-            @click="onSearch">Пошук</v-btn>
+            class="round-btn px-6 text-h6"
+            @click="onSearch"
+        >Пошук
+        </v-btn>
       </v-col>
       <v-col cols="5">
         <v-img
@@ -39,9 +48,9 @@ function onSearch(){
         ></v-img>
       </v-col>
     </v-row>
-    <v-row class="mt-6">
+    <v-row class="py-15 mb-15" >
       <v-col cols="12">
-        <div class="d-flex flex-row justify-space-between">
+        <div class="d-flex flex-row justify-space-between total-text-size">
           <div class="d-flex flex-column align-start">
             <div>
               00
@@ -90,6 +99,14 @@ function onSearch(){
 .header{
   padding: 100px 0;
 }
+.total-text-size{
+  font-size: 32px!important;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.02px;
+}
+
 .round-btn{
   border-radius: 2px;
 }

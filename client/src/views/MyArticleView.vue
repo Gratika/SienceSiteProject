@@ -5,30 +5,39 @@
   import NewArticleForm from "@/components/NewArticleForm.vue";
   import MyLocalStorage from "@/services/myLocalStorage";
   import FilterForMyArticle from "@/components/FilterForMyArticle.vue";
+  import {useRouter} from "vue-router";
+  //import type {IArticle} from "@/api/type";
 
   const articleStore = useArticleStore();
+  const router = useRouter();
+ /* const props = defineProps({
+    myArticles:{
+      type: Array<IArticle>,
+      default:[],
+      required: true
+    }
+  })*/
   const showDialog = ref(false);
   const showSelected = false;//не показуємо в кабінеті користувача
   const showMenu = true; //меню показуємо тільки в кабінеті користувача
+  const showBtnPublic = true; // ця кнопка буде відображатися тільки в кабінеті користувача
   const peopleId=MyLocalStorage.getItem('peopleId');
 
   let tags = ref<string|null>('');
   let sortParam = ref<number|null>(0)
 
-  onMounted(() => {
-    //articleStore.getMyArticleList(peopleId); //список моїх статей
-    articleStore.searchArticlesByParam(currentPage.value-1,undefined,undefined,
-         undefined,undefined,undefined,peopleId);
+  /*onMounted(() => {
+    articleStore.getMyArticleList(peopleId); //список моїх статей
     articleStore.getScienceList(); //отримуємо список наукових сфер
     articleStore.getScienceSectionList(); //отримуємо список підкатегорій
 
-  });
+  });*/
 
-  function handleButtonClick(){
-
-  }
-  function closeDialog(show:boolean){
+  function closeDialog(show:boolean, saveArticleId: string|undefined){
     showDialog.value=show;
+    console.log('saveArticleId', saveArticleId);
+    if(saveArticleId!==undefined)
+        router.push({ name: 'edit_article', params: { id: saveArticleId } });
   }
   function tagChoose(data:Array<string>|undefined){ //по тегу
     tags.value='';
@@ -115,15 +124,22 @@
           :article="article"
           :show-selected="showSelected"
           :show-menu="showMenu"
+          :show-btn-public="showBtnPublic"
       />
     </v-col>
   </v-row>
   <v-row v-if="articleStore.totalPage>0" class="justify-center">
-    <v-pagination
-        v-model="currentPage"
-        :length="articleStore.totalPage"
-        @update:model-value="onPageChange"
-    ></v-pagination>
+    <v-col cols="8">
+      <v-container>
+        <v-pagination
+            v-model="currentPage"
+            class="my-4"
+            :length="articleStore.totalPage"
+            @update:model-value="onPageChange"
+        ></v-pagination>
+      </v-container>
+    </v-col>
+
   </v-row>
 </template>
 

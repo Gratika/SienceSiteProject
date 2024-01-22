@@ -11,14 +11,21 @@ import Like from "@/components/Like.vue";
 const props = defineProps<{
   article:IArticle,
   showSelected:boolean,
-  showMenu:boolean
+  showMenu:boolean,
+  showBtnPublic:boolean
 }>()
+const isActive = ref<boolean>(props.article.isActive);
 const setReaction = computed(()=>{
   return props.article.reaction !== null;
 })
+const borderColor = computed(()=> {
+  if (isActive.value)
+    return '#2A3759'
+  else
+    return '#778FD2';
+})
 const router = useRouter();
 const articleStore = useArticleStore();
-//const isSelected = ref<boolean>(props.article.selected);
 // меню
 const location= 'top'; //позиція меню
 const menuItems = [
@@ -37,7 +44,7 @@ function handleAction(action: string){
 const author_=():string|undefined=>{
   if( props.article.author_ !=null){
       if(props.article.author_.surname!=null ){
-        console.log('surname=',props.article.author_.surname)
+        //console.log('surname=',props.article.author_.surname)
         return (props.article.author_.surname +' '+ props.article.author_.name).trim();
       }
 
@@ -65,6 +72,12 @@ function changeArticleSelect(){
   let article_id= props.article?.id as string;
   articleStore.addToFavorites(article_id);
 }
+function publicationArticle(){
+  let article_id= props.article?.id as string;
+  articleStore.publicationArticle(article_id).then(()=>{
+    isActive.value=true;
+  });
+}
 function formatDate(date: null | string): string {
   //console.log('date=',date)
  // console.log('typeof date=',typeof date)
@@ -78,13 +91,16 @@ function formatDate(date: null | string): string {
 
 <template>
 
-  <v-card class="ma-4 pa-5 left-border" variant="elevated">
+  <v-card
+      class="ma-4 pa-5 left-border"
+      :style="{ 'border-left-color': borderColor }"
+      variant="elevated"
+  >
 
       <v-row>
         <v-col cols="11">
           <v-card-text
-              class="text-h5 font-weight-bold"
-              style="line-height: 1.5rem"
+              class="card-title-size font-weight-bold myClickableObject"
               @click="readArticle">
             {{ props.article.title }}
           </v-card-text>
@@ -145,35 +161,43 @@ function formatDate(date: null | string): string {
 
 
     <v-card-text>
-      <div class="text-h6 font-weight-medium">
+      <div class="card-text-size font-weight-medium">
         <div>
          Автор: {{ author_() }}
         </div>
-        <div>
+        <div class="my-1">
         Дата: {{ formatDate(props.article.date_created)}}
         </div>
         <div>
-          Мова:
+          Мова: українська
         </div>
       </div>
     </v-card-text>
     <v-card-actions>
       <v-row>
-        <v-col cols="11">
+        <v-col cols="11" md="10">
           <v-chip
               v-for="(item, index) in props.article.tagItems"
               :key="index"
-              class="ma-2 text-sm-body-1 font-weight-bold"
+              class="ma-2 card-chips-text-size font-weight-bold"
               color="primary-darken-1"
               variant="flat"
           >
             {{ item }}
           </v-chip>
         </v-col>
-        <v-col cols="1">
-          <div class="d-flex justify-space-between">
+        <v-col cols="1" md="2">
+          <div v-if="!isActive && showBtnPublic" class="d-flex justify-end">
+            <v-btn
+                variant="outlined"
+                @click="publicationArticle"
+            >
+              Опублікувати
+            </v-btn>
+          </div>
+          <div v-else class="d-flex justify-end">
             <Like :is-selected="setReaction"/>
-            <span>{{props.article.countLike}}</span>
+            <span class="ms-4">{{props.article.countLike}}</span>
           </div>
 
 
@@ -185,9 +209,25 @@ function formatDate(date: null | string): string {
 </template>
 
 <style scoped>
+.card-text-size{
+  font-size: 22px!important;
+  line-height: normal;
+}
+
+.card-title-size{
+  font-size: 32px!important;
+  line-height: 1.5rem
+;
+}
+.card-chips-text-size{
+  font-size: 18px!important;
+}
+.myClickableObject {
+  cursor: pointer;
+}
 .left-border{
   border-left-width: 21px;
-  border-left-color: #2A3759;
+ /* border-left-color: #2A3759;*/
   border-radius: 5px;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
 }

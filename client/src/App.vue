@@ -36,7 +36,13 @@ const isLoginPage = computed(() => {
 
   </v-app>
 </template>
-<style scoped>
+<style>
+.v-input .v-label {
+  font-size: 1.2rem;
+}
+.v-field{
+  font-size: 1.3rem;
+}
 </style>
 
 

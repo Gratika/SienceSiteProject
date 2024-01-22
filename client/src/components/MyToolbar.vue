@@ -24,6 +24,9 @@ onMounted(()=>{
 function goToUserOffice(){
   router.push({ name: 'user_office'});
 }
+function returnHome(){
+  router.push({ name: 'home'});
+}
 
 const route = useRoute();
 // Обчислюємо, чи поточний шлях є шляхом '/search/:search'
@@ -39,9 +42,21 @@ watch(() => route.params.search, (newValue) => {
   if (typeof newValue === "string")  searchStr.value = newValue || '';
 });
 
+//слідкуємо за зміною сторінки, щоб приховувати рядок пошуку якщо він був видимим
+watch(() => route.path, (newPath) => {
+  console.log('Route changed to:', newPath);
+  showSearchStr.value=false;
+});
 function onSearch(){
   console.log('searchStr=', searchStr.value)
   router.push({ name: 'search_article', params: { search: searchStr.value} });
+}
+function handleKeyDown(event:KeyboardEvent) {
+  console.log('Key pressed:', event.key);
+  if (event.key === 'Enter') {
+    console.log('Key pressed:', event.key);
+    onSearch();
+  }
 }
 function onShowSearchStr(){
   showSearchStr.value=true;
@@ -54,11 +69,10 @@ function onShowSearchStr(){
         <v-container class="my-container">
           <div class="d-inline-flex justify-start align-center flex-wrap flex-row">
             <v-avatar   size="32" class="me-3" image="Icon.png"></v-avatar>
-            <RouterLink to="/" >
-              <v-toolbar-title class="me-3">
-                <h3>SсiFindHub</h3>
+              <v-toolbar-title class="me-3 logo-text myClickableObject" @click="returnHome">
+                SсiFindHub
               </v-toolbar-title>
-            </RouterLink>
+
           </div>
           <div class="new-element flex-grow-1">
             <v-text-field v-if="isSearchResultPage || showSearchStr"
@@ -69,45 +83,44 @@ function onShowSearchStr(){
                 hide-details
                 v-model="searchStr"
                 @click:append-inner="onSearch"
+                @keydown="handleKeyDown"
             ></v-text-field>
           </div>
 
           <div class="d-inline-flex align-center justify-end flex-wrap flex-row">
             <v-btn v-if="!isSearchResultPage && !showSearchStr"
-                   class="round-btn mx-3"
+                   class="round-btn mx-3 text-h6"
                    prepend-icon="mdi-magnify"
                    variant="text"
-                   size="small"
                    @click="onShowSearchStr"
             >
               Пошук
             </v-btn>
             <v-btn
-                class="round-btn mx-1"
+                to="/in_development"
+                class="round-btn mx-1 text-h6"
                 variant="text"
-                size="small"
-                disabled
+
             >
               Блог
             </v-btn>
             <v-btn
-                to="/test"
-                class="round-btn mx-1"
+                to="/in_development"
+                class="round-btn mx-1 text-h6"
                 variant="text"
-                size="small">
+            >
               Про нас
             </v-btn>
 
             <v-btn v-if="!authStore.isLogin"
-                   class="round-btn mx-1"
+                   class="round-btn mx-1 text-h6"
                    color="primary-darken-1"
                    variant="flat"
                    to="/login"
-                   size="small"
             >
               Вхід
             </v-btn>
-            <v-avatar v-else image="avatar.png" size="small" class="mx-1" @click="goToUserOffice"></v-avatar>
+            <v-avatar v-else image="avatar.png" size="small" class="mx-1 myClickableObject" @click="goToUserOffice"></v-avatar>
           </div>
         </v-container>
       </v-toolbar>
@@ -120,10 +133,21 @@ function onShowSearchStr(){
   justify-content: center;
 
 }
+.myClickableObject {
+  cursor: pointer;
+}
 .my-container{
   align-content: center;
   display: flex;
   flex-wrap: wrap;
+}
+.logo-text{
+  font-family: Ubuntu Mono,Mariupol, sans-serif;
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.8px;
 }
 .round-btn{
   border-radius: 2px;

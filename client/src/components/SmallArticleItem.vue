@@ -20,7 +20,7 @@ const router = useRouter();
 const author_=():string|undefined=>{
   if( props.article.author_ !=null){
     if(props.article.author_.surname!=null ){
-      console.log('surname=',props.article.author_.surname)
+      //console.log('surname=',props.article.author_.surname)
       return props.article.author_.surname +' '+ props.article.author_.name;
     }
 
@@ -47,7 +47,7 @@ function readArticle(){
         class="left-border pt-6 pb-3 ps-4 pe-5 d-flex flex-column justify-space-between"
         variant="elevated"
         min-width="300"
-        width="400"
+        width="350"
         height="300"
         @click="readArticle"
     >
@@ -58,21 +58,21 @@ function readArticle(){
         {{ props.article.title }}
       </v-card-text>
       <v-card-actions class=" flex-grow-1 flex-column card-align pa-0 my-auto">
-        <div class="my-auto text-subtitle-1 font-weight-medium" >
+        <div class="my-auto card-text-size font-weight-medium" >
           <div>
             Автор: {{ author_() }}
           </div>
-          <div>
+          <div class="my-1">
             Дата: {{ formatDate(props.article.date_created) }}
           </div>
           <div>
-            Мова:
+            Мова: українська
           </div>
         </div>
         <div class="wrapper">
           <div class="my-auto d-flex">
             <v-chip
-                v-for="(item, index) in props.article.tagItems"
+                v-for="(item, index) in props.article.tagItems.slice(0,2)"
                 :key="index"
                 class="text-subtitle-2 mt-1 me-4 d-flex font-weight-bold"
             >
@@ -100,7 +100,11 @@ function readArticle(){
   height: 300px;
   margin: 0 10px;
   padding: 0 10px;
-  width: 440px;
+  width: 390px;
+}
+.card-text-size{
+  font-size: 18px!important;
+  line-height: normal;
 }
 .left-border{
   border-left-width: 21px;

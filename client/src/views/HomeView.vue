@@ -15,6 +15,7 @@ const authStore = useAuthStore();
 const articleStore = useArticleStore();
 const showSelected = ref(false);
 const showMenu = false; //меню показуємо тільки в кабінеті користувача
+const showBtnPublic = false; // ця кнопка буде відображатися тільки в кабінеті користувача
 const newArticleList = ref<Array<IArticle>>([])
 onMounted(() => {
   const isLoginString = MyLocalStorage.getItem('isLogin');
@@ -26,7 +27,6 @@ onMounted(() => {
   });
   articleStore.getPopularArticleList(9);
   articleStore.getScienceList();
-  authStore.test();
 
 });
 
@@ -65,6 +65,7 @@ onMounted(() => {
             :article="article"
             :show-selected="showSelected"
             :show-menu="showMenu"
+            :show-btn-public="showBtnPublic"
         />
       </v-col>
     </v-row>

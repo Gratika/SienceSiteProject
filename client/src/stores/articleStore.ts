@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import type {
-    ArticleResponse,
+    IArticleResponse,
     GenericResponse,
     IArticle, IFullArticle,
     IScience,
@@ -62,7 +62,7 @@ export const useArticleStore = defineStore({
                     'mainTabArticles/newArticle',
                     {amount:amount}
                 );
-                console.log("NewArticle=", res);
+                //console.log("NewArticle=", res);
                 //цей метод буде повертати свій результат одразу в компонент
                 res?.map((item)=>{
                     let article = this.parseArticleAndReaction(item);
@@ -90,7 +90,7 @@ export const useArticleStore = defineStore({
                     'mainTabArticles/popularArticle',
                     {amount:amount}
                 );
-                console.log("PopularArticle=", res);
+               // console.log("PopularArticle=", res);
                 //цей метод виключення, для нього не підходить використання методу
                 // this.transformArticleAndReactionToListArticle(res);
                 // бо тут масив отриманних статей буде писатися в інший масив
@@ -108,7 +108,7 @@ export const useArticleStore = defineStore({
                 this.isLoading =false;
             }
         },
-        //отримати список моїх статей
+        //отримати список моїх статей(не використовується. запит йде через пошук)
         async getMyArticleList(peopleId:string) {
             try{
                 this.cntRec=0;
@@ -118,9 +118,9 @@ export const useArticleStore = defineStore({
                     'article/GetArticlesForUser',
                     {id_people: peopleId}
                 );
-                console.log("myArticles=", res);
+               // console.log("myArticles=", res);
                 this.transformArticleAndReactionToListArticle(res);
-                console.log("myArticles[]=", this.articles.values());
+                console.log("myArticles[]=", this.articles);
                 this.cntRec=this.articles.length;
             }catch (error) {
                 console.error(error);
@@ -139,7 +139,7 @@ export const useArticleStore = defineStore({
                     'selected_articles/getSelectedArticle',
                     {idPeople: peopleId}
                 );
-                console.log("mySelectedArticles=", res);
+                //console.log("mySelectedArticles=", res);
                 this.articles=[];
                 res?.map(item=>{
                     //перетворюємо IFullArticle<ISelectedArticle> в IFullArticle<IArticle>
@@ -149,7 +149,7 @@ export const useArticleStore = defineStore({
                         emotion:item.emotion,
                         countReactions:item.countReactions
                     }
-                    console.log('newItem=',newItem)
+                    //console.log('newItem=',newItem)
                     let article = this.parseArticleAndReaction(newItem);
                     if (article!==undefined){
                         this.articles.push(article);
@@ -202,6 +202,7 @@ export const useArticleStore = defineStore({
                             peopleId:peopleId}
 
                 );
+                console.log(res)
                 let article =this.parseArticleAndReaction(res);
                 //console.log("article=", article);
                 return article;
@@ -209,6 +210,20 @@ export const useArticleStore = defineStore({
                 console.error(error);
             }finally {
                 this.isLoading =false;
+            }
+
+        },
+        //збільшити кількість переглядів статті при закритті сторінки з нею
+        async incArticleView(articleId:string){
+            try{
+                 await sendRequest<void>(
+                    'GET',
+                    'article/AddView',
+                    {articleId: articleId}
+
+                );
+            }catch (error) {
+                console.error(error);
             }
 
         },
@@ -262,23 +277,60 @@ export const useArticleStore = defineStore({
                 console.error(error);
             }
         },
-        async saveArticle(newArticle:IArticle) {
+        async getScienceTheoryByScienceId(scienceId:string) {
+            try{
+                const res = await sendRequest<ISearchResponse<IFullArticle<IArticle>>>(
+                    'GET',
+                    'MenuSearching/SearchWithFilters',
+                    {
+                        'Pages': 0,
+                        'scienceId':scienceId
+                    }
+
+                );
+                if(res?.theories!==undefined)
+                  this.scientificSections=res.theories;
+                console.log("scientificSections=", res);
+            }catch (error) {
+                console.error(error);
+            }
+        },
+        async saveArticle(newArticle:IArticle):Promise<IArticleResponse|undefined> {
             try{
                 this.isLoading=true;
-                const res = await sendRequest<ArticleResponse>(
+                const res = await sendRequest<IArticleResponse>(
                     'POST',
                     'article/CreateArticle',
                     undefined,
                     newArticle
                 );
                 console.log("saveArticles =", res);
-                this.articles=[];
+                /*this.articles=[];
                 this.transformArticleAndReactionToListArticle(res.articles);
-                this.cntRec=this.articles?.length;
+                this.cntRec=this.articles?.length;*/
+                return res;
 
             }catch (error) {
                 if(error instanceof ServerBadRequestError)throw error;
                 else console.log('error from SaveArticle:', error,"type error = ", typeof error);
+            }finally {
+                this.isLoading=false;
+            }
+
+        },
+        //опублікувати статтю (при натисканні на кнопку на картці статті)
+        async publicationArticle(articleId:string):Promise<void> {
+            try{
+                this.isLoading=true;
+                 await sendRequest<IArticleResponse>(
+                    'Get',
+                    'article/publicationArticle',
+                    {'articleId':articleId}
+
+                );
+
+            }catch (error) {
+                throw error;
             }finally {
                 this.isLoading=false;
             }
@@ -326,7 +378,9 @@ export const useArticleStore = defineStore({
                                     typeOrder?:number|null,
                                     tags?:string|null,
                                     peopleId?:string|null,
-                                    scienceId?:string|null){
+                                    scienceId?:string|null,
+                                    scienceTheoryId?:string|null,
+                                    ){
             try{
                 this.cntRec=0;
                 this.isLoading=true;
@@ -342,7 +396,8 @@ export const useArticleStore = defineStore({
                         'TypeOrder':typeOrder,
                         'tags':tags,
                         'peopleId':peopleId,
-                        'scienceId':scienceId
+                        'scienceId':scienceId,
+                        'theoryId':scienceTheoryId
                     }
 
                 );
@@ -423,7 +478,7 @@ export const useArticleStore = defineStore({
         },
         parseArticleAndReaction(item:IFullArticle<IArticle>):IArticle|undefined{
            let article = item?.articles;
-            console.log("article=", article);
+            //console.log("article=", article);
             if (article!==undefined){
                 if(item.articles?.tag!==undefined && item.articles?.tag!==null)
                    article.tagItems = item.articles.tag.split(',').filter(Boolean);
@@ -437,7 +492,7 @@ export const useArticleStore = defineStore({
             data?.map((item)=>{
                 let article = this.parseArticleAndReaction(item);
                 if (article!==undefined){
-                    console.log(article);
+                   // console.log(article);
                     this.articles.push(article);
                 }
             })

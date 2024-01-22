@@ -16,14 +16,13 @@ const title = "Останні опубліковані статті";
 <template>
   <v-row class="justify-center carousel-color">
     <v-container>
-      <MyCarousels :title="title" :count-slade=2 :slade-width=440 :count-child-element="props.articles?.length">
-        <!--v-col v-for="n in 3" :key="n" cols="4"-->
+      <MyCarousels :title="title" :count-slade=3 :slade-width=390 :count-child-element="props.articles?.length">
         <SmallArticleItem
             v-for="item in props.articles"
             :key="item?.id"
             :article="item"
         />
-        <!--/v-col-->
+
       </MyCarousels>
     </v-container>
 

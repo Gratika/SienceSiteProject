@@ -7,6 +7,7 @@ import type {IArticle} from "@/api/type";
 import type { Ref} from "vue"
 import {useField, useForm} from "vee-validate";
 import MyLocalStorage from "@/services/myLocalStorage";
+import {createToast} from "mosha-vue-toastify";
  //отримуємо id статті з роута
 const  route = useRoute();
 const router = useRouter();
@@ -37,18 +38,37 @@ const articleStore = useArticleStore();
  const editorReadOnly = false;
  const initContent = ref('');
  const listFile=ref<string|null>(null);
+ const draftIsActive = ref(false);
+ const peopleId = MyLocalStorage.getItem('peopleId');
  onBeforeMount(()=>{
-   const data = articleStore.articles.find(art => art.id ===id);
+   if(typeof id==='string'){
+     articleStore.getArticle(id,peopleId).then((res)=>{
+       if(res!==undefined){
+         article.value = res
+         if(res.text!=null)
+           initContent.value=res.text;
+         //console.log('initContent_Edit =',initContent.value)
+         title.value.value = res.title;
+         tag.value.value = res.tagItems;
+         draftIsActive.value = res.isActive;
+         listFile.value = substrUserFolder(res.path_file);
+       }
+     })
+   }
+
+   /*const data = articleStore.articles.find(art => art.id ===id);
    if (data){
      article.value = data
      if(data.text!=null)
       initContent.value=data.text;
      console.log('initContent_Edit =',initContent.value)
      title.value.value = data.title;
-     tag.value.value= data.tagItems;
-     listFile.value=data.path_file;
-   }
+     tag.value.value = data.tagItems;
+     draftIsActive.value = data.isActive;
+     listFile.value = substrUserFolder(data.path_file);
+   }*/
  })
+
 
 /*валідація форм*/
 const { handleSubmit, handleReset } = useForm({
@@ -97,7 +117,6 @@ const submitArticle= handleSubmit(()=>{//публікація
 })
 const saveDraftArticle = handleSubmit(()=>{//зберегти чернетку
   validateArticle();
-  article.value.isActive=false;
   console.log(JSON.stringify(article))
   articleStore.updateArticle(article.value);
 });
@@ -120,16 +139,22 @@ const uploadFiles = () => {
   formData.append('id', id);
   for (let i = 0; i < filesToUpload.value.length; i++) {
     formData.append('files', filesToUpload.value[i]);
-    newFileName = newFileName.concat(filesToUpload.value[i].name,'; ')
+    newFileName = newFileName.concat(filesToUpload.value[i].name,', ')
   }
   articleStore.saveFile(formData).then(()=>{
     if (listFile.value===null){
       listFile.value=newFileName;
     }else{
-      listFile.value=listFile.value+newFileName;
+      listFile.value=listFile.value+', '+newFileName;
     }
   })
 
+}
+function substrUserFolder(filePatch:string|null):string|null{
+  if(filePatch===null || filePatch==='') return null;
+  let pos = filePatch.indexOf(',');
+  if (pos===-1) return null;
+  else return filePatch.substring(pos+1);
 }
 </script>
 
@@ -210,7 +235,15 @@ const uploadFiles = () => {
                 </v-col>
               </v-row>
               <v-row class="d-flex justify-end pa-4">
-                <v-btn @click="saveDraftArticle" variant="outlined" color="black" class="me-3">Зберегти чернетку</v-btn>
+                <v-btn
+                    color="black"
+                    class="me-3"
+                    :disabled="draftIsActive"
+                    variant="outlined"
+                    @click="saveDraftArticle"
+                >
+                  Зберегти чернетку
+                </v-btn>
                 <v-btn type="submit">Опублікувати</v-btn>
 
               </v-row>

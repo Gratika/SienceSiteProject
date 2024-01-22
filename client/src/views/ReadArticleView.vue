@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, computed, onBeforeMount, watch} from 'vue';
+import {ref, computed, onBeforeMount, watch, onBeforeUnmount} from 'vue';
 import type {IArticle, IReaction} from '@/api/type';
 import {useRoute} from 'vue-router';
 import {useArticleStore} from '@/stores/articleStore';
@@ -51,11 +51,12 @@ const initContent = ref('');
 let isSelected = ref(false);
 let countLike = ref(0);
 const articleStore = useArticleStore();
-const  peopleId = MyLocalStorage.getItem('peopleId');
+const  peopleId ='12345' //MyLocalStorage.getItem('peopleId');
 
 const emotionStore = useReactionStore();
 const isLoading = ref(true);
 let setReaction = ref(false);
+let cntPopulateArticle = ref(0);
 onBeforeMount(()=>{
   if(typeof id ==='string'){
       articleStore.getArticle(id, peopleId)//отримуємо статтю з сервера
@@ -84,7 +85,9 @@ onBeforeMount(()=>{
       }).finally(()=>{ isLoading.value = false;})
 
   }
-  articleStore.getPopularArticleList(5);
+  articleStore.getPopularArticleList(5).then(()=>{
+    cntPopulateArticle.value=articleStore.popularArticles.length
+  });
 
 });
 
@@ -141,6 +144,10 @@ function formatDate(date: null | string): string {
   const formattedDate: Date = new Date(date);
   return (moment(formattedDate)).format('DD.MM.YYYY HH:mm')
 }
+
+onBeforeUnmount(()=>{
+  articleStore.incArticleView(article.value.id)
+})
 
 
 </script>
@@ -221,7 +228,7 @@ function formatDate(date: null | string): string {
         <!--стовпчик що являє собою бічну панель зі списками-->
         <v-col lg="3" md="5" class="d-none d-md-flex px-0 px-lg-1">
           <div class="d-flex flex-column ps-3">
-            <v-list bg-color="background" class="text-h5 pb-6">
+            <v-list bg-color="background" class="text-h5 pb-13 mb-12">
               <v-list-item >
                 <v-icon class="me-2 " icon="mdi-account-circle-outline"/>
                 <v-list-item-title class="d-inline">
@@ -234,7 +241,7 @@ function formatDate(date: null | string): string {
                   Дата: {{ formatDate(article.date_created) }}
                 </v-list-item-title>
               </v-list-item>
-              <v-list-item>
+              <!--v-list-item>
                 <v-icon class="me-2" icon="mdi-alpha-a-box-outline"/>
                 <v-list-item-title class="d-inline">
                   Мова:
@@ -245,9 +252,9 @@ function formatDate(date: null | string): string {
                 <v-list-item-title class="d-inline">
                   Країна публікації:
                 </v-list-item-title>
-              </v-list-item>
+              </v-list-item-->
             </v-list>
-            <ItemListArticle
+            <ItemListArticle v-if="cntPopulateArticle>0"
                 :articles="articleStore.popularArticles"
             />
 

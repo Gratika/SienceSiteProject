@@ -15,6 +15,7 @@ const {search} = route.params;
 let searchSrt = ref('');
 const showSelected = ref(false);
 const showMenu = false; //меню показуємо тільки в кабінеті користувача
+const showBtnPublic = false; // ця кнопка буде відображатися тільки в кабінеті користувача
 const filterDoi = ref<number|null>(null);
 const selectedTag = ref<Array<string>>([])//модель для фільтру Теги
 let tags = ref<string|null>(null);//склеєні теги для відправки запиту
@@ -203,17 +204,24 @@ const onPageChange = () => {
               :show-selected="showSelected"
               :show-menu="showMenu"
               :article="article"
+              :show-btn-public="showBtnPublic"
           />
         </div>
 
       </v-col>
     </v-row>
     <v-row v-if="articleStore.totalPage>0" class="justify-center">
-      <v-pagination
-          v-model="currentPage"
-          :length="articleStore.totalPage"
-          @update:model-value="onPageChange"
-      ></v-pagination>
+      <v-col cols="8">
+        <v-container>
+          <v-pagination
+              v-model="currentPage"
+              class="my-4"
+              :length="articleStore.totalPage"
+              @update:model-value="onPageChange"
+          ></v-pagination>
+        </v-container>
+      </v-col>
+
     </v-row>
     <v-row>
       <div class="footer-distance"></div>
