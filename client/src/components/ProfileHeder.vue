@@ -18,7 +18,7 @@
 
 <template>
 <v-row>
-  <v-col cols="12">
+  <v-col cols="12" class="pt-0">
     <div class="gradient">
       <div class="avatar-overlay">
         <v-avatar image="avatar.png" size="x-large"></v-avatar>
@@ -26,15 +26,15 @@
     </div>
     <div class="general-size content-zone">
       <div class="btn-zone general-size">
-        <v-chip color="black" variant="tonal" class="rounded-btn" size="small" @click="goToUserProfile">
+        <v-chip color="black" variant="tonal" class="rounded-btn text-subtitle-1" size="small" @click="goToUserProfile">
           Редагувати профіль
         </v-chip>
-        <v-chip variant="outlined" class="rounded-btn" size="small" color="black">
+        <v-chip variant="outlined" class="rounded-btn text-subtitle-1" size="small" color="black">
           Налаштування
         </v-chip>
       </div>
-      <div class="general-size info-align">{{user?.people_?.surname}} {{user?.people_?.name}} </div>
-      <div class="general-size info-align">{{user?.email}}</div>
+      <div class="general-size info-align username-text-size">{{user?.people_?.surname}} {{user?.people_?.name}} </div>
+      <div class="general-size info-align text-h5">{{user?.email}}</div>
     </div>
 
   </v-col>
@@ -55,6 +55,11 @@
    flex-direction: row;
    justify-content: flex-end;
 
+ }
+ .username-text-size{
+   font-size: 30px!important;
+   font-weight: 500;
+   line-height: normal;
  }
  .content-zone{
    background-color: white;

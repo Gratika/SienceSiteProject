@@ -188,12 +188,9 @@ function formatDate(date: null | string): string {
         </v-col>
         <v-col cols="1" md="2">
           <div v-if="!isActive && showBtnPublic" class="d-flex justify-end">
-            <v-btn
-                variant="outlined"
-                @click="publicationArticle"
-            >
-              Опублікувати
-            </v-btn>
+            <v-chip variant="outlined" class="rounded-btn card-chips-text-size" >
+              Чернетка
+            </v-chip>
           </div>
           <div v-else class="d-flex justify-end">
             <Like :is-selected="setReaction"/>
@@ -216,8 +213,7 @@ function formatDate(date: null | string): string {
 
 .card-title-size{
   font-size: 32px!important;
-  line-height: 1.5rem
-;
+  line-height: 1.5rem;
 }
 .card-chips-text-size{
   font-size: 18px!important;
@@ -230,6 +226,10 @@ function formatDate(date: null | string): string {
  /* border-left-color: #2A3759;*/
   border-radius: 5px;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
+}
+.rounded-btn{
+  border-radius: 20px!important;
+  margin: 0 5px;
 }
 .style-btn-article-card{
   border-radius: 50%!important;

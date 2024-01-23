@@ -81,7 +81,7 @@
 
       </v-col>
 
-    <v-col cols="4" class="d-flex justify-end pe-0">
+    <v-col cols="4" class="d-flex justify-end">
       <div>
         <v-dialog
             v-model="showDialog"
@@ -91,7 +91,7 @@
           <template v-slot:activator="{ props }">
             <v-btn
                 v-bind="props"
-                class="circular-btn text-center"
+                class="text-center text-h6"
             >
               Нова стаття
             </v-btn>
