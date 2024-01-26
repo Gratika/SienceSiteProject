@@ -14,7 +14,7 @@ const props = defineProps({
 
 <template>
   <v-card
-      class="ps-3 pt-3 mt-6 card-shadow"
+      class="ps-3 pt-3 mt-6 mx-4 card-shadow"
   >
     <v-list>
       <div class="text-h5 font-weight-bold d-flex justify-center">
@@ -27,7 +27,7 @@ const props = defineProps({
       >
         <div class="d-flex flex-row align-center pa-0">
           <span class="text-h4 font-weight-bold me-2 d-inline">{{ i+1 }}</span>
-          <v-card-text class="text-subtitle-1 ps-1 d-inline">{{item.title}}</v-card-text>
+          <v-card-text class="text-h6 ps-1 d-inline">{{item.title}}</v-card-text>
         </div>
         <v-divider v-if="i+1<props.articles?.length" :thickness="2"></v-divider>
       </v-list-item>

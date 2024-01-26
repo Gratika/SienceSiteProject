@@ -9,8 +9,7 @@ import type {
     IUserResponse,
 } from './type';
 import MyLocalStorage from "@/services/myLocalStorage";
-import { createToast } from 'mosha-vue-toastify'
-import {HttpError, ServerBadRequestError} from "@/api/appException";
+import {ServerBadRequestError} from "@/api/appException";
 
 
 const BASE_URL:string = '/api/';
@@ -86,22 +85,15 @@ authApi.interceptors.request.use(
 
 //створюємо(реєструємо нового користувача)
 export const signUpUserFn = async (user: ISignUpInput) => {
+
     const response = await authApi.post<GenericResponse>('/User/CreateUser', user);
-    if(response.status==200)return response.data;
-    else {
-        console.log("BadRequest=",response.data)
-        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
-    }
+    response.data;
 };
 
 //авторизація, вхід в систему
-export const loginUserFn = async (user: ILoginInput) => {
-    const response = await authApi.post<ILoginResponse>('auth/AuthUser', user);
-    if(response.status==200)return response.data;
-    else {
-        console.log("BadRequest=",response.data)
-        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
-    }
+export const loginUserFn = async (user: ILoginInput)=> {
+            const response = await authApi.post<ILoginResponse>('auth/AuthUser', user);
+            return response.data;
 };
 
 
@@ -111,11 +103,7 @@ export const verifyEmailFn = async (verificationCode: string) => {
             code:verificationCode
         }
     });
-    if(response.status==200)return response.data;
-    else {
-        console.log("BadRequest=",response.data)
-        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
-    }
+    return response.data;
 };
 export const getRepeatCodeFn = async (email: string) => {
     const response = await authApi.get<string>('email/SentCode', {
@@ -123,21 +111,14 @@ export const getRepeatCodeFn = async (email: string) => {
             email : email
         }
     });
-    if(response.status==200)return response.data;
-    else {
-        console.log("BadRequest=",response.data)
-        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
-    }
+    return response.data;
 };
 
 //вихід з системи
 export const logoutUserFn = async () => {
     const response = await authApi.get<GenericResponse>('auth/logout');
-    if(response.status==200)return response.data;
-    else {
-        console.log("BadRequest=",response.data)
-        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
-    }
+    return response.data;
+
 };
 
 // Универсальная функция для отправки запроса
@@ -155,38 +136,26 @@ export const sendRequest = async <T>(
     });
     //console.log('response.status',response.status);
     //console.log('response.statusText',response.statusText);
-    if(response.status==200)return response.data;
-    else {
-        console.log("BadRequest=",response.data)
-        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
-    }
+    return response.data;
 
 };
-
-export const showErrorMessage = function( error : AxiosError){
-    if (error && error.response && error.response.data && error.response.data) {
-        createToast(error.response.data, {
-            position: 'bottom-center',
-            type: 'danger',
-        });
-    } else {
-        if(error && error.message){
-            createToast(error.message, {
-                position: 'top-right',
-                type: 'danger',
-            });
-        }else {
-            console.log('Unknown error:', error)
-            createToast('Произошла ошибка', {
-                position: 'top-right',
-                type: 'danger'
-            });
+export function showErrorMessage ( error:any):string{
+    if('name' in error && error.name==='AxiosError'){
+        if(error.response?.status===502){
+            return 'На сервері виникла тимчасова помилка. Спробуйте пізніше'
+        }
+        if (error?.response && error?.response.data ) {
+            if (typeof  error.response.data ==='string')
+                return error.response.data;
+            else return JSON.stringify(error.response.data)
+        } else {
+            if(error?.message){
+                return error.message;
+            }
         }
     }
+    if('message' in error) return error.message;
+    return ''
 }
-//інформація про користувача(профіль)
-/*export const getUserFn = async () => {
-    const response = await authApi.get<IUserResponse>('auth/currentUser');
-    return response.data;
-};
-*/
+
+

@@ -15,13 +15,14 @@
 <template>
   <div class="card-box" @click="searchScienceCategoryArticle">
     <v-sheet
-        height="180"
+        height="200"
         width="190"
-        class="py-4 d-flex flex-column card-shadow">
+        class="py-4 d-flex flex-column card-shadow overflow-hidden">
       <v-img
           class="ma-auto"
           :width="120"
           :src="props.science?.note"
+          cover
       ></v-img>
       <div class="text-center py-1 text-h5 font-weight-medium">{{props.science?.name}}</div>
     </v-sheet>
@@ -34,7 +35,7 @@
 .card-box{
   background-color: transparent;
   cursor: pointer;
-  height: 200px;
+  height: 220px;
   margin: 0 10px;
   padding: 10px;
   width: 230px;

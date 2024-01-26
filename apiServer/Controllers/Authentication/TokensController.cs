@@ -42,7 +42,7 @@ namespace apiServer.Controllers.Authentication
                 var jwt = new JwtSecurityToken(
                         issuer: _configuration["Jwt:Issuer"],
                         audience: _configuration["Jwt:Audience"],
-                        notBefore: now,
+                        /*notBefore: now,*/
                         claims: identity.Claims,
                         expires: now.Add(TimeSpan.FromMinutes(15)), // Срок действия токена в минутах (15)
                         signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"])), SecurityAlgorithms.HmacSha256));

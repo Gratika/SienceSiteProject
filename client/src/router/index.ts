@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import MyArticleView from "@/views/MyArticleView.vue";
+import MyLocalStorage from "@/services/myLocalStorage";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -163,17 +164,17 @@ const router = createRouter({
 
   ]
 })
-/*router.beforeEach((to, from, next) => {
+router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // Якщо сторінка вимагає авторизації
-    if (localStorage.getItem('isLogin')!=='true') { // Перевіряємо, чи користувач авторизований. Якщо ні
-     next('/login'); // Перенаправлення на сторінку авторизації
-    } else {// Якщо користувач авторизований, дозволяємо йому перейти на сторінку
-      next();
+    if (MyLocalStorage.getItem('isLogin')===true) { // Перевіряємо, чи користувач авторизований.
+       next(); // Якщо користувач авторизований, дозволяємо йому перейти на сторінку
+    } else {
+       next('/login'); // Перенаправлення на сторінку авторизації
     }
   } else {// Якщо сторінка не вимагає авторизації, дозволяємо перейти без перевірки
    next();
   }
-})*/
+})
 
 export default router

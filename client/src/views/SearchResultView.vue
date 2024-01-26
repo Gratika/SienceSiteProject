@@ -163,7 +163,7 @@ const onPageChange = () => {
       </v-col>
       <v-col cols="2">
         <div class="d-flex justify-end">
-       <span  @click="clearFilters">
+       <span  @click="clearFilters" class="text-h6">
           <u>Очистити</u>
        </span>
         </div>
@@ -178,7 +178,7 @@ const onPageChange = () => {
     </v-row>
     <v-row class="justify-space-between">
       <v-col cols="8"  md="6" sm="9">
-          <div class="text-h5">Результати пошуку</div>
+          <div class="text-h4">Результати пошуку</div>
       </v-col>
       <v-col cols="2" md="3" sm="3">
         <v-select

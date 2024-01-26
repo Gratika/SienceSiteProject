@@ -1,6 +1,19 @@
 :root {
     /* Overrides the border radius setting in the theme. */
     --ck-border-radius: 0px;
-    --ck-color-base-background: hsla(0, 0%, 98%, 0);
+    --ck-color-base-background: hsla(0, 0%, 98%, 100);
     --ck-color-base-border: hsla(0, 0%, 98%, 0);
+    --ck-font-size-base: 14px;
+
+
+
+    /* -- Overrides the default .ck-tooltip class colors. --------------------------------------- */
+
+    --ck-color-tooltip-background: hsl(252, 7%, 14%);
+    --ck-color-tooltip-text: hsl(0, 0%, 93%);
+
+
+
+
 }
+

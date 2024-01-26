@@ -15,9 +15,11 @@ function closeMessage(){
   <v-snackbar
       v-model="props.showMessage"
       multi-line
+      color = 'error'
+      rounded="pill"
   >
 
-    <p>{{props.message}}</p>
+    <p class="text-h6">{{props.message}}</p>
 
     <template v-slot:actions>
       <v-btn

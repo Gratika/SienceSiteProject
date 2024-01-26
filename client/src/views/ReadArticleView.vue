@@ -102,13 +102,21 @@ function getTags(data:string|null):string|undefined{
 
 //додати до обраного
 function changeArticleSelect(){
-let article_id= article.value.id as string;
-if(!isSelected.value) {
-  articleStore.addToFavorites(article_id).then(()=>{
-    isSelected.value = true;
-  })
-
-}
+  let article_id= article.value.id as string;
+  if(!isSelected.value) {
+    articleStore.addToFavorites(article_id).then(()=>{
+      isSelected.value = true;
+    }).catch((err)=>{
+      console.log(err)
+    })
+  }else {
+    articleStore.deleteFromFavorites(article_id)
+        .then(()=>{
+          isSelected.value = false;
+        }).catch((err)=>{
+          console.log(err)
+    })
+  }
 }
 
 function downloadFile(){
@@ -129,10 +137,7 @@ function  saveUserReaction(){
       setReaction.value = true;
       countLike.value++
     }).catch((error)=>{
-      createToast(error, {
-        position: 'top-right',
-        type: 'danger',
-      });
+      console.log(error)
     })
   }
 }
@@ -142,12 +147,13 @@ function formatDate(date: null | string): string {
   // console.log('typeof date=',typeof date)
   if (date == null) return '';
   const formattedDate: Date = new Date(date);
-  return (moment(formattedDate)).format('DD.MM.YYYY HH:mm')
+  return (moment(formattedDate)).format('DD.MM.YYYY')
 }
 
 onBeforeUnmount(()=>{
   articleStore.incArticleView(article.value.id)
 })
+
 
 
 </script>
@@ -197,7 +203,7 @@ onBeforeUnmount(()=>{
               <v-chip
                   v-for="(item, index) in article.tagItems"
                   :key="index"
-                  class="ma-2 my-chips"
+                  class="ma-2  chip-text-size"
                   color="primary-darken-1"
                   variant="flat"
               >
@@ -219,40 +225,40 @@ onBeforeUnmount(()=>{
     <v-container class=" px-0 pt-6 px-lg-1">
       <v-row class="flex-grow-1">
         <!--стовпчик з текстом статті-->
-        <v-col lg="9" md="7" class="d-flex flex-grow-1 pe-3">
+        <v-col lg="8" md="6" class="d-flex flex-grow-1 pe-3 text-h6">
           <RichTextEditor v-if="!isLoading"
               :initialContent="initContent"
               :is-read-only="editorReadOnly"
           />
         </v-col>
         <!--стовпчик що являє собою бічну панель зі списками-->
-        <v-col lg="3" md="5" class="d-none d-md-flex px-0 px-lg-1">
+        <v-col lg="4" md="6" class="d-none d-md-flex px-0 px-lg-1">
           <div class="d-flex flex-column ps-3">
-            <v-list bg-color="background" class="text-h5 pb-13 mb-12">
+            <v-list bg-color="background" class="pb-13 mb-12">
               <v-list-item >
-                <v-icon class="me-2 " icon="mdi-account-circle-outline"/>
-                <v-list-item-title class="d-inline">
+                <v-icon class="me-2 text-h5" icon="mdi-account-circle-outline"/>
+                <v-list-item-title class="text-h6 d-inline">
                   Автор: {{article.author_?.surname}} {{article.author_?.name}}
                 </v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <v-icon class="me-2" icon="mdi-calendar-blank-outline"/>
-                <v-list-item-title class="d-inline">
+                <v-icon class="me-2 text-h5" icon="mdi-calendar-blank-outline"/>
+                <v-list-item-title class="d-inline text-h6">
                   Дата: {{ formatDate(article.date_created) }}
                 </v-list-item-title>
               </v-list-item>
-              <!--v-list-item>
-                <v-icon class="me-2" icon="mdi-alpha-a-box-outline"/>
-                <v-list-item-title class="d-inline">
-                  Мова:
+              <v-list-item>
+                <v-icon class="me-2 text-h5" icon="mdi-alpha-a-box-outline"/>
+                <v-list-item-title class="d-inline text-h6">
+                  Мова: українська
                 </v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <v-icon class="me-2" icon="mdi-map-marker-radius-outline"/>
-                <v-list-item-title class="d-inline">
-                  Країна публікації:
+                <v-icon class="me-2 text-h5" icon="mdi-map-marker-radius-outline"/>
+                <v-list-item-title class="d-inline text-h6">
+                  Країна публікації: Україна
                 </v-list-item-title>
-              </v-list-item-->
+              </v-list-item>
             </v-list>
             <ItemListArticle v-if="cntPopulateArticle>0"
                 :articles="articleStore.popularArticles"
@@ -284,6 +290,10 @@ onBeforeUnmount(()=>{
 
 </template>
 <style scoped>
+
+.chip-text-size{
+  font-size: 16px!important;
+}
 .title-head{
   background-color: #E2E2E2;
   height: 240px;

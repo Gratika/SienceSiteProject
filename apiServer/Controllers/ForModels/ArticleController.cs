@@ -119,6 +119,7 @@ namespace apiServer.Controllers.ForModels
                 throw ex;
             }
         }
+        
         [HttpGet("GetArticle")]
         public async Task<ActionResult<FullArticle<Articles>>> GetArticle(string id, string peopleId)
         {
@@ -213,7 +214,7 @@ namespace apiServer.Controllers.ForModels
             }
             catch (Exception ex)
             {
-                throw ex;
+                return false;
             }
         }
         [HttpGet("AddView")]

@@ -44,7 +44,7 @@ watch(() => route.params.search, (newValue) => {
 
 //слідкуємо за зміною сторінки, щоб приховувати рядок пошуку якщо він був видимим
 watch(() => route.path, (newPath) => {
-  console.log('Route changed to:', newPath);
+  //console.log('Route changed to:', newPath);
   showSearchStr.value=false;
 });
 function onSearch(){
@@ -52,9 +52,9 @@ function onSearch(){
   router.push({ name: 'search_article', params: { search: searchStr.value} });
 }
 function handleKeyDown(event:KeyboardEvent) {
-  console.log('Key pressed:', event.key);
+ // console.log('Key pressed:', event.key);
   if (event.key === 'Enter') {
-    console.log('Key pressed:', event.key);
+    //console.log('Key pressed:', event.key);
     onSearch();
   }
 }

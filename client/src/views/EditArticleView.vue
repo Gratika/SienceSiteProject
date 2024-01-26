@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {isReadonly, onBeforeMount, ref} from "vue";
+import Swal from 'sweetalert2'
 import {useArticleStore} from "@/stores/articleStore";
 import RichTextEditor from "@/components/RichTextEditor.vue";
 import {useRoute, useRouter} from "vue-router";
@@ -8,6 +9,7 @@ import type { Ref} from "vue"
 import {useField, useForm} from "vee-validate";
 import MyLocalStorage from "@/services/myLocalStorage";
 import {createToast} from "mosha-vue-toastify";
+import {showErrorMessage} from "@/api/authApi";
  //отримуємо id статті з роута
 const  route = useRoute();
 const router = useRouter();
@@ -40,6 +42,7 @@ const articleStore = useArticleStore();
  const listFile=ref<string|null>(null);
  const draftIsActive = ref(false);
  const peopleId = MyLocalStorage.getItem('peopleId');
+ const isReady = ref(false);
  onBeforeMount(()=>{
    if(typeof id==='string'){
      articleStore.getArticle(id,peopleId).then((res)=>{
@@ -47,26 +50,15 @@ const articleStore = useArticleStore();
          article.value = res
          if(res.text!=null)
            initContent.value=res.text;
-         //console.log('initContent_Edit =',initContent.value)
+         console.log('initContent_Edit =',initContent.value)
          title.value.value = res.title;
          tag.value.value = res.tagItems;
          draftIsActive.value = res.isActive;
          listFile.value = substrUserFolder(res.path_file);
+         isReady.value=true;
        }
      })
    }
-
-   /*const data = articleStore.articles.find(art => art.id ===id);
-   if (data){
-     article.value = data
-     if(data.text!=null)
-      initContent.value=data.text;
-     console.log('initContent_Edit =',initContent.value)
-     title.value.value = data.title;
-     tag.value.value = data.tagItems;
-     draftIsActive.value = data.isActive;
-     listFile.value = substrUserFolder(data.path_file);
-   }*/
  })
 
 
@@ -105,20 +97,34 @@ const validateArticle=()=>{
   })
   article.value.tag = tagString;
 }
-//збереження відредагованної статті
+//публікація відредагованної статті
 const submitArticle= handleSubmit(()=>{//публікація
   validateArticle();
   article.value.isActive=true;
-  console.log(JSON.stringify(article))
-  articleStore.updateArticle(article.value).then(()=>{
-    router.push({ name: 'read_article', params: { id: article.value.id } });
-  });
+  //console.log(JSON.stringify(article))
+  articleStore.updateArticle(article.value)
+      .then((res)=>{
+         router.push({ name: 'read_article', params: { id: article.value.id }});
+      }).catch((error)=>{
+         console.log('public article=',error)
+      });
 
 })
+
+//збереження відредагованної статті
 const saveDraftArticle = handleSubmit(()=>{//зберегти чернетку
   validateArticle();
-  console.log(JSON.stringify(article))
-  articleStore.updateArticle(article.value);
+  //console.log(JSON.stringify(article))
+  articleStore.updateArticle(article.value)
+      .then((res)=>{
+        Swal.fire({
+          icon: 'info',
+          title: res ? res : 'Статтю успішно збережено',
+          text: ''
+        });
+      }).catch((error)=>{
+    console.log('public article=',error)
+  });
 });
 
 //файли
@@ -141,12 +147,23 @@ const uploadFiles = () => {
     formData.append('files', filesToUpload.value[i]);
     newFileName = newFileName.concat(filesToUpload.value[i].name,', ')
   }
-  articleStore.saveFile(formData).then(()=>{
+  articleStore.saveFile(formData).then((res)=>{
     if (listFile.value===null){
       listFile.value=newFileName;
     }else{
       listFile.value=listFile.value+', '+newFileName;
     }
+    Swal.fire({
+      icon: 'info',
+      title: res ? res : 'Файл успішно збережено',
+      text: ''
+    });
+  }).catch((err)=>{
+    Swal.fire({
+      icon: 'error',
+      title: 'Помилка збереження файлу',
+      text: showErrorMessage(err)
+    });
   })
 
 }
@@ -162,7 +179,19 @@ function substrUserFolder(filePatch:string|null):string|null{
   <v-container>
     <v-row>
       <v-col cols="12" class="my-10">
-        <v-card class="px-5 py-4 card-shadow">
+        <v-overlay :model-value="articleStore.isLoading"
+                   class="align-center justify-center">
+          <v-progress-circular
+              indeterminate
+              color="primary"
+          ></v-progress-circular>
+        </v-overlay>
+        <v-card class="px-5 py-6 card-shadow">
+          <v-card-title >
+            <div class="d-flex justify-center w-100 text-h4 pb-4">
+              Редагування статті
+            </div>
+          </v-card-title>
           <v-card-text>
             <v-form @submit.prevent="submitArticle">
               <v-row >
@@ -197,7 +226,8 @@ function substrUserFolder(filePatch:string|null):string|null{
                       chips
                       variant="outlined"
                   ></v-combobox>
-                  <v-sheet border>
+                  <span class="text-h6 d-inline">Текст статті</span>
+                  <v-sheet border v-if="isReady" class="mt-2 pa-5">
                     <RichTextEditor
                         :initialContent="initContent"
                         :is-read-only="editorReadOnly"
@@ -208,13 +238,13 @@ function substrUserFolder(filePatch:string|null):string|null{
               </v-row>
               <v-row v-if="listFile!=null">
                 <v-col cols="12">
-                  <div class="text-h6">Прикріпленні файли:</div>
+                  <div class="text-h6 font-weight-medium mt-3">Прикріпленні файли:</div>
                   <div class="text-subtitle-1 mt-2 ps-4 py-2 pe-1 border-file">{{listFile}}</div>
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="6">
-                  <div class="d-flex align-content-center">
+                <v-col cols="12" md="8">
+                  <div class="d-flex justify-start flex-row">
                     <v-file-input
                         clearable
                         density="compact"
@@ -222,14 +252,19 @@ function substrUserFolder(filePatch:string|null):string|null{
                         show-size
                         variant="outlined"
                         @change="handleFileChange"
-                        :prepend-icon=undefined
+                        :prepend-icon='undefined'
                     >
 
                       <template #prepend-inner>
                         <v-icon>mdi-file</v-icon>
                       </template>
                     </v-file-input>
-                    <v-btn class="ms-3" color="black" variant="tonal" density="compact" icon="mdi-check" @click="uploadFiles"/>
+                    <v-btn
+                        class="ms-3"
+                        color="primary"
+                        density="compact"
+                        icon="mdi-check"
+                        @click="uploadFiles"/>
                   </div>
 
                 </v-col>

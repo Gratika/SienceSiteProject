@@ -28,9 +28,9 @@ namespace apiServer.Controllers.Authentication
             AuthResponse Response = new AuthResponse();
             try
             {
-                //UserRequest userRequest = new UserRequest();
-                //userRequest.email = email;
-                //userRequest.password = pas;
+               // UserRequest userRequest = new UserRequest();
+               // userRequest.email = email;
+               // userRequest.password = pas;
 
                 List<Users> users = _context.Users.ToList();
                 // проверка данных в редис  
@@ -48,7 +48,7 @@ namespace apiServer.Controllers.Authentication
                     }
                     users = await _context.Users.Include(a => a.people_).ToListAsync();
                 }
-                return Ok("Вы не вошли");
+                return BadRequest("Вы не ввійшли. Неправильний логін або пароль");
             }
             catch (Exception ex)
             {

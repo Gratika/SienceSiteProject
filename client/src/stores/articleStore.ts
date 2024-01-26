@@ -7,10 +7,11 @@ import type {
     IScientificTheory,
     ISearchResponse, ISelectedArticle
 } from '@/api/type';
-import { sendRequest} from '@/api/authApi';
+import {sendRequest, showErrorMessage} from '@/api/authApi';
 import MyLocalStorage from "@/services/myLocalStorage";
 
 import {ServerBadRequestError} from "@/api/appException";
+import Swal from "sweetalert2";
 
 
 export type ArticleStoreState = {
@@ -130,18 +131,21 @@ export const useArticleStore = defineStore({
 
         },
         //отримати список моїх статей
-         async getMySelectedArticleList(peopleId:string) {
+         async getMySelectedArticleList(peopleId:string, page:number) {
             try{
                 this.cntRec=0;
                 this.articles=[];
                 this.isLoading=true;
-                const res = await sendRequest<Array<IFullArticle<ISelectedArticle>>>('GET',
+                const res = await sendRequest<ISearchResponse<IFullArticle<ISelectedArticle>>>('GET',
                     'selected_articles/getSelectedArticle',
-                    {idPeople: peopleId}
+                    {
+                        idPeople: peopleId,
+                        page:page
+                    }
                 );
-                //console.log("mySelectedArticles=", res);
+                console.log("mySelectedArticles=", res);
                 this.articles=[];
-                res?.map(item=>{
+                res?.articles?.map(item=>{
                     //перетворюємо IFullArticle<ISelectedArticle> в IFullArticle<IArticle>
                     let newItem:IFullArticle<IArticle> = {
                         articles:item.articles.article_,
@@ -156,10 +160,15 @@ export const useArticleStore = defineStore({
                     }
                 })
 
-                console.log("mySelectedArticles[]=", this.articles);
+                //console.log("mySelectedArticles[]=", this.articles);
                 this.cntRec=this.articles?.length;
+                if(res!==undefined && res.allPages!==undefined)
+                   this.totalPage=res.allPages;
+                else this.totalPage=1;
             }catch (error) {
                 console.error(error);
+                this.totalPage=1;
+                this.cntRec=0;
             }finally {
                 this.isLoading =false;
             }
@@ -202,12 +211,18 @@ export const useArticleStore = defineStore({
                             peopleId:peopleId}
 
                 );
-                console.log(res)
+                //console.log(res)
                 let article =this.parseArticleAndReaction(res);
-                //console.log("article=", article);
+                console.log("article=", article);
                 return article;
             }catch (error) {
-                console.error(error);
+               // console.error(error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Опс... Щось пішло не так!',
+                    text: showErrorMessage(error)
+                });
+                throw error
             }finally {
                 this.isLoading =false;
             }
@@ -241,9 +256,49 @@ export const useArticleStore = defineStore({
                 .then((res)=>{
                     let article =this.articles.find(item=>item.id===ArticleId)
                     if(article?.selected!==undefined) article.selected=true;
+                    Swal.fire({
+                        icon: 'info',
+                        title: res ? res : 'Виконано',
+                        text: ''
+                    });
                     console.log(res);
                 }, (error) =>{
                     console.log(error)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Не вдалося додати статтю до обраного',
+                        text: showErrorMessage(error)
+                    });
+                    throw error
+                });
+        },
+        //вилучити статтю з обраного
+        async deleteFromFavorites(ArticleId:string){
+            let peopleId = MyLocalStorage.getItem('peopleId');
+            let data = new FormData();
+            data.set('articleId',ArticleId);
+            data.set('peopleId', peopleId);
+            sendRequest<string>(
+                'POST',
+                'selected_articles/deleteSelectArticle',
+                undefined,
+                data)
+                .then((res)=>{
+                    let article =this.articles.find(item=>item.id===ArticleId)
+                    if(article?.selected!==undefined) article.selected=false;
+                    console.log(res);
+                    Swal.fire({
+                        icon: 'info',
+                        title: res ? res : 'Виконано',
+                        text: ''
+                    });
+                }, (error) =>{
+                    console.log(error)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Не вдалося вилучити статтю з обраного',
+                        text: showErrorMessage(error)
+                    });
                     throw error
                 });
         },
@@ -311,8 +366,8 @@ export const useArticleStore = defineStore({
                 return res;
 
             }catch (error) {
-                if(error instanceof ServerBadRequestError)throw error;
-                else console.log('error from SaveArticle:', error,"type error = ", typeof error);
+                console.log('error from SaveArticle:', error);
+                throw error;
             }finally {
                 this.isLoading=false;
             }
@@ -336,18 +391,25 @@ export const useArticleStore = defineStore({
             }
 
         },
-        async updateArticle(article:IArticle) {
+        async updateArticle(article:IArticle):Promise<string> {
             try{
                 this.isLoading=true;
-                const res = await sendRequest<GenericResponse>(
+                const res = await sendRequest<string>(
                     'POST',
                     'article/RedactArticle',
                     undefined,
                     article
                 );
                 console.log("updateArticles:", res);
+                return res
             }catch (error) {
-                console.error(error);
+                //console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Помилка при збереженні статті',
+                    text: showErrorMessage(error)
+                });
+                throw error;
             }finally {
                 this.isLoading =false;
             }
@@ -364,8 +426,18 @@ export const useArticleStore = defineStore({
                 );
                 this.articles = this.articles.filter(item=>item.id!=delArticle.id);
                 console.log("delArticle = ", res);
+                Swal.fire({
+                    icon: 'info',
+                    title: res,
+                    text: ''
+                });
             }catch (error) {
                 console.error(error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Помилка при видаленні статті',
+                    text: showErrorMessage(error)
+                });
             }finally {
                 this.isLoading =false;
             }
@@ -418,25 +490,27 @@ export const useArticleStore = defineStore({
             }
 
         },
-        async saveFile(data:FormData) {
+        async saveFile(data:FormData):Promise<string> {
             try{
                 this.isLoading=true;
-                const res = await sendRequest<GenericResponse>(
+                const res = await sendRequest<string>(
                     'POST',
                     '/files/addFiles',
                     undefined,
                     data
                 );
-                console.log("saveFile:", res);
+                //console.log("saveFile:", res);
+                return res;
             }catch (error) {
                 console.error(error);
+                throw error;
             }finally {
                 this.isLoading =false;
             }
         },
         async downloadFiles(article_id:string) {
 
-          /* варіант при відсутності авторизації
+          // варіант при відсутності авторизації
             const link = document.createElement('a');
             link.href = ' http://127.0.0.11:5000/api/Files/GetArchivWithFiles?id='+article_id;
             console.log(link)
@@ -444,8 +518,8 @@ export const useArticleStore = defineStore({
             link.click();
             // Видалення посилання після завершення завантаження
             document.body.removeChild(link);
-           */
-            try {
+
+            /*try {
                 const response = await sendRequest<Blob>(
                     'GET',
                     'Files/GetArchivWithFiles',
@@ -467,7 +541,7 @@ export const useArticleStore = defineStore({
             }catch (error) {
                 console.error('Помилка під час завантаження файлів:', error);
 
-            }
+            }*/
         },
         blobToFile (theBlob: Blob, fileName:string): File {
             const b: any = theBlob;
@@ -496,7 +570,23 @@ export const useArticleStore = defineStore({
                     this.articles.push(article);
                 }
             })
-        }
+        },
+       /* showErrorMessage ( error:any):string{
+            if('name' in error && error.name==='AxiosError'){
+                if (error?.response && error?.response.data ) {
+                    if (typeof  error.response.data ==='string')
+                       return error.response.data;
+                    else return JSON.stringify(error.response.data)
+                } else {
+                    if(error?.message){
+                        return error.message;
+                    }
+                }
+            }
+            if('message' in error) return error.message;
+            return ''
+        }*/
+
 
 
 

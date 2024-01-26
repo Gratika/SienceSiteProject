@@ -1,7 +1,7 @@
 export class ServerBadRequestError extends Error{
-    statusCode: number;
+    statusCode: number|string;
 
-    constructor(statusCode: number, message: string) {
+    constructor(statusCode: number|string, message: string) {
         super(message);
         this.name = "ServerBadRequestError";
         this.statusCode = statusCode;

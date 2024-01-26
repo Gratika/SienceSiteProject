@@ -15,14 +15,15 @@ const props = defineProps<{
   showBtnPublic:boolean
 }>()
 const isActive = ref<boolean>(props.article.isActive);
+const isSelected = ref<boolean>(props.article.selected);
 const setReaction = computed(()=>{
   return props.article.reaction !== null;
 })
 const borderColor = computed(()=> {
-  if (isActive.value)
-    return '#2A3759'
-  else
+  if (props.showBtnPublic && !isActive.value)
     return '#778FD2';
+  else
+    return '#2A3759';
 })
 const router = useRouter();
 const articleStore = useArticleStore();
@@ -70,7 +71,16 @@ function deleteArticle(){
 //додати статтю до обраного
 function changeArticleSelect(){
   let article_id= props.article?.id as string;
-  articleStore.addToFavorites(article_id);
+  if(isSelected.value){
+    articleStore.deleteFromFavorites(article_id)
+        .then(()=>{isSelected.value=false})
+        .catch((err)=>{console.log(err)});
+  }else{
+    articleStore.addToFavorites(article_id)
+        .then(()=>{isSelected.value=true})
+        .catch((err)=>{console.log(err)});
+  }
+
 }
 function publicationArticle(){
   let article_id= props.article?.id as string;
@@ -83,7 +93,7 @@ function formatDate(date: null | string): string {
  // console.log('typeof date=',typeof date)
   if (date == null) return '';
   const formattedDate: Date = new Date(date);
-  return (moment(formattedDate)).format('DD.MM.YYYY HH:mm')
+  return (moment(formattedDate)).format('DD.MM.YYYY')
 }
 
 
@@ -116,7 +126,7 @@ function formatDate(date: null | string): string {
                   width="40"
                   height="40"
                   viewBox="0 0 40 40"
-                  :fill="props.article.selected ? '#778FD2' : '#FFFFFF'"
+                  :fill="isSelected ? '#778FD2' : '#FFFFFF'"
                   stroke="#778FD2"
                   stroke-width="2"
                   stroke-linecap="round"

@@ -38,10 +38,13 @@ const isLoginPage = computed(() => {
 </template>
 <style>
 .v-input .v-label {
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 .v-field{
   font-size: 1.3rem;
+}
+.v-chip.v-chip--size-small{
+  font-size: 14px;
 }
 </style>
 

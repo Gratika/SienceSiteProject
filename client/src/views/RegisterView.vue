@@ -33,11 +33,11 @@ const { handleSubmit, handleReset } = useForm({
 
       return 'Введіть валідну електронну адресу'
     },
-    /*birthDate (value:string) {
-       if (/^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/.test(value) || value?.length==0) return true
-
+    birthDate (value:string) {
+       //if (/^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/.test(value) || value?.length==0) return true
+       if(dateIsValid(value))return true
        return 'Дата повина відповідати вказаному формату, або лишитися пустою'
-    },*/
+    },
     password (value:string) {
       if (value?.length >= 8) return true
 
@@ -52,12 +52,19 @@ const { handleSubmit, handleReset } = useForm({
 const email= useField('email');
 const  password = useField('password');
 const passwordConfirm = useField('passwordConfirm');
-//const birthDate = useField('birthDate');
+const birthDate = useField('birthDate');
 
+function dateIsValid(date: string|undefined):boolean{
+  console.log('birdDay=', date)
+  if(date===undefined || date?.length===0) return true;
+  return /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/.test(date);
+
+}
 function formatDate(input: null | string): string {
+
   //console.log('date=',date)
   // console.log('typeof date=',typeof date)
-  if (input == null) return '';
+  if (input == null) return (new Date()).toISOString();
   const parts = input.split('.');
  // return parts[2] +'-'+ parts[1]+'-'+parts[0];
   // Перетворення компонентів дати на числа
@@ -77,14 +84,14 @@ const submitRegister = handleSubmit(values => {
   if (typeof password.value.value === "string") {
     userRegister.value.password = password.value.value;
   }
-  /*if (typeof birthDate.value.value === "string") {
+  if (typeof birthDate.value.value === "string") {
     console.log('birthDate=', birthDate.value.value)
     userRegister.value.people.birthday=formatDate(birthDate.value.value);
-  }*/
+  }
   /*if (typeof passwordConfirm.value.value === "string") {
     userRegister.value.passwordConfirm = passwordConfirm.value.value;
   }*/
-  userRegister.value.people.birthday=formatDate(userBirthday.value)
+  //userRegister.value.people.birthday=formatDate(userBirthday.value)
   console.log('userRegister = ',userRegister.value)
   authStore.onRegistration(userRegister.value);
 
@@ -120,10 +127,10 @@ const submitRegister = handleSubmit(values => {
               </div>
               <v-text-field
                   clearable
-                  v-model="userBirthday"
+                  v-model="birthDate.value.value"
                   label="01.01.2000"
                   id="birthDate"
-
+                  :error-messages="birthDate.errorMessage.value"
 
               />
               <div class="mt-2 mb-3">

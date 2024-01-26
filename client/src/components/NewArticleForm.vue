@@ -6,6 +6,8 @@ import {useArticleStore} from "@/stores/articleStore";
 import MyLocalStorage from "@/services/myLocalStorage";
 import {createToast} from "mosha-vue-toastify";
 import MySnackbars from "@/components/MySnackbars.vue";
+import Swal from "sweetalert2";
+import {showErrorMessage} from "@/api/authApi";
 
 
 const props = defineProps<{
@@ -88,7 +90,8 @@ const  theory_id = useField('theory_id');
 
 //фільтруємо список з розділами залежно від обраної науки
 watch([scienceId],([newScienceId])=>{
-  console.log("scienceId=",scienceId,' newValue=',newScienceId);
+ // console.log("scienceId=",scienceId,' newValue=',newScienceId);
+  theory_id.value.value=null;
   if (newScienceId!=null && newScienceId!=''){
     isEditing.value = true;
     console.log('props.scienceSectionList=',props.scienceSectionList)
@@ -124,12 +127,25 @@ const submitArticle= handleSubmit(()=>{
   if (scienceTheory.value)  article.value.theory_=scienceTheory.value;
   article.value.date_created= (new Date()).toISOString();
   article.value.modified_date= (new Date()).toISOString();
-  console.log('article=', article.value);
+  //console.log('article=', article.value);
   articleStore.saveArticle(article.value)
       .then((res:IArticleResponse|undefined)=>{
+        if (res?.response){
+          Swal.fire({
+            icon: 'info',
+            title:  res.response ,
+            text: ''
+          });
+        }
         emits('close', dialogShow.value, res?.articleId);
       })
-      .catch((err)=>console.log('Axios Error: ', err));
+      .catch((err)=>{
+        Swal.fire({
+          icon: 'error',
+          title: 'Помилка при збереженні статті',
+          text: showErrorMessage(err)
+        });
+      });
 
 })
 function processTags(data:string|null):string|null {

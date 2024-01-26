@@ -6,12 +6,14 @@ import type {ILoginInput, IUser, ISignUpInput, ILoginResponse} from "@/api/type"
 import {
     getRepeatCodeFn,
     loginUserFn,
-    logoutUserFn, sendRequest, showErrorMessage,
+    sendRequest,
     signUpUserFn,
     verifyEmailFn
 } from '@/api/authApi'
 import { createToast } from 'mosha-vue-toastify';
 import router from '@/router'
+import {ServerBadRequestError} from "@/api/appException";
+import Swal from "sweetalert2";
 
 
 export type AuthStoreState ={
@@ -20,6 +22,8 @@ export type AuthStoreState ={
     username:string;
     isLogin:boolean;
     isLoading:boolean;
+    errorMessage:string;
+    showError:boolean;
 }
 
 export const useAuthStore = defineStore({
@@ -31,6 +35,9 @@ export const useAuthStore = defineStore({
         isLogin:MyLocalStorage.getItem('isLogin')?MyLocalStorage.getItem('isLogin')===true:false,
         username: MyLocalStorage.getItem('username')?MyLocalStorage.getItem('username'):'',
         isLoading:false,
+        errorMessage:'',
+        showError:false,
+
     } ),
     getters:{
         getPeopleId(state): string {
@@ -50,21 +57,32 @@ export const useAuthStore = defineStore({
     actions: {
 
         onRegistration(user:ISignUpInput){
+            this.errorMessage='';
+            this.showError=false;
             this.isLoading=true;
             signUpUserFn(user).then(
                 res=>{
-                    this.isLoading = false;
-                    MyLocalStorage.setItem('email', user.email);
+                   MyLocalStorage.setItem('email', user.email);
                    router.push('/verify_email');
                 }
             ).catch((error) => {
-                this.isLoading = false;
                 console.log('error=',error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Помилка авторизації',
+                    text: error.response?.data ? error.response?.data:error.message
+                });
+            }).finally(()=>{
+                this.isLoading = false;
             })
         },
         onLogin(user:ILoginInput, previousRoute:string){
+            this.errorMessage='';
+            this.showError=false;
+            this.isLoading=true;
             loginUserFn(user).then(
                 res=>{
+                    console.log(res);
                     this.token = res.user.access_token;
                     this.username = res.user.login;
                     this.isLogin =true;
@@ -77,7 +95,7 @@ export const useAuthStore = defineStore({
                         MyLocalStorage.setItem('userId',this.authUser.id);
                         MyLocalStorage.setItem('peopleId',this.authUser.people_id);
                         MyLocalStorage.setItem('email', this.authUser.email);
-                        MyLocalStorage.setItem('bucketName', this.authUser.people_!.path_bucket);
+                        MyLocalStorage.setItem('bucketName', this.authUser.people_?.path_bucket);
                     }
                     if(res.user.email_is_checked ===0){
                         router.push({path:'/verify_email'}).then((res)=>{
@@ -89,14 +107,23 @@ export const useAuthStore = defineStore({
 
                 }
             ).catch(error => {
-                console.log('error=', error)
-                //showErrorMessage(error);
+                console.log('error login=', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Помилка авторизації',
+                        text: error.response?.data ? error.response?.data:error.message
+                    });
+                //throw error
+                //this.showErrorMessage(error)
+
+            }).finally(()=>{
+                this.isLoading = false;
             })
         },
         onLogout(){
-            logoutUserFn().then(
-                res=>{
-                    console.log(res.message);
+            //logoutUserFn().then(
+              //  res=>{
+                    //console.log(res.message);
                     this.token = '';
                     this.username = '';
                     this.isLogin =false;
@@ -109,9 +136,10 @@ export const useAuthStore = defineStore({
                     MyLocalStorage.setItem('peopleId','');
                     MyLocalStorage.setItem('email','');
                     MyLocalStorage.setItem('bucketName', '');
+                    router.push({path:'/'})
 
-                }
-            )
+               // }
+            //)
 
         },
         onVerifEmail(code: string){
@@ -181,17 +209,6 @@ export const useAuthStore = defineStore({
             }).catch(error => {
                 //showErrorMessage(error);
             })*/
-        },
-        async test() {
-            try{
-                const res = await sendRequest<string>(
-                    'GET',
-                    'Tokens/Check'
-                );
-                console.log("test=", res);
-            }catch (error) {
-                console.error(error);
-            }
         },
 
     }

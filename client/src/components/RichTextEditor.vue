@@ -24,7 +24,7 @@ const props = defineProps({
   },
   initialContent: {
     type: String,
-    default: '<p>Default initial content</p>'
+    default: '<p>Напишіть тут щось</p>'
   },
 });
 
@@ -32,10 +32,12 @@ const emits = defineEmits(['save-content']);
 const editorRef = ref<HTMLElement|null>(null);
 let editorInstance: ClassicEditor ;
 //const editor = ref(null);
-const editorData = ref<string>(props.initialContent);
+const editorData = ref<string>('');
 const token = MyLocalStorage.getItem('token');
 
 onMounted(()=>{
+ editorData.value=props.initialContent;
+ console.log('editorData=',editorData.value)
  editorRef.value = document.querySelector('#editor');
  if (editorRef.value){
    ClassicEditor
@@ -44,7 +46,7 @@ onMounted(()=>{
            BlockQuote, Font, Link, Paragraph,Alignment,Heading, List, ListProperties,SimpleUploadAdapter,
            Table, TableToolbar,Image, ImageResizeEditing, ImageResizeHandles, ImageInsert, AutoImage],
          fontSize: {
-           options: [8,10,12,'default', 16, 18, 20],
+           options: [8, 10, 12,'default', 16, 18, 20],
            supportAllValues: true
          },
          list: {
@@ -76,8 +78,10 @@ onMounted(()=>{
        })
        .then(editor => {
          editorInstance = editor;
+         editorInstance.setData(editorData.value);
          if (editorInstance && editorInstance.ui.view.editable.element){
            editorInstance.ui.view.editable.element.style.border='none';
+
          }
            if (editorInstance && editorInstance.ui.view.toolbar.element) {
            editorInstance.ui.view.toolbar.element.style.display = props.isReadOnly ? 'none' : 'flex';
@@ -163,8 +167,7 @@ const editorConfig = {
 
 <template>
   <main id="sample">
-    <div id="editor" class="ck-editor__editable_inline" v-html="editorData"/>
-
+    <div id="editor"   class="ck-editor__editable_inline" v-html="editorData"/>
 
   </main>
 </template>
@@ -174,6 +177,11 @@ const editorConfig = {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  min-height: 500px;
 
 }
+
+/*#editor{
+  font-size: 1.1rem!important;
+}*/
 </style>

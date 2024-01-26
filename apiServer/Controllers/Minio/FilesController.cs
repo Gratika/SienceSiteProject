@@ -58,7 +58,7 @@ namespace apiServer.Controllers.Minio
                 {
                     bucketName = article.author_.path_bucket;
                 }
-                //Если бакета не существует - добавляем
+                //Если бакета не существует - добавляем 
                 var beArgs = new BucketExistsArgs()
                     .WithBucket(bucketName);
                 bool found = await _minio.BucketExistsAsync(beArgs).ConfigureAwait(false);
@@ -70,7 +70,7 @@ namespace apiServer.Controllers.Minio
                 }
                 if (string.IsNullOrEmpty(article.path_file) == true)
                 {
-                    article.path_file = _genericString.GenerateRandomString(20); // папка для статьи
+                    article.path_file = _genericString.GenerateRandomString(20); // папка для статьи 
                     prefixForArticle[0] = article.path_file;
                 }
 
@@ -78,7 +78,16 @@ namespace apiServer.Controllers.Minio
                 {
                     if (file != null)
                     {
-                        IFormFile fileInWebp = ConvertToWebp(file);
+                        IFormFile fileInWebp;
+                        if (file.ContentType == "image/jpeg")
+                        {
+                            fileInWebp = ConvertToWebp(file);
+                        }
+                        else
+                        {
+                            fileInWebp = file;
+                        }
+
                         long currentUtcTime = DateTime.Now.Ticks;
                         string NewFileName = Path.GetFileNameWithoutExtension(fileInWebp.FileName) + "_" + currentUtcTime + Path.GetExtension(fileInWebp.FileName);
 
@@ -87,9 +96,9 @@ namespace apiServer.Controllers.Minio
                             .WithObject(prefixForArticle[0] + "/" + NewFileName)
                             .WithObjectSize(fileInWebp.Length)
                             .WithStreamData(fileInWebp.OpenReadStream());
-                        //.WithContentType(file.ContentType);
+                        //.WithContentType(file.ContentType); 
 
-                        // Выполняем операцию загрузки объекта в <link>MinIO</link>
+                        // Выполняем операцию загрузки объекта в <link>MinIO</link> 
                         await _minio.PutObjectAsync(putObjectArgs);
 
 

@@ -5,6 +5,9 @@ import {computed, ref} from "vue";
   import type {ILoginInput}  from "@/api/type";
   import {useAuthStore} from "@/stores/authStore";
 import {useRouter} from "vue-router";
+import MySnackbars from "@/components/MySnackbars.vue";
+import Swal from "sweetalert2";
+
 
   const userLogin: Ref<ILoginInput> = ref({
     email:'',
@@ -38,8 +41,6 @@ import {useRouter} from "vue-router";
   const email= useField('email');
   const  password = useField('password');
 
-  const isLoading=ref(false)
-
   const submitLogin= handleSubmit(()=>{
     if (typeof email.value.value === "string") {
       userLogin.value.email = email.value.value;
@@ -47,16 +48,18 @@ import {useRouter} from "vue-router";
     if (typeof password.value.value === "string") {
       userLogin.value.password = password.value.value;
     }
+     authStore.onLogin(userLogin.value, previousRoute.value);
 
-    authStore.onLogin(userLogin.value, previousRoute.value);
-    //alert(JSON.stringify(userLogin.value));
+
+
   })
+
 </script>
 
 <template>
 <v-row class="py-7 justify-center">
   <v-col cols="12"  md="6" sm="10" xs="12">
-    <v-overlay :model-value="isLoading"
+    <v-overlay :model-value="authStore.isLoading"
     class="align-center justify-center">
       <v-progress-circular
           indeterminate
@@ -84,28 +87,11 @@ import {useRouter} from "vue-router";
           id="password"
           :error-messages="password.errorMessage.value"
       />
-      <!--v-text-field
-          clearable
-          v-model="email.value.value"
-          label="Електронна пошта"
-          prepend-inner-icon="mdi-email"
-          id="email"
-          :error-messages="email.errorMessage.value"
-      /-->
-      <!--v-text-field
-          type="password"
-          clearable
-          v-model="password.value.value"
-          label="Пароль"
-          prepend-inner-icon="mdi-key"
-          id="password"
-          :error-messages="password.errorMessage.value"
-      /-->
 
       <v-btn type="submit" block class="mt-4">Увійти</v-btn>
     </v-form>
     <div class="my-4">
-      <h3 class="text-center">або</h3>
+      <p class="text-center text-h6">або</p>
     </div>
     <div class="d-flex justify-space-between ">
       <v-btn
@@ -133,46 +119,10 @@ import {useRouter} from "vue-router";
         Microsoft
       </v-btn>
     </div>
-    <!--v-card class="my-8">
-      <v-card-title class="text-center">
-        Вхід
-      </v-card-title>
-      <v-card-item>
-        <v-form @submit.prevent="submitLogin" >
-          <v-text-field
-              v-model="email.value.value"
-              label="Електронна пошта"
-              id="email"
-              :error-messages="email.errorMessage.value"
-          />
-          <v-text-field
-              clearable
-              v-model="email.value.value"
-              label="Електронна пошта"
-              prepend-inner-icon="mdi-email"
-              id="email"
-              :error-messages="email.errorMessage.value"
-          />
-          <v-text-field
-              type="password"
-              clearable
-              v-model="password.value.value"
-              label="Пароль"
-              prepend-inner-icon="mdi-key"
-              id="password"
-              :error-messages="password.errorMessage.value"
-          />
-
-          <v-btn type="submit" block class="mt-2" color="my-accent" >Submit</v-btn>
-        </v-form>
-      </v-card-item>
-      <v-card-actions>
-        <v-btn block to="/register">Зареєструватися</v-btn>
-      </v-card-actions>
-    </v-card-->
 
   </v-col>
 </v-row>
+
 </template>
 
 <style scoped>

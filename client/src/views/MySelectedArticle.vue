@@ -11,58 +11,23 @@ const showSelected = true;//показуємо на сторінці Збере�
 const showMenu = false; //меню не показуємо на сторінці Збережене в кабінеті користувача
 const showBtnPublic = false; // ця кнопка буде відображатися тільки в кабінеті користувача
 const peopleId=MyLocalStorage.getItem('peopleId');
-const selectedTag = ref<Array<string>>([])//модель для фільтру Теги
-const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 
-const sortedValue = ref<number>(0);
-
-/*onMounted(() => {
-  articleStore.getMySelectedArticleList(peopleId); //список моїх статей
-  articleStore.getScienceList(); //отримуємо список наукових сфер (для формування списку тегів)
-});*/
-
+//пагінація
+const currentPage = ref(1); // Поточна сторінка
+const onPageChange = () => {
+  // Оновлення поточної сторінки при зміні
+  console.log('currentPage =',currentPage.value)
+  articleStore.getMySelectedArticleList(peopleId,currentPage.value-1); //список моїх обраних статей
+};
 
 
-function tagFiltered(focused:boolean){ //по тегу
-  if (!focused)
-    console.log('selectedTag =', selectedTag.value)
-  // articleStore.searchArticlesByParam()
-}
-function selectSortParam(){
-  console.log("sortedValue=", sortedValue)
-}
+
+
+
+
 </script>
 
 <template>
-  <v-row class="py-10 justify-start align-content-center">
-    <v-col cols="6" class="ps-0">
-      <div class="d-flex">
-        <v-combobox
-            class="mx-3 w-50"
-            label="Теги"
-            :items="articleStore.tagItems"
-            :delimiters="delimiters"
-            v-model="selectedTag"
-            multiple
-            chips
-            @update:focused="tagFiltered"
-        ></v-combobox>
-        <v-select
-            class="mx-3 w-50"
-            v-model="sortedValue"
-            hint="Оберіть параметр сортування"
-            :items="articleStore.sortedOptions"
-            item-title="value"
-            item-value="key"
-            label="Впорядкувати"
-            @update:modelValue= "selectSortParam"
-        ></v-select>
-      </div>
-
-    </v-col>
-
-  </v-row>
-
   <v-row class="justify-center">
     <v-col cols="12">
       <v-overlay :model-value="articleStore.isLoading"
@@ -72,7 +37,10 @@ function selectSortParam(){
             color="primary"
         ></v-progress-circular>
       </v-overlay>
-      <ArticleItem
+      <div v-if="articleStore.cntRec==0" class="d-flex justify-center py-16 text-h4">
+        Ви ще не додали до "Обраного" жодної статті :(
+      </div>
+      <ArticleItem v-else
           v-for="article in articleStore.articles"
           :key="article.id"
           :article="article"
@@ -81,6 +49,19 @@ function selectSortParam(){
           :show-btn-public="showBtnPublic"
       />
     </v-col>
+  </v-row>
+  <v-row v-if="articleStore.totalPage>0" class="justify-center">
+    <v-col cols="8">
+      <v-container>
+        <v-pagination
+            v-model="currentPage"
+            class="my-4"
+            :length="articleStore.totalPage"
+            @update:model-value="onPageChange"
+        ></v-pagination>
+      </v-container>
+    </v-col>
+
   </v-row>
 
 </template>

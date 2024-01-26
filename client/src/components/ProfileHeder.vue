@@ -4,6 +4,7 @@
   import type {IUser} from "@/api/type";
   import MyLocalStorage from "@/services/myLocalStorage";
   import {useRouter} from "vue-router";
+  import {useAuthStore} from "@/stores/authStore";
 
   const user:ComputedRef<null | IUser>= computed(()=>{
     let userStorage = MyLocalStorage.getItem('user');
@@ -13,6 +14,10 @@
   const router = useRouter();
   function goToUserProfile(){
     router.push({ name: 'profile'});
+  }
+  const authStore = useAuthStore();
+  function logout(){
+    authStore.onLogout();
   }
 </script>
 
@@ -29,8 +34,8 @@
         <v-chip color="black" variant="tonal" class="rounded-btn text-subtitle-1" size="small" @click="goToUserProfile">
           Редагувати профіль
         </v-chip>
-        <v-chip variant="outlined" class="rounded-btn text-subtitle-1" size="small" color="black">
-          Налаштування
+        <v-chip variant="outlined" class="rounded-btn text-subtitle-1" size="small" color="black" @click="logout">
+          Вихід
         </v-chip>
       </div>
       <div class="general-size info-align username-text-size">{{user?.people_?.surname}} {{user?.people_?.name}} </div>

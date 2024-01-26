@@ -83,8 +83,9 @@ Startup.Init<Articles>("http://solr:8983/solr/new_core");
 Startup.Init<People>("http://solr:8983/solr/new_core");
 Startup.Init<Scientific_theories>("http://solr:8983/solr/new_core");
 //Startup.Init<Selected_articles>("http://solr:8983/solr/new_core");
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.MapControllers();
 app.UseCors("CorsPolicy"); //CorsPolicy AllowAll

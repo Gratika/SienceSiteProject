@@ -42,7 +42,7 @@ namespace apiServer.Controllers.ForModels
                 {
 
                     FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(oneSelectArticles.Id, emojiId, oneSelectArticles.article_.author_id);
-                    ar.Selected = _context.Selected_articles.Any(a => a.article_id == oneSelectArticles.Id && a.people_id == oneSelectArticles.article_.author_id);
+                    ar.Selected = true;
                     articlesAndReactions.Articles.Add(new FullArticle<Selected_articles> { Articles = oneSelectArticles, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
 
                 }
@@ -76,7 +76,7 @@ namespace apiServer.Controllers.ForModels
             }
         }
         [HttpPost("DeleteSelectArticle")]
-        public async Task<ActionResult> DeleteSelectArticle(string articleId, string peopleId) //добавление в избранное
+        public async Task<ActionResult> DeleteSelectArticle([FromForm] string articleId, [FromForm] string peopleId) //добавление в избранное
         {
             try
             {
