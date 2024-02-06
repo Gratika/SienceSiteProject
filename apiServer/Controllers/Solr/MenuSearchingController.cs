@@ -31,7 +31,7 @@ namespace apiServer.Controllers.Solr
         }
 
         [HttpGet("SearchWithFilters")]
-        public async Task<ActionResult<List<Articles>>> SearchWithFilters( int Pages, string? SearchString, int? year, int? Filters, int? TypeOrder,string? tags, string? peopleId,string? scienceId, string? theoryId) // возвращение по наибольшему числу просмотров
+        public async Task<ActionResult<List<Articles>>> SearchWithFilters(int Pages, string? SearchString, int? year, int? Filters, int? TypeOrder,string? tags, string? peopleId,string? scienceId, string? theoryId, string? idPeopleForSelect) // возвращение по наибольшему числу просмотров
         {
             try
             {
@@ -68,14 +68,14 @@ namespace apiServer.Controllers.Solr
             {
 
                 FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
-                ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
+                ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == idPeopleForSelect);
                 articlesAndReactions.Articles.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
                 if (!string.IsNullOrEmpty(scienceId))
                 articlesAndReactions.Sciences = _context.Sciences.FirstOrDefault(a => a.Id == scienceId);
                 articlesAndReactions.Theories = await _context.Scientific_theories.Where(t => t.science_id == scienceId).ToListAsync();
             }
-
-            return Ok(articlesAndReactions);
+                searchResponse.allPages = (double)Math.Ceiling((decimal)articlesAndReactions.Articles.Count / 10);
+                return Ok(articlesAndReactions);
             }
             catch (Exception ex)
             {
@@ -114,8 +114,7 @@ namespace apiServer.Controllers.Solr
                         
                     }
                 }
-                SearchResponse<Articles> searchResponse = new SearchResponse<Articles>();
-                searchResponse.allPages = (double)Math.Ceiling((decimal)articles.Count / 10);
+                SearchResponse<Articles> searchResponse = new SearchResponse<Articles>();                
                 searchResponse.Articles = tenArticle;
 
                 return searchResponse;

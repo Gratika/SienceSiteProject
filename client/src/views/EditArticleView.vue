@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {isReadonly, onBeforeMount, ref} from "vue";
+import {isReadonly, onBeforeMount, onMounted, ref} from "vue";
 import Swal from 'sweetalert2'
 import {useArticleStore} from "@/stores/articleStore";
 import RichTextEditor from "@/components/RichTextEditor.vue";
@@ -60,7 +60,9 @@ const articleStore = useArticleStore();
      })
    }
  })
-
+onMounted(()=>{
+  window.scroll(0,0)
+})
 
 /*валідація форм*/
 const { handleSubmit, handleReset } = useForm({
@@ -237,13 +239,12 @@ function substrUserFolder(filePatch:string|null):string|null{
                 </v-col>
               </v-row>
               <v-row v-if="listFile!=null">
-                <v-col cols="12">
-                  <div class="text-h6 font-weight-medium mt-3">Прикріпленні файли:</div>
-                  <div class="text-subtitle-1 mt-2 ps-4 py-2 pe-1 border-file">{{listFile}}</div>
+                <v-col cols="12" class="pt-0">
+                  <div class="text-file-list mt-2 ps-4 py-2 pe-1 border-file">{{listFile}}</div>
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12" md="8">
+                <v-col cols="8" md="5" sm="6">
                   <div class="d-flex justify-start flex-row">
                     <v-file-input
                         clearable
@@ -252,15 +253,15 @@ function substrUserFolder(filePatch:string|null):string|null{
                         show-size
                         variant="outlined"
                         @change="handleFileChange"
-                        :prepend-icon='undefined'
+                        prepend-icon=''
                     >
 
                       <template #prepend-inner>
-                        <v-icon>mdi-file</v-icon>
+                        <v-icon>mdi-file-word-outline</v-icon>
                       </template>
                     </v-file-input>
                     <v-btn
-                        class="ms-3"
+                        class="ms-3 mt-1"
                         color="primary"
                         density="compact"
                         icon="mdi-check"
@@ -296,6 +297,7 @@ function substrUserFolder(filePatch:string|null):string|null{
 <style scoped>
 .border-file{
   border: solid 1px rgba(var(--v-border-color),var(--v-border-opacity));
+  border-radius: 4px;
 }
  .card-shadow{
    border-radius: 5px;
@@ -304,4 +306,18 @@ function substrUserFolder(filePatch:string|null):string|null{
  .footer-distance{
    min-height: 100px;
  }
+.v-file-input {
+  flex-direction: row-reverse;
+
+}
+.text-file-list{
+  font-size: 20px;
+}
+.ck.ck-toolbar{
+  background: white;
+}
+.ck.ck-editor__main>.ck-editor__editable{
+  background: white;
+}
+
 </style>

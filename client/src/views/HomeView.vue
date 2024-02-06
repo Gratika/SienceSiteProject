@@ -11,25 +11,40 @@ import ScienceCarousels from "@/components/ScienceCarousels.vue";
 import {useAuthStore} from "@/stores/authStore";
 import type {IArticle} from "@/api/type";
 
-const authStore = useAuthStore();
 const articleStore = useArticleStore();
 const showSelected = ref(false);
 const showMenu = false; //меню показуємо тільки в кабінеті користувача
 const showBtnPublic = false; // ця кнопка буде відображатися тільки в кабінеті користувача
+const page = ref(0);
+const pointer = ref<Element|undefined>();
 const newArticleList = ref<Array<IArticle>>([])
 onMounted(() => {
   const isLoginString = MyLocalStorage.getItem('isLogin');
   if (isLoginString!=null){
     showSelected.value = isLoginString;
   }
-  articleStore.getNewArticleList(9).then((res)=>{
+  articleStore.getNewArticleList(page.value).then((res)=>{
     if (res!==undefined) newArticleList.value=res;
   });
-  articleStore.getPopularArticleList(9);
+  articleStore.getPopularArticleList(page.value);
   articleStore.getScienceList();
-
+  //вказуємо елемент за яким потрібно слідкувати
+  if(pointer.value!==undefined)  observer.observe(pointer.value)
 });
+//відслідковуємо видимість нашого pointer для виконання нового запиту до сервера
+//для реалізації нескінченної стрічки
+const options = {
+  rootMargin: "0px",
+  threshold: 1.0,
+};
+const callback : IntersectionObserverCallback = (entries, observer) => {
 
+  if(entries[0].isIntersecting && (page.value+1<articleStore.totalPage)){
+    page.value++;
+    articleStore.getMorePopularArticle(page.value);
+  }
+}
+const observer = new IntersectionObserver(callback, options);
 </script>
 
 <template>
@@ -69,6 +84,7 @@ onMounted(() => {
         />
       </v-col>
     </v-row>
+    <div ref="pointer" class="pointer"></div>
 
     <div class="footer-distance"></div>
   </v-container>
@@ -78,5 +94,8 @@ onMounted(() => {
 <style scoped>
 .footer-distance{
   min-height: 100px;
+}
+.pointer{
+  height: 5px;
 }
 </style>

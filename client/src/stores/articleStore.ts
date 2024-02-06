@@ -1,16 +1,16 @@
-import { defineStore } from 'pinia';
+import {defineStore} from 'pinia';
 import type {
-    IArticleResponse,
     GenericResponse,
-    IArticle, IFullArticle,
+    IArticle,
+    IArticleResponse,
+    IFullArticle,
     IScience,
     IScientificTheory,
-    ISearchResponse, ISelectedArticle
+    ISearchResponse,
+    ISelectedArticle
 } from '@/api/type';
 import {sendRequest, showErrorMessage} from '@/api/authApi';
 import MyLocalStorage from "@/services/myLocalStorage";
-
-import {ServerBadRequestError} from "@/api/appException";
 import Swal from "sweetalert2";
 
 
@@ -54,81 +54,84 @@ export const useArticleStore = defineStore({
 
     actions: {
         //отримати список нових статтей
-        async getNewArticleList(amount:number):Promise<Array<IArticle>|undefined> {
-            try {
-                let newArticles:Array<IArticle>=[];
+        async getNewArticleList(pages:number, ):Promise<Array<IArticle>|undefined> {
+
+            const sortParam = 10; //спочатку більш нові
+            const  peopleId = MyLocalStorage.getItem('peopleId'); //може повернутися і null
+            try{
                 this.isLoading=true;
-                const res = await sendRequest<Array<IFullArticle<IArticle>>>(
+                let newArticles:Array<IArticle>=[];
+                const res = await sendRequest<ISearchResponse<IFullArticle<IArticle>>>(
                     'GET',
-                    'mainTabArticles/newArticle',
-                    {amount:amount}
+                    'MenuSearching/SearchWithFilters',
+                    {
+                        'Pages': pages,
+                        'TypeOrder':sortParam,
+                        'idPeopleForSelect':peopleId
+                    }
+
                 );
-                //console.log("NewArticle=", res);
-                //цей метод буде повертати свій результат одразу в компонент
-                res?.map((item)=>{
+                console.log("new articles", res);
+                res?.articles?.map((item)=>{
                     let article = this.parseArticleAndReaction(item);
                     if (article!==undefined){
+                        // console.log(article);
                         newArticles.push(article);
                     }
                 })
-                // console.log("NewArticle[]=", newArticles)
+                console.log("New_articles []= ", newArticles);
                 return newArticles;
-
-            }catch(error){
-                console.error(error);
-            }finally{
-              this.isLoading=false;
+            }catch (error) {
+               console.error(error);
+            }finally {
+                this.isLoading =false;
             }
 
         },
         //отримати список популярних статтей
-        async getPopularArticleList(amount:number) {
+        async getPopularArticleList(pages:number) {
             try{
-                this.popularArticles=[];
                 this.isLoading=true;
-                const res = await sendRequest<Array<IFullArticle<IArticle>>>(
-                    'GET',
-                    'mainTabArticles/popularArticle',
-                    {amount:amount}
-                );
-               // console.log("PopularArticle=", res);
-                //цей метод виключення, для нього не підходить використання методу
-                // this.transformArticleAndReactionToListArticle(res);
-                // бо тут масив отриманних статей буде писатися в інший масив
-                res?.map((item)=>{
+                this.popularArticles=[];
+                const res = await this.getPopularArticle(pages);
+                res?.articles?.map((item)=>{
                     let article = this.parseArticleAndReaction(item);
                     if (article!==undefined){
+                        // console.log(article);
                         this.popularArticles.push(article);
                     }
                 })
+                console.log('allPages=',res.allPages)
+                this.totalPage = res.allPages;
                 //console.log("PopularArticle[]=", this.articles);
-
-            }catch (error){
-                console.error(error);
-            }finally {
-                this.isLoading =false;
-            }
-        },
-        //отримати список моїх статей(не використовується. запит йде через пошук)
-        async getMyArticleList(peopleId:string) {
-            try{
-                this.cntRec=0;
-                this.articles=[];
-                this.isLoading=true;
-                const res = await sendRequest<Array<IFullArticle<IArticle>>>('GET',
-                    'article/GetArticlesForUser',
-                    {id_people: peopleId}
-                );
-               // console.log("myArticles=", res);
-                this.transformArticleAndReactionToListArticle(res);
-                console.log("myArticles[]=", this.articles);
-                this.cntRec=this.articles.length;
             }catch (error) {
                 console.error(error);
             }finally {
                 this.isLoading =false;
             }
+        },
 
+        //отримати список популярних статтей, що відповідає наступній сторінці
+        //для реалізації нескінченної стрічки
+        //статті, які ми будемо отримувати уцьому запиті будемо дописувати в кінець масиву
+        //сам масив не обнуляємо
+        async getMorePopularArticle(pages:number) {
+            try{
+                this.isLoading=true;
+                const res = await this.getPopularArticle(pages);
+                res?.articles?.map((item)=>{
+                    let article = this.parseArticleAndReaction(item);
+                    if (article!==undefined){
+                        // console.log(article);
+                        this.popularArticles.push(article);
+                    }
+                })
+                console.log("PopularArticle[]=", this.popularArticles);
+            }catch (error) {
+                console.error(error);
+            }finally {
+                this.isLoading =false;
+            }
         },
         //отримати список моїх статей
          async getMySelectedArticleList(peopleId:string, page:number) {
@@ -274,33 +277,48 @@ export const useArticleStore = defineStore({
         },
         //вилучити статтю з обраного
         async deleteFromFavorites(ArticleId:string){
-            let peopleId = MyLocalStorage.getItem('peopleId');
-            let data = new FormData();
-            data.set('articleId',ArticleId);
-            data.set('peopleId', peopleId);
-            sendRequest<string>(
-                'POST',
-                'selected_articles/deleteSelectArticle',
-                undefined,
-                data)
-                .then((res)=>{
-                    let article =this.articles.find(item=>item.id===ArticleId)
-                    if(article?.selected!==undefined) article.selected=false;
-                    console.log(res);
-                    Swal.fire({
-                        icon: 'info',
-                        title: res ? res : 'Виконано',
-                        text: ''
-                    });
-                }, (error) =>{
-                    console.log(error)
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Не вдалося вилучити статтю з обраного',
-                        text: showErrorMessage(error)
-                    });
-                    throw error
+            try{
+                const res= await this.deleteUserFavorites(ArticleId)
+                let article =this.articles.find(item=>item.id===ArticleId)
+                if(article?.selected!==undefined) article.selected=false;
+                console.log(res);
+                Swal.fire({
+                    icon: 'info',
+                    title: res,
+                    text: ''
                 });
+            }catch(error){
+                console.log(error)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Не вдалося вилучити статтю з обраного',
+                    text: showErrorMessage(error)
+                });
+                throw error;
+            }
+
+        },
+        /*при вилученні статті з обраних на сторінці збережені, потрібно візуально вилучати статтю,
+        * а не тільки змінювати значок закладки*/
+        async deleteFromSelectedArticle(ArticleId:string){
+            try{
+                const res= await this.deleteUserFavorites(ArticleId);
+                console.log(res);
+                Swal.fire({
+                    icon: 'info',
+                    title: res,
+                    text: ''
+                });
+                this.articles = this.articles.filter(item=>item.id!==ArticleId)
+            }catch(error){
+                console.log(error)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Не вдалося вилучити статтю з обраного',
+                    text: showErrorMessage(error)
+                });
+                throw error;
+            }
         },
         //отримати перелік наукових сфер
         async getScienceList() {
@@ -334,12 +352,14 @@ export const useArticleStore = defineStore({
         },
         async getScienceTheoryByScienceId(scienceId:string) {
             try{
+                const  peopleIdForSelected = MyLocalStorage.getItem('peopleId'); //може повернутися і null
                 const res = await sendRequest<ISearchResponse<IFullArticle<IArticle>>>(
                     'GET',
                     'MenuSearching/SearchWithFilters',
                     {
                         'Pages': 0,
-                        'scienceId':scienceId
+                        'scienceId':scienceId,
+                        'idPeopleForSelect':peopleIdForSelected
                     }
 
                 );
@@ -457,6 +477,7 @@ export const useArticleStore = defineStore({
                 this.cntRec=0;
                 this.isLoading=true;
                 this.totalPage=0;
+                const  peopleIdForSelected = MyLocalStorage.getItem('peopleId'); //може повернутися і null
                 const res = await sendRequest<ISearchResponse<IFullArticle<IArticle>>>(
                     'GET',
                     'MenuSearching/SearchWithFilters',
@@ -469,7 +490,8 @@ export const useArticleStore = defineStore({
                         'tags':tags,
                         'peopleId':peopleId,
                         'scienceId':scienceId,
-                        'theoryId':scienceTheoryId
+                        'theoryId':scienceTheoryId,
+                        'idPeopleForSelect':peopleIdForSelected
                     }
 
                 );
@@ -571,24 +593,35 @@ export const useArticleStore = defineStore({
                 }
             })
         },
-       /* showErrorMessage ( error:any):string{
-            if('name' in error && error.name==='AxiosError'){
-                if (error?.response && error?.response.data ) {
-                    if (typeof  error.response.data ==='string')
-                       return error.response.data;
-                    else return JSON.stringify(error.response.data)
-                } else {
-                    if(error?.message){
-                        return error.message;
-                    }
-                }
-            }
-            if('message' in error) return error.message;
-            return ''
-        }*/
+        //отримати список популярних статтей
+        async getPopularArticle(pages:number):Promise<ISearchResponse<IFullArticle<IArticle>>> {
+
+            const sortParam = 12; //за кількістю переглядів
+            const  peopleId = MyLocalStorage.getItem('peopleId'); //може повернутися і null
+            const res = await sendRequest<ISearchResponse<IFullArticle<IArticle>>>(
+                    'GET',
+                    'MenuSearching/SearchWithFilters',
+                    {
+                        'Pages': pages,
+                        'TypeOrder': sortParam,
+                        'idPeopleForSelect': peopleId
+                    });
+            console.log("popular articles", res);
+            return res;
+        },
+        async deleteUserFavorites(ArticleId:string) {
+            let peopleId = MyLocalStorage.getItem('peopleId');
+            let data = new FormData();
+            data.set('articleId', ArticleId);
+            data.set('peopleId', peopleId);
+            return await sendRequest<string>(
+                'POST',
+                'selected_articles/deleteSelectArticle',
+                undefined,
+                data
+            );
 
 
-
-
+        }
     }
 });

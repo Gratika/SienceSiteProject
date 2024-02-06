@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type {IArticle} from "@/api/type";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useArticleStore} from "@/stores/articleStore";
 import moment from "moment/moment";
-import {boolean} from "zod";
+
 import {computed, ref} from "vue";
 import Like from "@/components/Like.vue";
 
@@ -26,6 +26,7 @@ const borderColor = computed(()=> {
     return '#2A3759';
 })
 const router = useRouter();
+const route = useRoute();
 const articleStore = useArticleStore();
 // меню
 const location= 'top'; //позиція меню
@@ -68,13 +69,26 @@ function readArticle(){
 function deleteArticle(){
   articleStore.deleteArticle(props.article);
 }
+const isSelectedArticlePage = computed(() => {
+  return route.name === 'user_office';
+
+});
 //додати статтю до обраного
 function changeArticleSelect(){
+  //console.log('route.name = ',route.name)
   let article_id= props.article?.id as string;
   if(isSelected.value){
-    articleStore.deleteFromFavorites(article_id)
-        .then(()=>{isSelected.value=false})
-        .catch((err)=>{console.log(err)});
+    if (isSelectedArticlePage){
+       articleStore.deleteFromSelectedArticle(article_id)
+    }else {
+      articleStore.deleteFromFavorites(article_id)
+          .then(() => {
+            isSelected.value = false
+          })
+          .catch((err) => {
+            console.log(err)
+          });
+    }
   }else{
     articleStore.addToFavorites(article_id)
         .then(()=>{isSelected.value=true})
@@ -82,12 +96,12 @@ function changeArticleSelect(){
   }
 
 }
-function publicationArticle(){
+/*function publicationArticle(){
   let article_id= props.article?.id as string;
   articleStore.publicationArticle(article_id).then(()=>{
     isActive.value=true;
   });
-}
+}*/
 function formatDate(date: null | string): string {
   //console.log('date=',date)
  // console.log('typeof date=',typeof date)
@@ -189,7 +203,7 @@ function formatDate(date: null | string): string {
           <v-chip
               v-for="(item, index) in props.article.tagItems"
               :key="index"
-              class="ma-2 card-chips-text-size font-weight-bold"
+              class="me-2 mb-2 card-chips-text-size font-weight-bold"
               color="primary-darken-1"
               variant="flat"
           >

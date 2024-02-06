@@ -59,13 +59,9 @@ namespace apiServer.Controllers.Authentication
             {
                 People peopleOn = _people.CreatePeople();
             peopleOn.Id = Guid.NewGuid().ToString();
-            peopleOn.name = userRequest.people.name ;
-            peopleOn.surname = userRequest.people.surname ;
-            if (userRequest.people.birthday != null)
-            {
-               peopleOn.birthday = userRequest.people.birthday;
-            }
-            
+            peopleOn.name = userRequest.people.name;
+            peopleOn.surname =userRequest.people.surname;
+            peopleOn.birthday = userRequest.people.birthday;
 
                 Users FirstEx = new Users();
                 FirstEx.Id = Guid.NewGuid().ToString();
@@ -124,6 +120,17 @@ namespace apiServer.Controllers.Authentication
                 }
             }
             return true;
+        }
+        [HttpPost("RedactEmail")]
+        public ActionResult RedactEmail(string id,string email)
+        {
+            Users users = _context.Users.FirstOrDefault(a => a.Id == id);
+            users.email = email;
+            users.email_is_checked = 0;
+
+            _context.Users.Update(users);
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }

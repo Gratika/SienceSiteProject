@@ -31,9 +31,6 @@ const myCustomLightTheme: ThemeDefinition = {
         info: '#2196F3',
         success: '#4CAF50',
         warning: '#FB8C00',
-        'my-dark':'#607D8B',
-        'my-accent':'#F44336',
-        'my-background-darken-1':'#E2E2E2'
     },
     variables:{
         'theme-background':'#F9F9F9'
@@ -64,7 +61,8 @@ const vuetify = createVuetify({
         },
         VTextField:{
             variant:'outlined',
-            density:'compact'
+            density:'compact',
+
         },
         VChip:{
             color:'primary-darken-1',

@@ -2,11 +2,11 @@ import { defineStore } from 'pinia';
 
 
 import MyLocalStorage from "@/services/myLocalStorage";
-import type {ILoginInput, IUser, ISignUpInput, ILoginResponse} from "@/api/type";
+import type {ILoginInput, IUser, ISignUpInput, ILoginResponse, IPeople} from "@/api/type";
 import {
     getRepeatCodeFn,
     loginUserFn,
-    sendRequest,
+    sendRequest, showErrorMessage,
     signUpUserFn,
     verifyEmailFn
 } from '@/api/authApi'
@@ -22,8 +22,7 @@ export type AuthStoreState ={
     username:string;
     isLogin:boolean;
     isLoading:boolean;
-    errorMessage:string;
-    showError:boolean;
+
 }
 
 export const useAuthStore = defineStore({
@@ -35,8 +34,7 @@ export const useAuthStore = defineStore({
         isLogin:MyLocalStorage.getItem('isLogin')?MyLocalStorage.getItem('isLogin')===true:false,
         username: MyLocalStorage.getItem('username')?MyLocalStorage.getItem('username'):'',
         isLoading:false,
-        errorMessage:'',
-        showError:false,
+
 
     } ),
     getters:{
@@ -57,8 +55,6 @@ export const useAuthStore = defineStore({
     actions: {
 
         onRegistration(user:ISignUpInput){
-            this.errorMessage='';
-            this.showError=false;
             this.isLoading=true;
             signUpUserFn(user).then(
                 res=>{
@@ -69,16 +65,14 @@ export const useAuthStore = defineStore({
                 console.log('error=',error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Помилка авторизації',
-                    text: error.response?.data ? error.response?.data:error.message
+                    title: 'Помилка реєстрації',
+                    text: showErrorMessage(error)
                 });
             }).finally(()=>{
                 this.isLoading = false;
             })
         },
         onLogin(user:ILoginInput, previousRoute:string){
-            this.errorMessage='';
-            this.showError=false;
             this.isLoading=true;
             loginUserFn(user).then(
                 res=>{
@@ -87,6 +81,8 @@ export const useAuthStore = defineStore({
                     this.username = res.user.login;
                     this.isLogin =true;
                     this.authUser = res.user;
+                    console.log('res.user',res.user);
+                    console.log('this.authUser',this.authUser);
                     MyLocalStorage.setItem('token',this.token);
                     MyLocalStorage.setItem('username',this.username);
                     MyLocalStorage.setItem('isLogin',this.isLogin);
@@ -111,7 +107,7 @@ export const useAuthStore = defineStore({
                     Swal.fire({
                         icon: 'error',
                         title: 'Помилка авторизації',
-                        text: error.response?.data ? error.response?.data:error.message
+                        text: showErrorMessage(error)
                     });
                 //throw error
                 //this.showErrorMessage(error)
@@ -168,34 +164,53 @@ export const useAuthStore = defineStore({
                     console.log('err from RepeatVerificationCode: ',err)
                 })
         },
-        async onUpdateUser( updateUser:IUser){
-            console.log("updateUser = ", updateUser)
-            /*sendRequest<ILoginResponse>(
-                    'POST',
-                    'auth/updateUser',
-                    undefined,
-                    updateUser
-            ).then(res=>{
-                this.token = res.user.access_token;
-                console.log("token: ",res.user.access_token);
-                this.authUser = res.user;
-                this.username = res.user.login;
-                MyLocalStorage.setItem('token',this.token);
-                MyLocalStorage.setItem('username',this.username);
-                if(this.authUser!=null){
-                    MyLocalStorage.setItem('user',JSON.stringify(this.authUser));
-                    MyLocalStorage.setItem('userId',this.authUser.id);
-                    MyLocalStorage.setItem('peopleId',this.authUser.people_id);
-                    MyLocalStorage.setItem('email', this.authUser.email);
-                    MyLocalStorage.setItem('bucketName', this.authUser.people_!.path_bucket);
-                }
-                createToast("Log in!", {
-                    position: 'bottom-center',
+        async getPeople():Promise<IPeople|undefined>{
+            const peopleId = this.getPeopleId;
+            try{
+                const  res = await sendRequest<IPeople>(
+                    'GET',
+                    'people/getPeople',
+                    {id: peopleId}
+                );
+                console.log('people = ',res)
+                return res;
+            }catch(error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Не вдалося завантажити дані користувача',
+                    text: showErrorMessage(error)
                 });
-                console.log('res from onLogin: ',res)
+            }
+        },
+        async onUpdateUser( updatePeople:IPeople, email:string){
+
+            sendRequest<string>(
+                    'POST',
+                    'people/redactPeople',
+                    undefined,
+                updatePeople
+            ).then(res=>{
+                console.log('user email=', email)
+                if(this.authUser !== null ) {
+                    this.authUser.email = email;
+                    MyLocalStorage.setItem('email', email);
+                }
+
+                Swal.fire({
+                    icon: 'info',
+                    title: res ? res : 'Виконано',
+                    text: ''
+                });
+
+
             }).catch(error => {
-                //showErrorMessage(error);
-            })*/
+                console.log('error login=', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Помилка при збереженні даних користувача',
+                    text: showErrorMessage(error)
+                });
+            })
         },
         async onSaveAvatar( imageData:FormData){
             console.log("imageData = ", imageData)

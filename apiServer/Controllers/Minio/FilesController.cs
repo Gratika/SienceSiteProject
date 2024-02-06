@@ -110,7 +110,7 @@ namespace apiServer.Controllers.Minio
                 _context.people.Update(article.author_);
                 _context.SaveChanges();
 
-                return Ok("Файлы успешно добавленны");
+                return Ok("Файлы успешно добавленны ");
             }
             catch (Exception ex)
             {

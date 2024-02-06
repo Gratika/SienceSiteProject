@@ -7,23 +7,6 @@ import {useField, useForm} from "vee-validate";
 import moment from "moment";
 
 const authStore = useAuthStore();
-let userName =ref('');
-let userSurname =ref('');
-let userBirthday =ref<string|null>('');
-let user = ref<IUser>({
-    id:'',
-    login:'',
-    password:'',
-    email:'',
-    access_token:'',
-    refresh_token:'',
-    date_create: '',
-    modified_date: '',
-    role_id:1,
-    email_is_checked:0,
-    people_id:'',
-    people_:null,
-});
 let people_ = ref<IPeople>(
     {
       id:'',
@@ -36,13 +19,15 @@ let people_ = ref<IPeople>(
     }
 )
 onMounted(()=>{
-  if (authStore.authUser!==null){
-    user.value = authStore.authUser;
-    userName.value = getName();
-    userSurname.value = getSurname();
-    userBirthday.value = getBirthday();
-    email.value.value=user.value.email;
-  }
+  authStore.getPeople()
+      .then((res:IPeople|undefined)=> {
+        if(res!==undefined) {
+          people_.value = res
+          people_.value.birthday = formatDate(people_.value.birthday);
+          birthDate.value.value=people_.value.birthday;
+        }
+      });
+  email.value.value = authStore.authUser?.email;
 });
 function formatDate(date: null | string): string {
   console.log('date=',date)
@@ -51,18 +36,26 @@ function formatDate(date: null | string): string {
   const formattedDate: Date = new Date(date);
   return (moment(formattedDate)).format('DD.MM.YYYY')
 }
-function getName():string {
-  if (user.value.people_ ==null) return '';
-  return user.value.people_.name;
+//"dd.mm.yyyy" => "yyyy-mm-dd"
+function getFormatDate(input: undefined | string): string {
+  //console.log('date=',date)
+  // console.log('typeof date=',typeof date)
+  if (input === undefined || input==='') return (new Date()).toISOString();
+  const parts = input.split('.');
+  // return parts[2] +'-'+ parts[1]+'-'+parts[0];
+  // Перетворення компонентів дати на числа
+  const day = parseInt(parts[0], 10);
+  console.log('day=',day)
+  const month = parseInt(parts[1], 10);
+  console.log('month=',month)
+  const year = parseInt(parts[2], 10);
+  console.log('year=',year)
+
+  // Створення нового об'єкта Date
+  const date = new Date(year, month - 1, day);
+  return date.toISOString()
 }
-function getSurname():string {
-  if (user.value.people_ ==null) return '';
-  return user.value.people_.surname;
-}
-function getBirthday():string|null {
-  if (user.value.people_ ==null) return '';
-  return formatDate(user.value.people_.birthday);
-}
+
 /*валідація форм*/
 const { handleSubmit, handleReset } = useForm({
   validationSchema: {
@@ -71,26 +64,31 @@ const { handleSubmit, handleReset } = useForm({
 
       return 'Введіть валідну електронну адресу'
     },
+    birthDate (value:string) {
+      if(dateIsValid(value))return true
+      return 'Дата повина відповідати вказаному формату, або лишитися пустою'
+    },
   },
 })
 const email= useField('email');
+const birthDate = useField('birthDate');
+function dateIsValid(date: string|undefined):boolean{
+  console.log('birdDay=', date)
+  if(date===undefined || date?.length===0) return true;
+  return /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/.test(date);
 
+}
 const submitLogin= handleSubmit(()=>{
+  let userEmail = '';
   if (typeof email.value.value === "string") {
-    user.value.email = email.value.value;
+    userEmail = email.value.value;
   }
-  if (user.value.people_ ==null){
-    people_.value.name = userName.value;
-    people_.value.surname=userSurname.value;
-    people_.value.birthday=userBirthday.value;
-    user.value.people_=people_.value;
-  }else{
-    user.value.people_.surname=userSurname.value;
-    user.value.people_.name = userName.value;
-    user.value.people_.birthday = userBirthday.value;
+  if (typeof birthDate.value.value === "string") {
+    console.log('birthDate=', birthDate.value.value)
+    people_.value.birthday=getFormatDate(birthDate.value.value);
   }
-  //authStore.onLogin(userLogin.value);
-  alert(JSON.stringify(user.value));
+  authStore.onUpdateUser(people_.value, userEmail);
+  alert(JSON.stringify(people_.value));
 })
 </script>
 
@@ -109,7 +107,7 @@ const submitLogin= handleSubmit(()=>{
                 <h2>Ім'я</h2>
               </div>
               <v-text-field
-                  v-model.trim="userName"
+                  v-model.trim="people_.name"
                   label="Ім'я"
                   id="userName"
               />
@@ -118,7 +116,7 @@ const submitLogin= handleSubmit(()=>{
             </div>
             <v-text-field
                 clearable
-                v-model.trim="userSurname"
+                v-model.trim="people_.surname"
                 label="Прізвище"
                 id="surname"
             />
@@ -127,14 +125,16 @@ const submitLogin= handleSubmit(()=>{
               </div>
               <v-text-field
                   clearable
-                  v-model.trim="userBirthday"
+                  v-model.trim="birthDate.value.value"
                   label="01.01.2000"
                   id="birthday"
+                  :error-messages="birthDate.errorMessage.value"
               />
             <div class="mt-4 mb-3">
               <h2>Пошта</h2>
             </div>
             <v-text-field
+                :disabled="true"
                 v-model="email.value.value"
                 label="email@example.com"
                 id="email"

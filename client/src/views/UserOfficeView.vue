@@ -2,24 +2,55 @@
 
 import ProfileHeder from "@/components/ProfileHeder.vue";
 import MyArticleView from "@/views/MyArticleView.vue";
-import {onMounted, reactive} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import MySelectedArticle from "@/views/MySelectedArticle.vue";
 import {useArticleStore} from "@/stores/articleStore";
 import MyLocalStorage from "@/services/myLocalStorage";
+import {useAuthStore} from "@/stores/authStore";
+import type {IPeople} from "@/api/type";
+import moment from "moment/moment";
 
 const state = reactive({
   tab: null
 });
+const authStore = useAuthStore();
 const articleStore = useArticleStore();
 const peopleId = MyLocalStorage.getItem('peopleId');
+let people_ = ref<IPeople>(
+    {
+      id:'',
+      surname:'',
+      name:'',
+      birthday:'',
+      path_bucket:'',
+      date_create: '',
+      modified_date:''
+    }
+);
+const email = ref('');
 onMounted(()=>{
-  //articleStore.getMyArticleList(peopleId); //список моїх статей
   articleStore.searchArticlesByParam(0,undefined,undefined,
       undefined,undefined,undefined,peopleId);//список моїх статей
   articleStore.getMySelectedArticleList(peopleId,0); //список моїх обраних статей
   articleStore.getScienceList(); //отримуємо список наукових сфер (для формування списку тегів)
   articleStore.getScienceSectionList(); //отримуємо список підкатегорій
-})
+  authStore.getPeople()
+      .then((res:IPeople|undefined)=> {
+        if(res!==undefined) {
+          people_.value = res
+          people_.value.birthday = formatDate(people_.value.birthday);
+        }
+      });
+  if(authStore.authUser)
+    email.value = authStore.authUser.email;
+});
+function formatDate(date: null | string): string {
+  console.log('date=',date)
+  console.log('typeof date=',typeof date)
+  if (date == null) return '';
+  const formattedDate: Date = new Date(date);
+  return (moment(formattedDate)).format('DD.MM.YYYY')
+}
 function getPageData(){
   console.log('state.tab=',state.tab);
   console.log('typeof',typeof state.tab)
@@ -32,7 +63,7 @@ function getPageData(){
 
 <template>
   <v-container>
-    <ProfileHeder/>
+    <ProfileHeder :email="email" :people="people_"/>
     <v-card color="background" variant="flat">
       <v-tabs
           class="tab-style"
@@ -69,5 +100,8 @@ function getPageData(){
 }
 .footer-distance{
   min-height: 100px;
+}
+.v-chip--variant-outlined{
+  border: 1px solid black!important;
 }
 </style>

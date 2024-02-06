@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type {IArticle} from "@/api/type";
 import {computed} from "vue";
+import {useRouter} from "vue-router";
 
 const props = defineProps({
   articles: {
@@ -8,7 +9,11 @@ const props = defineProps({
     default:[],
     required:true
   }
-})
+});
+const router = useRouter();
+function doRead(id:string){
+  router.push({ name: 'read_article', params: { id: id } });
+}
 
 </script>
 
@@ -25,7 +30,10 @@ const props = defineProps({
           v-for="(item, i) in props.articles"
           :key="i"
       >
-        <div class="d-flex flex-row align-center pa-0">
+        <div
+            class="d-flex flex-row flex-nowrap align-center pa-0 cursor-pointer"
+            @click="doRead(item.id)"
+        >
           <span class="text-h4 font-weight-bold me-2 d-inline">{{ i+1 }}</span>
           <v-card-text class="text-h6 ps-1 d-inline">{{item.title}}</v-card-text>
         </div>
@@ -39,5 +47,8 @@ const props = defineProps({
  .card-shadow{
    border-radius: 5px;
    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+ }
+ .cursor-pointer{
+   cursor: pointer;
  }
 </style>

@@ -60,15 +60,19 @@ namespace apiServer.Controllers.ForModels
                 throw ex;
             }
         }
-        //[HttpGet("GetPeopleFromRedis")]
-        //public People GetPeopleFromRedis(string id)
-        //{
-        //    People people = _redisController.GetData<People>(id);
+        [HttpGet("GetPeople")]
+        public People GetPeople(string id)
+        {
+            People people = _redisController.GetData<People>(id);
+            if(people == null)
+            {
+                people = _context.people.FirstOrDefault(a => a.Id == id);
+            }
 
-        //    return people;
-        //}
+            return people;
+        }
         //[Authorize]
-        [HttpGet("RedactPeople")]
+        [HttpPost("RedactPeople")]
         public ActionResult RedactPeople(People people)
         {
             try

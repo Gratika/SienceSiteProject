@@ -104,6 +104,7 @@ function onShowSearchStr(){
             >
               Блог
             </v-btn>
+
             <v-btn
                 to="/in_development"
                 class="round-btn mx-1 text-h6"
@@ -153,7 +154,7 @@ function onShowSearchStr(){
   border-radius: 2px;
 }
 .search-input{
-  border-radius: 2px;
+  border-radius: 1px;
   background: #D9D9D9;
   margin-left: auto;
   margin-right: auto;

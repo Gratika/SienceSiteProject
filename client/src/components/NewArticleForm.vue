@@ -192,6 +192,7 @@ function closeDialog() {
                       item-value="id"
                       :items="scienceSectionList_"
                       label="Розділ"
+                      no-data-text="Розділів не знайдено"
                       variant="outlined"
                       v-model="theory_id.value.value"
                       :error-messages="theory_id.errorMessage.value"

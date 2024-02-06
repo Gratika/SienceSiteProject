@@ -167,7 +167,7 @@ const editorConfig = {
 
 <template>
   <main id="sample">
-    <div id="editor"   class="ck-editor__editable_inline" v-html="editorData"/>
+    <div id="editor"   v-html="editorData"/>
 
   </main>
 </template>
@@ -177,11 +177,13 @@ const editorConfig = {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  font-size: 20px;
   min-height: 500px;
+  line-height: 1.5rem;
 
 }
 
-/*#editor{
-  font-size: 1.1rem!important;
-}*/
+.ck.ck-editor__main>.ck-editor__editable{
+  background: white;
+}
 </style>

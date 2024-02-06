@@ -7,7 +7,7 @@ import { useField, useForm } from 'vee-validate'
 import type {ISignUpInput} from "@/api/type";
 import {useAuthStore} from "@/stores/authStore";
 import moment from "moment";
-const userBirthday = ref('');
+//const userBirthday = ref('');
 
 const userRegister: Ref<ISignUpInput>  = ref({
   people:{
@@ -60,11 +60,11 @@ function dateIsValid(date: string|undefined):boolean{
   return /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/.test(date);
 
 }
-function formatDate(input: null | string): string {
+function formatDate(input: undefined | string): string {
 
   //console.log('date=',date)
-  // console.log('typeof date=',typeof date)
-  if (input == null) return (new Date()).toISOString();
+  console.log('input=',input);
+  if (input === undefined || input==='') return (new Date()).toISOString();
   const parts = input.split('.');
  // return parts[2] +'-'+ parts[1]+'-'+parts[0];
   // Перетворення компонентів дати на числа
@@ -87,6 +87,9 @@ const submitRegister = handleSubmit(values => {
   if (typeof birthDate.value.value === "string") {
     console.log('birthDate=', birthDate.value.value)
     userRegister.value.people.birthday=formatDate(birthDate.value.value);
+  }
+  if (typeof birthDate.value.value === "undefined") {
+    userRegister.value.people.birthday=(new Date()).toISOString();
   }
   /*if (typeof passwordConfirm.value.value === "string") {
     userRegister.value.passwordConfirm = passwordConfirm.value.value;

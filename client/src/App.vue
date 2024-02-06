@@ -18,6 +18,10 @@ const isDevelopmentPage = computed(() => {
 const isLoginPage = computed(() => {
   return route.name === 'login';
 });
+
+const isVerifPage = computed(() => {
+  return route.name === 'verify_email';
+});
 </script>
 <template>
   <v-app id="inspire">
@@ -30,7 +34,7 @@ const isLoginPage = computed(() => {
        <RouterView />
     </v-main>
 
-    <v-footer v-if="!isNotFoundPage && !isDevelopmentPage &&!isLoginPage" class="pa-0">
+    <v-footer v-if="!isNotFoundPage && !isDevelopmentPage && !isLoginPage && !isVerifPage" class="pa-0">
       <Footer/>
     </v-footer>
 
@@ -41,7 +45,7 @@ const isLoginPage = computed(() => {
   font-size: 1rem;
 }
 .v-field{
-  font-size: 1.3rem;
+  font-size: 20px;
 }
 .v-chip.v-chip--size-small{
   font-size: 14px;

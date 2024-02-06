@@ -21,8 +21,7 @@ const filterDoi = ref<number|null>(null);
 const selectedTag = ref<Array<string>>([])//модель для фільтру Теги
 let tags = ref<string|null>(null);//склеєні теги для відправки запиту
 let scienceSectionId = ref<string|null>('');
-//const selectedYearStr = ref<string|null>(null);
-//let selectedYear = ref<number|null>(null);
+
 const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 
 
@@ -42,7 +41,7 @@ onMounted(()=>{
   }
   //формуємо масив тегів
   articleStore.getScienceList();
-
+  window.scroll(0,0);
 })
 
 function selectSortParam(){
@@ -54,6 +53,7 @@ function selectSortParam(){
 function tagFiltered(focused:boolean){ //по тегу
   //console.log("tagFilteredFocused=",focused)
   if (!focused){
+    if (selectedTag.value.length==0) tags.value=null;
     selectedTag.value.map((item)=>{
       if (tags.value==null) tags.value=item.trim();
       else tags.value= tags.value+','+item.trim();
@@ -71,18 +71,6 @@ function setScienceSection(){
       filterDoi.value,sortedValue.value,tags.value, undefined,scienceIdSrt.value, scienceSectionId.value);
 }
 
-/*function updateYear(focused:boolean){
-  //console.log("updateYearVal=", selectedYearStr.value)
-  if(!focused){
-    if(selectedYearStr.value!=null && selectedYearStr.value!=''){
-      selectedYear.value = parseInt(selectedYearStr.value,10);
-      //console.log("selectedYear=", selectedYearStr.value)}
-      //console.log("updateYearFocused=",focused)
-      articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value,selectedYear.value,
-          filterDoi.value,sortedValue.value,tags.value);
-    }
-  }
-}*/
 function selectFilter(focused:boolean){//по типу статті (наукові, ненаукові)
   //console.log("selectFilterFocused=",focused)
   if (!focused){
@@ -125,23 +113,19 @@ const onPageChange = () => {
       </v-overlay>
       <v-col cols="3">
         <v-autocomplete
-            density="comfortable"
+            density="compact"
             item-title="name"
             item-value="id"
             :items="articleStore.scientificSections"
             label="Розділ"
+            no-data-text="Розділів не знайдено"
             variant="outlined"
             v-model="scienceSectionId"
             @update:modelValue="setScienceSection"
         ></v-autocomplete>
-        <!--v-text-field
-            label="Рік"
-            density="compact"
-            v-model="selectedYearStr"
-            @update:focused="updateYear"
-        ></v-text-field-->
+
       </v-col>
-      <v-col cols="3">
+      <v-col cols="4">
         <v-combobox
             label="Теги"
             :items="articleStore.tagItems"
@@ -156,7 +140,6 @@ const onPageChange = () => {
       <v-col cols="3">
         <v-select
             v-model="filterDoi"
-            density="compact"
             :items="articleStore.filterOptions"
             item-title="value"
             item-value="key"
@@ -166,7 +149,7 @@ const onPageChange = () => {
 
 
       </v-col>
-      <v-col cols="2">
+      <v-col cols="1">
         <div class="d-flex justify-end">
        <span  @click="clearFilters" class="text-h6">
           <u>Очистити</u>
@@ -176,11 +159,12 @@ const onPageChange = () => {
 
     </v-row>
     <v-row class="justify-space-between">
-      <v-col cols="8"  md="6" sm="9">
+      <v-col cols="8"  md="6" sm="9" class="pb-0 mt-3">
         <div class="text-h4">Статті в категорії </div>
       </v-col>
-      <v-col cols="2" md="3" sm="3">
+      <v-col cols="2" md="3" sm="3" class="pb-0 mt-3">
         <v-select
+            density="compact"
             v-model="sortedValue"
             hint="Оберіть параметр сортування"
             :items="articleStore.sortedOptions"
@@ -193,7 +177,7 @@ const onPageChange = () => {
     </v-row>
     <v-row class="justify-center">
       <v-col cols="12" >
-        <div v-if="articleStore.cntRec===0" class="mt-6">
+        <div v-if="articleStore.cntRec===0" class="mt-6 not-found">
           <span class="text-h3">За вашим запитом нічого не знайдено</span>
         </div>
         <div v-else>
@@ -231,6 +215,12 @@ const onPageChange = () => {
 <style scoped>
 .footer-distance{
   min-height: 100px;
+}
+.not-found{
+  align-items: center;
+  height: 350px;
+  display: flex;
+  justify-content: center;
 }
 
 </style>

@@ -44,6 +44,19 @@ const router = createRouter({
       }
     },
     {
+      path: '/category-list',
+      name: 'category_list',
+      component: () => import('../views/CategoryList.vue'),
+      beforeEnter: (to, from, next) => {
+        import('../views/CategoryList.vue').then(module => {
+          next();
+        }).catch(error => {
+          console.error('Помилка завантаження модуля MyArticleView.vue:', error);
+          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
+        });
+      }
+    },
+    {
       path: '/my_article',
       name: 'my_article',
       component: () => import('../views/MyArticleView.vue'),
@@ -153,7 +166,7 @@ const router = createRouter({
     {
       path: '/test',
       name: 'test',
-      component: ()=>import('../views/NotFoundView.vue'),
+      component: ()=>import('../views/VerifyEmailView.vue'),
 
     },
     {/* UserProfileView для непередбачуваних маршрутів*/

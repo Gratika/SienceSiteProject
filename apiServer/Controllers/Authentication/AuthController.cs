@@ -1,5 +1,6 @@
 ﻿using apiServer.Controllers.Redis;
 using apiServer.Models;
+using apiServer.Models.ForUser;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
@@ -23,17 +24,17 @@ namespace apiServer.Controllers.Authentication
         }
 
         [HttpPost("AuthUser")]
-        public async Task<ActionResult> AuthUser(/*string pas, string email*/UserRequest userRequest) //авторизация
+        public async Task<ActionResult> AuthUser (/*string pas, string email*/UserRequest userRequest) //авторизация
         {
             AuthResponse Response = new AuthResponse();
             try
             {
-               // UserRequest userRequest = new UserRequest();
-               // userRequest.email = email;
-               // userRequest.password = pas;
+                //UserRequest userRequest = new UserRequest();
+                //userRequest.email = email;
+                //userRequest.password = pas;
 
-                List<Users> users = _context.Users.ToList();
-                // проверка данных в редис  
+                List<Users> users = _context.Users.Include(a => a.people_).ToList();
+
                 for (int i = 0; i < 2; i++)
                 {
                     Response.user = await CheckUserUnique(users, userRequest.password, userRequest.email);
@@ -48,7 +49,7 @@ namespace apiServer.Controllers.Authentication
                     }
                     users = await _context.Users.Include(a => a.people_).ToListAsync();
                 }
-                return BadRequest("Вы не ввійшли. Неправильний логін або пароль");
+                return Ok("Вы не вошли");
             }
             catch (Exception ex)
             {

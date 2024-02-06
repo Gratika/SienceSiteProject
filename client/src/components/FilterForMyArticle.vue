@@ -35,7 +35,7 @@ function chooseSortParam(){
 <template>
   <div class="d-flex">
     <v-combobox
-        class="mx-3 w-50"
+        class="mx-3 w-66"
         label="Теги"
         :items="props.tagItems"
         :delimiters="delimiters"
@@ -45,7 +45,7 @@ function chooseSortParam(){
         @update:focused="tagChoose"
     ></v-combobox>
     <v-select
-        class="mx-3 w-50"
+        class="mx-3 w-33"
         v-model="sortedValue"
         hint="Оберіть параметр сортування"
         :items="props.sortedOptions"

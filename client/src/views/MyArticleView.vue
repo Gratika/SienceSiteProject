@@ -70,8 +70,8 @@
 
 <template>
   <!--відкрити діалог створення нової статті-->
-  <v-row class="py-10 justify-space-between align-content-center">
-      <v-col cols="6" class="ps-0">
+  <v-row class="pt-10  justify-space-between align-content-center">
+      <v-col cols="8" class="ps-0">
         <FilterForMyArticle
             :sorted-options="articleStore.sortedOptions"
             :tag-items="articleStore.tagItems"
@@ -110,7 +110,7 @@
   </v-row>
 
   <v-row class="justify-center">
-    <v-col cols="12">
+    <v-col cols="12" class="pt-0">
       <v-overlay :model-value="articleStore.isLoading"
                  class="align-center justify-center">
         <v-progress-circular

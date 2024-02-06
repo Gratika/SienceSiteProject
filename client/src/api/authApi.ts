@@ -43,8 +43,7 @@ authApi.interceptors.request.use(
     (config) => {
         // Проверяем, есть ли токен в localStorage
         const token = MyLocalStorage.getItem('token');
-        //console.log("token:");
-       // console.log(token);
+        //console.log("token:", token);
         if (token) {
             // Если есть, добавляем его в заголовок Authorization
             config.headers['Authorization'] = `Bearer ${token}`;

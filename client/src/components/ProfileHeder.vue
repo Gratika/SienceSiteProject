@@ -1,16 +1,15 @@
 <script setup lang="ts">
-  import {computed} from "vue";
-  import  type {ComputedRef} from "vue";
-  import type {IUser} from "@/api/type";
-  import MyLocalStorage from "@/services/myLocalStorage";
+
+  import type {IPeople} from "@/api/type";
   import {useRouter} from "vue-router";
   import {useAuthStore} from "@/stores/authStore";
+  import {object} from "zod";
 
-  const user:ComputedRef<null | IUser>= computed(()=>{
-    let userStorage = MyLocalStorage.getItem('user');
-    if (userStorage == null) return null;
-    return userStorage as IUser;
-  })
+
+  const props = defineProps<{
+    email:String,
+    people:IPeople
+  }>();
   const router = useRouter();
   function goToUserProfile(){
     router.push({ name: 'profile'});
@@ -38,8 +37,8 @@
           Вихід
         </v-chip>
       </div>
-      <div class="general-size info-align username-text-size">{{user?.people_?.surname}} {{user?.people_?.name}} </div>
-      <div class="general-size info-align text-h5">{{user?.email}}</div>
+      <div class="general-size info-align username-text-size">{{people.surname}} {{people.name}} </div>
+      <div class="general-size info-align text-h5">{{email}}</div>
     </div>
 
   </v-col>

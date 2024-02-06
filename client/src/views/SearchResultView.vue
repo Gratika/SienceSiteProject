@@ -65,6 +65,7 @@ function selectSortParam(){
 function tagFiltered(focused:boolean){ //по тегу
   //console.log("tagFilteredFocused=",focused)
   if (!focused){
+    if (selectedTag.value.length==0) tags.value=null;
     selectedTag.value.map((item)=>{
       if (tags.value==null) tags.value=item.trim();
       else tags.value= tags.value+','+item.trim();
@@ -111,9 +112,10 @@ function clearFilters(){ //скинути фільтри
 const currentPage = ref(1); // Поточна сторінка
 const onPageChange = () => {
   // Оновлення поточної сторінки при зміні
-  console.log('currentPage =',currentPage.value)
+  //console.log('currentPage =',currentPage.value)
   articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value, selectedYear.value,
       filterDoi.value,sortedValue.value,tags.value);
+  window.scroll(0,0)
 };
 
 </script>
@@ -128,40 +130,48 @@ const onPageChange = () => {
             color="primary"
         ></v-progress-circular>
       </v-overlay>
-      <v-col cols="3">
+      <v-col cols="12" sm="4">
         <v-combobox
             label="Теги"
             :items="articleStore.tagItems"
             :delimiters="delimiters"
             density="compact"
+            hide-no-data
             v-model="selectedTag"
             multiple
             chips
             @update:focused="tagFiltered"
         ></v-combobox>
       </v-col>
-      <v-col cols="3">
-        <v-text-field
-            label="Рік"
-            density="compact"
-            v-model="selectedYearStr"
-            @update:focused="updateYear"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="3">
+      <v-col cols="12" sm="3">
         <v-select
             v-model="filterDoi"
-            density="compact"
             :items="articleStore.filterOptions"
             item-title="value"
             item-value="key"
             label="Тип"
             @update:focused="selectFilter"
         ></v-select>
-
-
       </v-col>
-      <v-col cols="2">
+      <v-col cols="12" sm="3">
+        <v-select
+            v-model="sortedValue"
+            hint="Оберіть параметр сортування"
+            :items="articleStore.sortedOptions"
+            item-title="value"
+            item-value="key"
+            label="Сортувати"
+            @update:modelValue= "selectSortParam"
+        ></v-select>
+        <!--v-text-field
+            label="Рік"
+            density="compact"
+            v-model="selectedYearStr"
+            @update:focused="updateYear"
+        ></v-text-field-->
+      </v-col>
+
+      <v-col cols="1">
         <div class="d-flex justify-end">
        <span  @click="clearFilters" class="text-h6">
           <u>Очистити</u>
@@ -177,10 +187,10 @@ const onPageChange = () => {
       </v-col-->
     </v-row>
     <v-row class="justify-space-between">
-      <v-col cols="8"  md="6" sm="9">
-          <div class="text-h4">Результати пошуку</div>
+      <v-col cols="12"><!--  md="6" sm="9"-->
+          <div class="text-title">Результати пошуку</div>
       </v-col>
-      <v-col cols="2" md="3" sm="3">
+      <!--v-col cols="2" md="3" sm="3">
         <v-select
             v-model="sortedValue"
             hint="Оберіть параметр сортування"
@@ -190,11 +200,11 @@ const onPageChange = () => {
             label="Сортувати"
             @update:modelValue= "selectSortParam"
         ></v-select>
-      </v-col>
+      </v-col-->
     </v-row>
     <v-row class="justify-center">
       <v-col cols="12" >
-        <div v-if="articleStore.cntRec===0" class="mt-6">
+        <div v-if="articleStore.cntRec===0" class="mt-6 not-found">
           <span class="text-h3">За вашим запитом нічого не знайдено</span>
         </div>
         <div v-else>
@@ -232,6 +242,15 @@ const onPageChange = () => {
 <style scoped>
   .footer-distance{
   min-height: 100px;
+  }
+  .not-found{
+    align-items: center;
+    height: 350px;
+    display: flex;
+    justify-content: center;
+  }
+  .text-title{
+    font-size: 28px;
   }
 
 </style>

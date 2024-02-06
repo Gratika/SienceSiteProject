@@ -119,18 +119,18 @@ namespace apiServer.Controllers.ForModels
                 throw ex;
             }
         }
-        
+
         [HttpGet("GetArticle")]
-        public async Task<ActionResult<FullArticle<Articles>>> GetArticle(string id, string peopleId)
+        public async Task<ActionResult<FullArticle<Articles>>> GetArticle(string id, string? peopleId)
         {
             try
             {
                 FullArticle<Articles> article = new FullArticle<Articles>();
-            article = await _reactionController.GetReactionForArticle<Articles>(id, emojiId, peopleId);
-            article.Articles = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);
-            article.Selected = _context.Selected_articles.Any(a => a.article_id == article.Articles.Id && a.people_id == article.Articles.author_id);
+                article = await _reactionController.GetReactionForArticle<Articles>(id, emojiId, peopleId);
+                article.Articles = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);
+                article.Selected = _context.Selected_articles.Any(a => a.article_id == article.Articles.Id && a.people_id == peopleId);
 
-             return Ok(article);
+                return Ok(article);
             }
             catch (Exception ex)
             {
