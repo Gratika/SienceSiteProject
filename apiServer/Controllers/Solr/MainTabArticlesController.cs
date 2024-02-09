@@ -32,7 +32,7 @@ namespace apiServer.Controllers.Search
             emojiId = "1";
         }
         [HttpGet("NewArticle")]
-        public async Task<ActionResult> NewArticle(int amount) // возвращение статей от новых к старым
+        public async Task<ActionResult> NewArticle(int amount, string? idPeopleForSelect) // возвращение статей от новых к старым
         {
             try
             {
@@ -47,8 +47,8 @@ namespace apiServer.Controllers.Search
                 List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
                 foreach (var article in articles)
                 {
-                    FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
-                    ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
+                    FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, idPeopleForSelect);
+                    ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == idPeopleForSelect);
                     articleAndReactions.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
                 }
 
@@ -60,7 +60,7 @@ namespace apiServer.Controllers.Search
             }
         }
         [HttpGet("PopularArticle")]
-        public async Task<ActionResult> PopularArticle(int amount) // возвращение статей от новых к старым
+        public async Task<ActionResult> PopularArticle(int amount, string? idPeopleForSelect) // возвращение статей от новых к старым
         {
             try
             {
@@ -75,8 +75,8 @@ namespace apiServer.Controllers.Search
                 List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
                 foreach (var article in articles)
                 {
-                    FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
-                    ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == article.author_id);
+                    FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, idPeopleForSelect);
+                    ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == idPeopleForSelect);
                     articleAndReactions.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
                 }
 

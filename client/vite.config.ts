@@ -3,7 +3,9 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import ckeditor5 from '@ckeditor/vite-plugin-ckeditor5';
-import Vuetify  from 'vite-plugin-vuetify';;
+import Vuetify  from 'vite-plugin-vuetify';
+import { createRequire } from 'node:module';
+const require = createRequire( import.meta.url );
 //import vuetify from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/

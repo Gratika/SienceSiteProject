@@ -21,6 +21,7 @@ const filterDoi = ref<number|null>(null);
 const selectedTag = ref<Array<string>>([])//модель для фільтру Теги
 let tags = ref<string|null>(null);//склеєні теги для відправки запиту
 let scienceSectionId = ref<string|null>('');
+let scienceName = ref<string|undefined>('');
 
 const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 
@@ -39,6 +40,7 @@ onMounted(()=>{
   if (isLoginString!=null){
     showSelected.value = isLoginString;
   }
+  scienceName.value = (articleStore.sciences.find(item => item.id===scienceIdSrt.value))?.name
   //формуємо масив тегів
   articleStore.getScienceList();
   window.scroll(0,0);
@@ -160,7 +162,7 @@ const onPageChange = () => {
     </v-row>
     <v-row class="justify-space-between">
       <v-col cols="8"  md="6" sm="9" class="pb-0 mt-3">
-        <div class="text-h4">Статті в категорії </div>
+        <div class="text-h4">Статті в категорії {{scienceName}} </div>
       </v-col>
       <v-col cols="2" md="3" sm="3" class="pb-0 mt-3">
         <v-select

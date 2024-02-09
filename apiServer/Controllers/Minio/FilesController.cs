@@ -1,4 +1,4 @@
-﻿using apiServer.Models;
+﻿    using apiServer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Minio.DataModel.Args;
@@ -40,7 +40,7 @@ namespace apiServer.Controllers.Minio
                 .Build();
             _hostingEnvironment = hostingEnvironment;
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost("AddFiles")]
         public async Task<ActionResult<List<string>>> AddFiles([FromForm] string id, [FromForm] List<IFormFile> files)
         {
@@ -58,7 +58,7 @@ namespace apiServer.Controllers.Minio
                 {
                     bucketName = article.author_.path_bucket;
                 }
-                //Если бакета не существует - добавляем 
+                //Если бакета не существует - добавляем
                 var beArgs = new BucketExistsArgs()
                     .WithBucket(bucketName);
                 bool found = await _minio.BucketExistsAsync(beArgs).ConfigureAwait(false);
@@ -70,7 +70,7 @@ namespace apiServer.Controllers.Minio
                 }
                 if (string.IsNullOrEmpty(article.path_file) == true)
                 {
-                    article.path_file = _genericString.GenerateRandomString(20); // папка для статьи 
+                    article.path_file = _genericString.GenerateRandomString(20); // папка для статьи
                     prefixForArticle[0] = article.path_file;
                 }
 
@@ -86,8 +86,8 @@ namespace apiServer.Controllers.Minio
                         else
                         {
                             fileInWebp = file;
-                        }
-
+                        }    
+                        
                         long currentUtcTime = DateTime.Now.Ticks;
                         string NewFileName = Path.GetFileNameWithoutExtension(fileInWebp.FileName) + "_" + currentUtcTime + Path.GetExtension(fileInWebp.FileName);
 
@@ -96,9 +96,9 @@ namespace apiServer.Controllers.Minio
                             .WithObject(prefixForArticle[0] + "/" + NewFileName)
                             .WithObjectSize(fileInWebp.Length)
                             .WithStreamData(fileInWebp.OpenReadStream());
-                        //.WithContentType(file.ContentType); 
+                        //.WithContentType(file.ContentType);
 
-                        // Выполняем операцию загрузки объекта в <link>MinIO</link> 
+                        // Выполняем операцию загрузки объекта в <link>MinIO</link>
                         await _minio.PutObjectAsync(putObjectArgs);
 
 
@@ -110,7 +110,7 @@ namespace apiServer.Controllers.Minio
                 _context.people.Update(article.author_);
                 _context.SaveChanges();
 
-                return Ok("Файлы успешно добавленны ");
+                return Ok("Файлы успешно добавленны");
             }
             catch (Exception ex)
             {
@@ -152,11 +152,11 @@ namespace apiServer.Controllers.Minio
         {
             try
             {
-                IMinioClient minio = new MinioClient()
-               .WithEndpoint("localhost:9000") //localhost:9090
-               .WithCredentials("ROOTUSER", "CHANGEME123")
-               .WithSSL(false)
-               .Build();
+               // IMinioClient minio = new MinioClient()
+               //.WithEndpoint("localhost:9000") //localhost:9090
+               //.WithCredentials("ROOTUSER", "CHANGEME123")
+               //.WithSSL(false)
+               //.Build();
                 List<string> downloadUrl = new List<string>();
                 string[] path_to_file = path_files.Split(',');
 
@@ -167,7 +167,7 @@ namespace apiServer.Controllers.Minio
                                                      .WithObject(path_to_file[0] + "/" + path_to_file[i])
                                                      .WithExpiry(3600);
 
-                    downloadUrl.Add(await minio.PresignedGetObjectAsync(args));
+                    downloadUrl.Add(await _minio.PresignedGetObjectAsync(args));
                 }
                 return downloadUrl;
             }
@@ -231,7 +231,7 @@ namespace apiServer.Controllers.Minio
                 throw ex;
             }
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost("RedactFiles")]
         public async Task<ActionResult<List<string>>> RedactFiles(string id, List<IFormFile>? files) // создаем файлы из url и записываем в архив
         {
@@ -245,7 +245,7 @@ namespace apiServer.Controllers.Minio
                 throw ex;
             }
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost("DeleteFiles")]
         public async Task<ActionResult> DeleteFiles(string id) // создаем файлы из url и записываем в архив
         {

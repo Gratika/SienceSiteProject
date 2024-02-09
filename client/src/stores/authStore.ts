@@ -98,7 +98,9 @@ export const useAuthStore = defineStore({
                             console.log('push_res=',res);
                         });
                     }else{
+                        if(previousRoute!=='/verify_email')
                         router.push({path: previousRoute});
+                        else router.push({path: '/'});
                     }
 
                 }

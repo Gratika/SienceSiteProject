@@ -37,7 +37,7 @@ namespace apiServer.Controllers.Solr
             {
                 //Filters = new List<int>();
                 //Filters.Add(1);
-                SearchResponse<Articles> searchResponse = await SearchWithOrders(Pages * 10, SearchString, TypeOrder, tags, peopleId);               
+                SearchResponse<Articles> searchResponse = await SearchWithOrders(SearchString, TypeOrder, tags, peopleId);               
 
                     switch (Filters)
                     {
@@ -61,20 +61,22 @@ namespace apiServer.Controllers.Solr
                 searchResponse.Articles = searchResponse.Articles.Where(a => a.theory_id == theoryId).ToList();
             }
 
-            SearchResponse<FullArticle<Articles>> articlesAndReactions = new SearchResponse<FullArticle<Articles>>();
+                SearchResponse<FullArticle<Articles>> articlesAndReactions = new SearchResponse<FullArticle<Articles>>();
                 articlesAndReactions.Articles = new List<FullArticle<Articles>>();
-                articlesAndReactions.allPages = searchResponse.allPages;
-            foreach (var article in searchResponse.Articles)
-            {
-
-                FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(article.Id, emojiId, article.author_id);
-                ar.Selected = _context.Selected_articles.Any(a => a.article_id == article.Id && a.people_id == idPeopleForSelect);
-                articlesAndReactions.Articles.Add(new FullArticle<Articles> { Articles = article, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
-                if (!string.IsNullOrEmpty(scienceId))
-                articlesAndReactions.Sciences = _context.Sciences.FirstOrDefault(a => a.Id == scienceId);
-                articlesAndReactions.Theories = await _context.Scientific_theories.Where(t => t.science_id == scienceId).ToListAsync();
-            }
-                searchResponse.allPages = (double)Math.Ceiling((decimal)articlesAndReactions.Articles.Count / 10);
+                Pages *= 10;
+                for (int i = Pages; i < Pages + 10; i++)
+                {
+                    if (searchResponse.Articles.Count > i)
+                    {
+                        FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(searchResponse.Articles[i].Id, emojiId, idPeopleForSelect);
+                        ar.Selected = _context.Selected_articles.Any(a => a.article_id == searchResponse.Articles[i].Id && a.people_id == idPeopleForSelect);
+                        articlesAndReactions.Articles.Add(new FullArticle<Articles> { Articles = searchResponse.Articles[i], Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
+                        if (!string.IsNullOrEmpty(scienceId))
+                            articlesAndReactions.Sciences = _context.Sciences.FirstOrDefault(a => a.Id == scienceId);
+                        articlesAndReactions.Theories = await _context.Scientific_theories.Where(t => t.science_id == scienceId).ToListAsync();
+                    }
+                }
+                articlesAndReactions.allPages = (double)Math.Ceiling((decimal)articlesAndReactions.Articles.Count / 10);
                 return Ok(articlesAndReactions);
             }
             catch (Exception ex)
@@ -83,7 +85,7 @@ namespace apiServer.Controllers.Solr
             }
         }
         [HttpGet("SearchWithOrders")]
-        public async Task<SearchResponse<Articles>> SearchWithOrders( int Pages, string? SearchString, int? TypeOrder, string? tags,string? peopleId) // возвращение по наибольшему числу просмотров
+        public async Task<SearchResponse<Articles>> SearchWithOrders(string? SearchString, int? TypeOrder, string? tags,string? peopleId) // возвращение по наибольшему числу просмотров
         {
             try
             {
@@ -91,31 +93,21 @@ namespace apiServer.Controllers.Solr
                 {
                     SearchString = "*";
                 }
-                List<Articles> articles = _searchController.Search(SearchString, tags, peopleId);
+                SearchResponse<Articles> searchResponse = new SearchResponse<Articles>();
+                searchResponse.Articles = _searchController.Search(SearchString, tags, peopleId);
 
                 switch (TypeOrder)
                 {
                     case 10:
-                        articles = _orderingController.FromNewToOld(articles);
+                        searchResponse.Articles = _orderingController.FromNewToOld(searchResponse.Articles);
                         break;
                     case 11:
-                        articles = _orderingController.FromOldToNew(articles);
+                        searchResponse.Articles = _orderingController.FromOldToNew(searchResponse.Articles);
                         break;
                     case 12:
-                        articles = _orderingController.ForViews(articles);
+                        searchResponse.Articles = _orderingController.ForViews(searchResponse.Articles);
                         break;
                 }
-                List<Articles> tenArticle = new List<Articles>();            
-                for (int i = Pages; i < Pages + 10; i++)
-                {
-                    if (articles.Count > i)
-                    {
-                        tenArticle.Add(articles[i]);
-                        
-                    }
-                }
-                SearchResponse<Articles> searchResponse = new SearchResponse<Articles>();                
-                searchResponse.Articles = tenArticle;
 
                 return searchResponse;
             }
