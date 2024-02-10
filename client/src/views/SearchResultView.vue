@@ -2,8 +2,7 @@
 
 import ArticleItem from "@/components/ArticleItem.vue";
 import {useArticleStore} from "@/stores/articleStore";
-import type {ISelectedArticle} from "@/api/type";
-import {computed, onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch} from "vue";
 import {useRoute} from "vue-router";
 import MyLocalStorage from "@/services/myLocalStorage";
 
@@ -39,6 +38,7 @@ onMounted(()=>{
   }
   //формуємо масив тегів
   articleStore.getScienceList();
+  window.scroll(0,0)
 })
 watch(
     () => route.params,
@@ -70,8 +70,8 @@ function tagFiltered(focused:boolean){ //по тегу
       if (tags.value==null) tags.value=item.trim();
       else tags.value= tags.value+','+item.trim();
     })
-    tags.value = tags.value? tags.value?.substring(1):'';
-    console.log('tags =', tags.value)
+    //tags.value = tags.value? tags.value?.substring(1):'';
+    //console.log('tags =', tags.value)
     articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value,selectedYear.value,
         filterDoi.value,sortedValue.value,tags.value);
   }
@@ -93,7 +93,7 @@ function updateYear(focused:boolean){
 function selectFilter(focused:boolean){//по типу статті (наукові, ненаукові)
   console.log("selectFilterFocused=",focused)
   if (!focused){
-    console.log("filterDoi=",filterDoi.value)
+    //console.log("filterDoi=",filterDoi.value)
     articleStore.searchArticlesByParam(currentPage.value-1,searchSrt.value, selectedYear.value,
         filterDoi.value,sortedValue.value,tags.value);
 
@@ -173,7 +173,7 @@ const onPageChange = () => {
 
       <v-col cols="1">
         <div class="d-flex justify-end">
-       <span  @click="clearFilters" class="text-h6">
+       <span  @click="clearFilters" class="text-h6 cursor-pointer">
           <u>Очистити</u>
        </span>
         </div>
@@ -240,6 +240,9 @@ const onPageChange = () => {
 </template>
 
 <style scoped>
+  .cursor-pointer {
+    cursor: pointer;
+  }
   .footer-distance{
   min-height: 100px;
   }

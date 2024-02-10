@@ -19,7 +19,7 @@ namespace apiServer.Controllers.ForModels
         {
             _context = context;
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost("AddReaction")]
         public ActionResult AddReaction(Reactions reaction)
         {

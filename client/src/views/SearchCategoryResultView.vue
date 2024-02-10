@@ -60,7 +60,7 @@ function tagFiltered(focused:boolean){ //по тегу
       if (tags.value==null) tags.value=item.trim();
       else tags.value= tags.value+','+item.trim();
     })
-    tags.value = tags.value? tags.value?.substring(1):null;
+    //tags.value = tags.value? tags.value?.substring(1):null;
     //console.log('tags =', tags.value)
     articleStore.searchArticlesByParam( currentPage.value-1,undefined, /*selectedYear.value*/undefined,
         filterDoi.value,sortedValue.value,tags.value, undefined,scienceIdSrt.value, scienceSectionId.value);

@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import type {IArticleResponse, IArticle, IPeople, IScience, IScientificTheory, IUser} from "@/api/type";
+import type {IArticleResponse, IArticle, IPeople, IScience, IScientificTheory, INewArticleModel} from "@/api/type";
 import {onMounted, ref, watch} from "vue";
 import {useField, useForm} from "vee-validate";
 import {useArticleStore} from "@/stores/articleStore";
 import MyLocalStorage from "@/services/myLocalStorage";
-import {createToast} from "mosha-vue-toastify";
-import MySnackbars from "@/components/MySnackbars.vue";
 import Swal from "sweetalert2";
 import {showErrorMessage} from "@/api/authApi";
+import {useLayoutStore} from "@/stores/layoutStore";
+import router from "@/router";
+import {useAuthStore} from "@/stores/authStore";
 
 
 const props = defineProps<{
@@ -15,6 +16,7 @@ const props = defineProps<{
   scienceSectionList:IScientificTheory[]
   }>()
 const articleStore = useArticleStore();
+const layoutStore = useLayoutStore();
 const emits = defineEmits(['close']);
 const dialogShow = ref(false);//відображення діалогового вікна
 const scienceId = ref('');//id обраної наукової сфери
@@ -48,8 +50,23 @@ let scienceTheory = ref<IScientificTheory|undefined>({
   science_: null,
   name: '',
   note: ''
+});
+//відновити данні з Pinia
+function restoreLayout(){
+  let saveData = layoutStore.restoreLayoutNewArticle();
+  if (saveData !==null){
+    article.value=saveData.article_;
+    scienceId.value = saveData.scienceId;
+    theory_id.value.value = saveData.article_.theory_id;
+    title.value.value = saveData.article_.title;
+    article.value.doi = saveData.article_.doi;
+    tag.value.value = saveData.article_.tag?.split(',');
+    layoutStore.saveLayoutNewArticle(null);
+  }
+}
+onMounted(()=>{
+  restoreLayout();
 })
-
 //отримуємо значення author_id  з localStorage
 function  getAuthorId():string|null {
   let peopleId = MyLocalStorage.getItem('peopleId');
@@ -94,12 +111,13 @@ watch([scienceId],([newScienceId])=>{
   theory_id.value.value=null;
   if (newScienceId!=null && newScienceId!=''){
     isEditing.value = true;
-    console.log('props.scienceSectionList=',props.scienceSectionList)
+    //console.log('props.scienceSectionList=',props.scienceSectionList)
     scienceSectionList_.value = props.scienceSectionList.filter(s=>s.science_id.trim()==newScienceId.trim())
-    console.log('scienceSectionList_=',scienceSectionList_.value)
+    //console.log('scienceSectionList_=',scienceSectionList_.value)
   }else isEditing.value = false;
 })
 watch([theory_id],([newTheory_id])=>{
+  console.log('newTheory_id', newTheory_id.value.value)
   if (newTheory_id && newTheory_id.value.value!=null && newTheory_id.value.value!=''){
     console.log('newTheory_id', newTheory_id.value.value)
     scienceTheory.value = props.scienceSectionList.find(s=>s.id==newTheory_id.value.value)
@@ -145,9 +163,24 @@ const submitArticle= handleSubmit(()=>{
           title: 'Помилка при збереженні статті',
           text: showErrorMessage(err)
         });
+        if('name' in err
+            && err.name==='AxiosError'
+            && err.response?.status===401){
+          console.log('saveArticleLayout = ', article.value);
+          saveLayout(article.value);
+          useAuthStore().delUserData();
+          router.push('/login');
+        }
       });
 
-})
+});
+function saveLayout(article:IArticle){
+  let saveData:INewArticleModel={
+    scienceId: scienceId.value,
+    article_:article
+  }
+  layoutStore.saveLayoutNewArticle(saveData);
+}
 function processTags(data:string|null):string|null {
   if (data !== null) {
     if (data.endsWith(',') || data.endsWith('#'))

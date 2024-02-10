@@ -76,7 +76,8 @@ namespace apiServer.Controllers.Solr
                         articlesAndReactions.Theories = await _context.Scientific_theories.Where(t => t.science_id == scienceId).ToListAsync();
                     }
                 }
-                articlesAndReactions.allPages = (double)Math.Ceiling((decimal)articlesAndReactions.Articles.Count / 10);
+                articlesAndReactions.allPages = (double)Math.Ceiling((decimal)searchResponse.Articles.Count / 10);
+                
                 return Ok(articlesAndReactions);
             }
             catch (Exception ex)

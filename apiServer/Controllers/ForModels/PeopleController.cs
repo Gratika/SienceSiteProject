@@ -71,7 +71,8 @@ namespace apiServer.Controllers.ForModels
 
             return people;
         }
-        //[Authorize]
+       
+        [Authorize]
         [HttpPost("RedactPeople")]
         public ActionResult RedactPeople(People people)
         {

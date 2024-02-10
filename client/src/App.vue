@@ -34,7 +34,7 @@ const isVerifPage = computed(() => {
        <RouterView />
     </v-main>
 
-    <v-footer v-if="!isNotFoundPage && !isDevelopmentPage && !isLoginPage && !isVerifPage" class="pa-0">
+    <v-footer v-if="!isNotFoundPage && !isDevelopmentPage && !isLoginPage && !isVerifPage" class="pa-0 ma-0">
       <Footer/>
     </v-footer>
 

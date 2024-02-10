@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {isReadonly, onBeforeMount, onMounted, ref} from "vue";
+import {onBeforeMount, onMounted, ref} from "vue";
 import Swal from 'sweetalert2'
 import {useArticleStore} from "@/stores/articleStore";
 import RichTextEditor from "@/components/RichTextEditor.vue";
@@ -9,6 +9,8 @@ import type { Ref} from "vue"
 import {useField, useForm} from "vee-validate";
 import MyLocalStorage from "@/services/myLocalStorage";
 import {showErrorMessage} from "@/api/authApi";
+import {useLayoutStore} from "@/stores/layoutStore";
+import {useAuthStore} from "@/stores/authStore";
  //отримуємо id статті з роута
 const  route = useRoute();
 const router = useRouter();
@@ -36,29 +38,25 @@ const article = ref<IArticle>({
 })
 const delimiters = ['#',','] //масив рядків, що будуть створювати новий тег при вводі
 const articleStore = useArticleStore();
- const editorReadOnly = false;
- const initContent = ref('');
- const listFile=ref<string|null>(null);
- const draftIsActive = ref(false);
- const peopleId = MyLocalStorage.getItem('peopleId');
- const isReady = ref(false);
- onBeforeMount(()=>{
-   if(typeof id==='string'){
-     articleStore.getArticle(id,peopleId).then((res)=>{
-       if(res!==undefined){
-         article.value = res
-         if(res.text!=null)
-           initContent.value=res.text;
-         console.log('initContent_Edit =',initContent.value)
-         title.value.value = res.title;
-         tag.value.value = res.tagItems;
-         draftIsActive.value = res.isActive;
-         listFile.value = substrUserFolder(res.path_file);
-         isReady.value=true;
-       }
-     })
-   }
- })
+const layoutStore = useLayoutStore();
+const editorReadOnly = false;
+const initContent = ref('');
+const listFile=ref<string|null>(null);
+const draftIsActive = ref(false);
+const peopleId = MyLocalStorage.getItem('peopleId');
+const isReady = ref(false);
+onBeforeMount(()=>{
+  if (!restoreLayout()) {
+    if (typeof id === 'string') {
+      articleStore.getArticle(id, peopleId).then((res) => {
+        if (res !== undefined) {
+          initialContent(res);
+          listFile.value = substrUserFolder(res.path_file);
+        }
+      })
+    }
+  }
+ });
 onMounted(()=>{
   window.scroll(0,0)
 })
@@ -83,7 +81,27 @@ const  tag = useField('tag');
 
 function saveContent(articleText: string){
   article.value.text = articleText
+}
+function initialContent(res:IArticle){
+  article.value = res;
+  if (res.text != null)
+    initContent.value = res.text;
+  //console.log('initContent_Edit =', initContent.value)
+  title.value.value = res.title;
+  tag.value.value = res.tagItems;
+  draftIsActive.value = res.isActive;
+  isReady.value = true;
 
+}
+function restoreLayout():boolean{
+  let saveData = layoutStore.restoreLayoutEditArticle();
+  if (saveData !==null){
+    initialContent(saveData);
+    listFile.value = saveData.path_file;
+    layoutStore.saveLayoutEditArticle(null);
+    return true;
+  }
+  return false;
 }
 const validateArticle=()=>{
   if (typeof title.value.value === "string") {
@@ -98,6 +116,9 @@ const validateArticle=()=>{
   })
   article.value.tag = tagString;
 }
+function saveLayout(saveData:IArticle){
+  layoutStore.saveLayoutEditArticle(saveData);
+}
 //публікація відредагованної статті
 const submitArticle= handleSubmit(()=>{//публікація
   validateArticle();
@@ -107,7 +128,18 @@ const submitArticle= handleSubmit(()=>{//публікація
       .then((res)=>{
          router.push({ name: 'read_article', params: { id: article.value.id }});
       }).catch((error)=>{
-         console.log('public article=',error)
+          Swal.fire({
+          icon: 'error',
+          title: 'Помилка під час публікації статті',
+          text: showErrorMessage(error)
+          });
+         if('name' in error
+              && error.name==='AxiosError'
+              && error.response?.status===401){
+           saveLayout(article.value);
+           useAuthStore().delUserData();
+           router.push('/login');
+         }
       });
 
 })
@@ -124,7 +156,18 @@ const saveDraftArticle = handleSubmit(()=>{//зберегти чернетку
           text: ''
         });
       }).catch((error)=>{
-    console.log('public article=',error)
+         Swal.fire({
+           icon: 'error',
+           title: 'Помилка під час збереження статті',
+           text: showErrorMessage(error)
+         });
+        if('name' in error
+             && error.name==='AxiosError'
+             && error.response?.status===401){
+         saveLayout(article.value);
+         useAuthStore().delUserData();
+         router.push('/login');
+        }
   });
 });
 
@@ -165,6 +208,12 @@ const uploadFiles = () => {
       title: 'Помилка збереження файлу',
       text: showErrorMessage(err)
     });
+    if('name' in err
+        && err.name==='AxiosError'
+        && err.response?.status===401){
+      useAuthStore().delUserData();
+      router.push('/login');
+    }
   })
 
 }
@@ -228,7 +277,7 @@ function substrUserFolder(filePatch:string|null):string|null{
                       variant="outlined"
                   ></v-combobox>
                   <span class="text-h6 d-inline">Текст статті</span>
-                  <v-sheet border v-if="isReady" class="mt-2 pa-5">
+                  <v-sheet border v-if="isReady" class="mt-2 pa-5 text-h6">
                     <RichTextEditor
                         :initialContent="initContent"
                         :is-read-only="editorReadOnly"

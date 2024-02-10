@@ -12,7 +12,7 @@ namespace apiServer.Controllers.ForModels
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class Selected_articlesController : ControllerBase
     {
         private readonly ArhivistDbContext _context;
@@ -32,7 +32,7 @@ namespace apiServer.Controllers.ForModels
         {
             try
             {
-                var selArticle = await _context.Selected_articles.Where(a => a.people_id == idPeople).Include(a => a.people_).Include(a => a.article_).Skip(page * 10).Take(10).ToListAsync();
+                var selArticle = await _context.Selected_articles.Where(a => a.people_id == idPeople).Include(a => a.people_)./*Include(a => a.article_).*/Skip(page * 10).Take(10).ToListAsync();
 
                 SearchResponse<FullArticle<Selected_articles>> articlesAndReactions = new SearchResponse<FullArticle<Selected_articles>>();
                 articlesAndReactions.Articles = new List<FullArticle<Selected_articles>>();
@@ -41,12 +41,14 @@ namespace apiServer.Controllers.ForModels
                 foreach (var oneSelectArticles in selArticle)
                 {
 
+                    oneSelectArticles.article_ = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == oneSelectArticles.article_id);
                     FullArticle<Articles> ar = await _reactionController.GetReactionForArticle<Articles>(oneSelectArticles.Id, emojiId, oneSelectArticles.article_.author_id);
                     ar.Selected = true;
                     articlesAndReactions.Articles.Add(new FullArticle<Selected_articles> { Articles = oneSelectArticles, Emotion = ar.Emotion, CountReactions = ar.CountReactions, Selected = ar.Selected });
 
                 }
                 return Ok(articlesAndReactions);
+                //return Ok(selArticle);
             }
             catch (Exception ex)
             {

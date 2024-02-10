@@ -6,6 +6,9 @@ import moment from "moment/moment";
 
 import {computed, ref} from "vue";
 import Like from "@/components/Like.vue";
+import Swal from "sweetalert2";
+import {showErrorMessage} from "@/api/authApi";
+import {useAuthStore} from "@/stores/authStore";
 
 //пропси від батьківського елементу
 const props = defineProps<{
@@ -85,14 +88,38 @@ function changeArticleSelect(){
           .then(() => {
             isSelected.value = false
           })
-          .catch((err) => {
-            console.log(err)
+          .catch((error) => {
+            console.log(error)
+            if('name' in error
+                && error.name==='AxiosError'
+                && error.response?.status===401) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Помилка авторизації',
+                text: showErrorMessage(error)
+              });
+              useAuthStore().delUserData();
+              router.push('/login');
+            }
           });
     }
   }else{
     articleStore.addToFavorites(article_id)
         .then(()=>{isSelected.value=true})
-        .catch((err)=>{console.log(err)});
+        .catch((error)=>{
+          console.log(error);
+          if('name' in error
+              && error.name==='AxiosError'
+              && error.response?.status===401) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Помилка авторизації',
+              text: showErrorMessage(error)
+            });
+            useAuthStore().delUserData();
+            router.push('/login');
+          }
+        });
   }
 
 }

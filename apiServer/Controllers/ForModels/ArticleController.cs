@@ -41,7 +41,7 @@ namespace apiServer.Controllers.ForModels
             _tokensController = tokensController;
             emojiId = "1";
         }
-        //[Authorize]
+        [Authorize]
         [HttpGet("GetArticlesForUser")]
         public async /*Task<ActionResult>*/Task<List<FullArticle<Articles>>> GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
         {
@@ -73,7 +73,7 @@ namespace apiServer.Controllers.ForModels
                throw ex;
             }
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost("CreateArticle")]
         public async Task<ActionResult> CreateArticle(Articles? article) // Создание статьи
         {
@@ -137,7 +137,7 @@ namespace apiServer.Controllers.ForModels
                 throw ex;
             }
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost("RedactArticle")]
         public async Task<ActionResult> RedactArticle(/*IFormFile? file1, IFormFile? file2,*/ Articles article/*, string id, string title, string pathFile, string pathBucket*/)
         {
@@ -161,7 +161,7 @@ namespace apiServer.Controllers.ForModels
                 throw ex;
             }        
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost("DeleteArticle")]
         public async Task<ActionResult> DeleteArticle(Articles article)
         {
@@ -232,7 +232,7 @@ namespace apiServer.Controllers.ForModels
                 throw ex;
             }          
         }
-        //[Authorize]
+        [Authorize]
         [HttpGet("PublicationArticle")]
         public void PublicationArticle(string articleId)
         {

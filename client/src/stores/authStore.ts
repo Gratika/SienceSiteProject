@@ -59,7 +59,18 @@ export const useAuthStore = defineStore({
             signUpUserFn(user).then(
                 res=>{
                    MyLocalStorage.setItem('email', user.email);
-                   router.push('/verify_email');
+                   router.push('/verify_email')
+                       .catch((err)=>{
+                          router.push('/')
+                              .then(()=>{
+                                  Swal.fire({
+                                      icon: 'info',
+                                      title: 'Схоже, проблем з реєстрацією не виникло.',
+                                      text: 'Увійдіть у свій профіль, скориставшись своїми реєстраційними даними'
+                                  });
+                              })
+
+                       });
                 }
             ).catch((error) => {
                 console.log('error=',error);
@@ -122,18 +133,7 @@ export const useAuthStore = defineStore({
             //logoutUserFn().then(
               //  res=>{
                     //console.log(res.message);
-                    this.token = '';
-                    this.username = '';
-                    this.isLogin =false;
-                    this.authUser =null;
-                    MyLocalStorage.setItem('token',this.token);
-                    MyLocalStorage.setItem('username',this.username);
-                    MyLocalStorage.setItem('isLogin',this.isLogin);
-                    MyLocalStorage.setItem('user','');
-                    MyLocalStorage.setItem('userId','');
-                    MyLocalStorage.setItem('peopleId','');
-                    MyLocalStorage.setItem('email','');
-                    MyLocalStorage.setItem('bucketName', '');
+                    this.delUserData();
                     router.push({path:'/'})
 
                // }
@@ -153,6 +153,11 @@ export const useAuthStore = defineStore({
                     router.push('/login');
                 }).catch(err=>{
                 this.isLoading = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Помилка при перевірці email',
+                    text: showErrorMessage(err)
+                });
                 console.log('error from onVerifEmail: ',err);
             })
         },
@@ -185,34 +190,29 @@ export const useAuthStore = defineStore({
             }
         },
         async onUpdateUser( updatePeople:IPeople, email:string){
+           try{
+               const res = await sendRequest<string>(
+                   'POST',
+                   'people/redactPeople',
+                   undefined,
+                   updatePeople
+               );
+               //console.log('user email=', email)
+               if(this.authUser !== null ) {
+                   this.authUser.email = email;
+                   MyLocalStorage.setItem('email', email);
+               }
 
-            sendRequest<string>(
-                    'POST',
-                    'people/redactPeople',
-                    undefined,
-                updatePeople
-            ).then(res=>{
-                console.log('user email=', email)
-                if(this.authUser !== null ) {
-                    this.authUser.email = email;
-                    MyLocalStorage.setItem('email', email);
-                }
+               Swal.fire({
+                   icon: 'info',
+                   title: res ? res : 'Виконано',
+                   text: ''
+               });
+           }catch (error){
+               //console.log('error login=', error);
+               throw error;
+           }
 
-                Swal.fire({
-                    icon: 'info',
-                    title: res ? res : 'Виконано',
-                    text: ''
-                });
-
-
-            }).catch(error => {
-                console.log('error login=', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Помилка при збереженні даних користувача',
-                    text: showErrorMessage(error)
-                });
-            })
         },
         async onSaveAvatar( imageData:FormData){
             console.log("imageData = ", imageData)
@@ -227,6 +227,20 @@ export const useAuthStore = defineStore({
                 //showErrorMessage(error);
             })*/
         },
+        delUserData(){
+            this.token = '';
+            this.username = '';
+            this.isLogin =false;
+            this.authUser =null;
+            MyLocalStorage.setItem('token',this.token);
+            MyLocalStorage.setItem('username',this.username);
+            MyLocalStorage.setItem('isLogin',this.isLogin);
+            MyLocalStorage.setItem('user','');
+            MyLocalStorage.setItem('userId','');
+            MyLocalStorage.setItem('peopleId','');
+            MyLocalStorage.setItem('email','');
+            MyLocalStorage.setItem('bucketName', '');
+        }
 
     }
 });

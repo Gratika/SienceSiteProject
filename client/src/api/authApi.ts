@@ -10,6 +10,7 @@ import type {
 } from './type';
 import MyLocalStorage from "@/services/myLocalStorage";
 import {ServerBadRequestError} from "@/api/appException";
+import {useRouter} from "vue-router";
 
 
 const BASE_URL:string = '/api/';
@@ -31,11 +32,7 @@ const authApi = axios.create({
 //функція для оновлення токену, у випадку якщо його термін сплив
 export const refreshAccessTokenFn = async () => {
     const response = await authApi.get<ILoginResponse>('auth/refresh');
-    if(response.status==200)return response.data;
-    else {
-        console.log("BadRequest=",response.data)
-        throw new ServerBadRequestError(response.status,JSON.stringify(response.data))
-    }
+    return response.data;
 };
 //перехоплювач (interceptors) відповідей чи запитів axios (до того як вони будуть опрацьована then або catch)
 //автоматично виконується до запитів та після отримання відповіді
@@ -59,24 +56,17 @@ authApi.interceptors.request.use(
     }
 );
 /*authApi.interceptors.response.use(
-    //якщо отримали відповідь, то повертаємо її
+    // Успішна відповідь від сервера
     (response) => {
         return response;
     },
-    //якщо сервер відповів помилкою
+    // Помилка від сервера
     async (error) => {
-        console.log(error);
         const originalRequest = error.config;
-        let errMessage = ''
-        if (error.response?.data) {
-          errMessage = error.response.data as string
-        }else{
-          errMessage = error.message;
-        }
-        if (errMessage.includes('not logged in') && !originalRequest._retry) { //яка містить 'not logged in'
-            originalRequest._retry = true;
-            await refreshAccessTokenFn(); //викликаємо функцію оновлення токена
-            return authApi(originalRequest);
+        // Перевірка, чи відповідь сервера має код 401
+        if (error.response && error.response.status === 401) {
+            // Перенаправлення на сторінку логіну
+            await router.push('/login');
         }
         return Promise.reject(error);
     }
@@ -142,6 +132,9 @@ export function showErrorMessage ( error:any):string{
     if('name' in error && error.name==='AxiosError'){
         if(error.response?.status===502){
             return 'На сервері виникла тимчасова помилка. Спробуйте пізніше'
+        }
+        if(error.response?.status===401){
+            return 'Термін дії вашого токену закінчився. Потрібна авторизація'
         }
         if (error?.response && error?.response.data ) {
             if (typeof  error.response.data ==='string')

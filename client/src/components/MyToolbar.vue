@@ -68,7 +68,12 @@ function onShowSearchStr(){
       <v-toolbar class="pa-2" density="compact">
         <v-container class="my-container">
           <div class="d-inline-flex justify-start align-center flex-wrap flex-row">
-            <v-avatar   size="32" class="me-3" image="Icon.png"></v-avatar>
+            <v-avatar   size="32" class="me-3">
+              <v-img
+                  src="Icon.png"
+                  alt="S"
+              ></v-img>
+            </v-avatar>
               <v-toolbar-title class="me-3 logo-text myClickableObject" @click="returnHome">
                 SсiFindHub
               </v-toolbar-title>
@@ -121,7 +126,17 @@ function onShowSearchStr(){
             >
               Вхід
             </v-btn>
-            <v-avatar v-else image="avatar.png" size="small" class="mx-1 myClickableObject" @click="goToUserOffice"></v-avatar>
+            <v-avatar
+                v-else
+                size="small"
+                class="mx-1 myClickableObject"
+                @click="goToUserOffice"
+            >
+              <v-img
+                  src="avatar.png"
+                  alt="K"
+              ></v-img>
+            </v-avatar>
           </div>
         </v-container>
       </v-toolbar>

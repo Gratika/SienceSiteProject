@@ -76,7 +76,7 @@ namespace apiServer.Controllers.Authentication
                 //Проверка уникальности пользователя по паролю и email
                 if (await IsUserUnique(FirstEx) == 0)
                 {
-                    return Ok("Пользователь с таким логином, паролем или email уже существует.");
+                    return BadRequest("Пользователь с таким логином, паролем или email уже существует.");
                 }
                 else
                 {

@@ -43,6 +43,7 @@ onMounted(()=>{
       });
   if(authStore.authUser)
     email.value = authStore.authUser.email;
+  window.scroll(0,0);
 });
 function formatDate(date: null | string): string {
   console.log('date=',date)

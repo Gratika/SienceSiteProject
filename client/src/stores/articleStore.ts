@@ -12,6 +12,8 @@ import type {
 import {sendRequest, showErrorMessage} from '@/api/authApi';
 import MyLocalStorage from "@/services/myLocalStorage";
 import Swal from "sweetalert2";
+import router from "@/router";
+import {useAuthStore} from "@/stores/authStore";
 
 
 export type ArticleStoreState = {
@@ -146,7 +148,7 @@ export const useArticleStore = defineStore({
                         page:page
                     }
                 );
-                console.log("mySelectedArticles=", res);
+                //console.log("mySelectedArticles=", res);
                 this.articles=[];
                 res?.articles?.map(item=>{
                     //перетворюємо IFullArticle<ISelectedArticle> в IFullArticle<IArticle>
@@ -168,10 +170,21 @@ export const useArticleStore = defineStore({
                 if(res!==undefined && res.allPages!==undefined)
                    this.totalPage=res.allPages;
                 else this.totalPage=1;
-            }catch (error) {
+            }catch (error:any) {
                 console.error(error);
                 this.totalPage=1;
                 this.cntRec=0;
+                if('name' in error
+                    && error.name==='AxiosError'
+                    && error.response?.status===401){
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Помилка авторизації',
+                        text: showErrorMessage(error)
+                    });
+                    useAuthStore().delUserData();
+                    router.push('/login');
+                }
             }finally {
                 this.isLoading =false;
             }
@@ -251,29 +264,24 @@ export const useArticleStore = defineStore({
             let data = new FormData();
             data.set('ArticleId',ArticleId);
             data.set('PeopleId', peopleId);
-            sendRequest<GenericResponse>(
-                'POST',
-                'selected_articles/addSelectArticle',
-                undefined,
-                data)
-                .then((res)=>{
-                    let article =this.articles.find(item=>item.id===ArticleId)
-                    if(article?.selected!==undefined) article.selected=true;
-                    Swal.fire({
-                        icon: 'info',
-                        title: res ? res : 'Виконано',
-                        text: ''
-                    });
-                    console.log(res);
-                }, (error) =>{
-                    console.log(error)
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Не вдалося додати статтю до обраного',
-                        text: showErrorMessage(error)
-                    });
-                    throw error
+            try{
+                const res = await sendRequest<GenericResponse>(
+                    'POST',
+                    'selected_articles/addSelectArticle',
+                    undefined,
+                    data
+                );
+                let article =this.articles.find(item=>item.id===ArticleId)
+                if(article?.selected!==undefined) article.selected=true;
+                Swal.fire({
+                    icon: 'info',
+                    title: res ? res : 'Виконано',
+                    text: ''
                 });
+                //console.log(res);
+            }catch(error){
+                throw error
+            }
         },
         //вилучити статтю з обраного
         async deleteFromFavorites(ArticleId:string){
@@ -281,19 +289,13 @@ export const useArticleStore = defineStore({
                 const res= await this.deleteUserFavorites(ArticleId)
                 let article =this.articles.find(item=>item.id===ArticleId)
                 if(article?.selected!==undefined) article.selected=false;
-                console.log(res);
+                //console.log(res);
                 Swal.fire({
                     icon: 'info',
                     title: res,
                     text: ''
                 });
             }catch(error){
-                console.log(error)
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Не вдалося вилучити статтю з обраного',
-                    text: showErrorMessage(error)
-                });
                 throw error;
             }
 
@@ -310,14 +312,21 @@ export const useArticleStore = defineStore({
                     text: ''
                 });
                 this.articles = this.articles.filter(item=>item.id!==ArticleId)
-            }catch(error){
+            }catch(error:any){
                 console.log(error)
                 Swal.fire({
                     icon: 'error',
                     title: 'Не вдалося вилучити статтю з обраного',
                     text: showErrorMessage(error)
                 });
-                throw error;
+                if('name' in error
+                    && error.name==='AxiosError'
+                    && error.response?.status===401){
+                  useAuthStore().delUserData();
+                  router.push('/login');
+                }
+
+                //throw error;
             }
         },
         //отримати перелік наукових сфер
@@ -379,38 +388,22 @@ export const useArticleStore = defineStore({
                     undefined,
                     newArticle
                 );
-                console.log("saveArticles =", res);
+               // console.log("saveArticles =", res);
                 /*this.articles=[];
                 this.transformArticleAndReactionToListArticle(res.articles);
                 this.cntRec=this.articles?.length;*/
+                this.isLoading=false;
                 return res;
 
             }catch (error) {
-                console.log('error from SaveArticle:', error);
-                throw error;
-            }finally {
                 this.isLoading=false;
+               // console.log('error from SaveArticle:', error);
+                throw error;
             }
 
         },
         //опублікувати статтю (при натисканні на кнопку на картці статті)
-        async publicationArticle(articleId:string):Promise<void> {
-            try{
-                this.isLoading=true;
-                 await sendRequest<IArticleResponse>(
-                    'Get',
-                    'article/publicationArticle',
-                    {'articleId':articleId}
 
-                );
-
-            }catch (error) {
-                throw error;
-            }finally {
-                this.isLoading=false;
-            }
-
-        },
         async updateArticle(article:IArticle):Promise<string> {
             try{
                 this.isLoading=true;
@@ -420,18 +413,13 @@ export const useArticleStore = defineStore({
                     undefined,
                     article
                 );
-                console.log("updateArticles:", res);
+                //console.log("updateArticles:", res);
+                this.isLoading =false;
                 return res
             }catch (error) {
                 //console.error(error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Помилка при збереженні статті',
-                    text: showErrorMessage(error)
-                });
-                throw error;
-            }finally {
                 this.isLoading =false;
+                throw error;
             }
 
         },
@@ -446,20 +434,26 @@ export const useArticleStore = defineStore({
                 );
                 this.articles = this.articles.filter(item=>item.id!=delArticle.id);
                 console.log("delArticle = ", res);
+                this.isLoading =false;
                 Swal.fire({
                     icon: 'info',
                     title: res,
                     text: ''
                 });
-            }catch (error) {
-                console.error(error);
+            }catch (error:any) {
+                //console.error(error);
+                this.isLoading =false;
                 await Swal.fire({
                     icon: 'error',
                     title: 'Помилка при видаленні статті',
                     text: showErrorMessage(error)
                 });
-            }finally {
-                this.isLoading =false;
+                if('name' in error
+                    && error.name==='AxiosError'
+                    && error.response?.status===401){
+                    useAuthStore().delUserData();
+                    router.push('/login');
+                }
             }
 
         },

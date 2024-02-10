@@ -2,17 +2,52 @@
 import { onMounted, ref} from 'vue';
 import { ClassicEditor } from '@ckeditor/ckeditor5-editor-classic';
 import { Essentials } from '@ckeditor/ckeditor5-essentials';
-import { Bold, Italic, Subscript, Superscript, Underline} from '@ckeditor/ckeditor5-basic-styles';
-import { Link } from '@ckeditor/ckeditor5-link';
-import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
+import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
+import { FontColor } from '@ckeditor/ckeditor5-font';
+import { CodeBlock } from '@ckeditor/ckeditor5-code-block';
+import { Bold, Italic, Subscript, Superscript, Underline,Code} from '@ckeditor/ckeditor5-basic-styles';
 import { Font } from '@ckeditor/ckeditor5-font';
 import {Alignment} from "@ckeditor/ckeditor5-alignment";
 import {Heading} from "@ckeditor/ckeditor5-heading";
-import {GeneralHtmlSupport} from "@ckeditor/ckeditor5-html-support";
-import {List, ListProperties} from "@ckeditor/ckeditor5-list";
-import {Table, TableToolbar} from "@ckeditor/ckeditor5-table";
+import { HorizontalLine } from '@ckeditor/ckeditor5-horizontal-line';
 import {BlockQuote} from "@ckeditor/ckeditor5-block-quote";
-import {Image,  ImageResizeEditing, ImageResizeHandles, ImageInsert, AutoImage} from "@ckeditor/ckeditor5-image";
+import {
+  AutoImage,
+  Image,
+  ImageCaption,
+  ImageInsert,
+  ImageResize,
+  ImageStyle,
+  ImageToolbar,
+  ImageUpload
+} from '@ckeditor/ckeditor5-image';
+import { Indent, IndentBlock } from '@ckeditor/ckeditor5-indent';
+import { Link, LinkImage } from '@ckeditor/ckeditor5-link';
+import { List } from '@ckeditor/ckeditor5-list';
+import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
+import { PasteFromOffice } from '@ckeditor/ckeditor5-paste-from-office';
+import { RemoveFormat } from '@ckeditor/ckeditor5-remove-format';
+import { SelectAll } from '@ckeditor/ckeditor5-select-all';
+import {
+  SpecialCharacters,
+  SpecialCharactersArrows,
+  SpecialCharactersCurrency,
+  SpecialCharactersEssentials,
+  SpecialCharactersLatin,
+  SpecialCharactersMathematical,
+  SpecialCharactersText
+} from '@ckeditor/ckeditor5-special-characters';
+import {
+  Table,
+  TableCaption,
+  TableCellProperties,
+  TableColumnResize,
+  TableProperties,
+  TableToolbar
+} from '@ckeditor/ckeditor5-table';
+import { TextTransformation } from '@ckeditor/ckeditor5-typing';
+import { Undo } from '@ckeditor/ckeditor5-undo';
+
 import {SimpleUploadAdapter} from "@ckeditor/ckeditor5-upload";
 import MyLocalStorage from "@/services/myLocalStorage";
 import '@/styles/editorReadonlyCustom.css'
@@ -34,6 +69,120 @@ let editorInstance: ClassicEditor ;
 //const editor = ref(null);
 const editorData = ref<string>('');
 const token = MyLocalStorage.getItem('token');
+const editorConfig = {
+  plugins:[
+    Alignment,
+    AutoImage,
+    BlockQuote,
+    Bold,
+    Code,
+    CodeBlock,
+    Essentials,
+    FindAndReplace,
+    FontColor,
+    Heading,
+    HorizontalLine,
+    Image,
+    ImageCaption,
+    ImageInsert,
+    ImageResize,
+    ImageStyle,
+    ImageToolbar,
+    ImageUpload,
+    Indent,
+    IndentBlock,
+    Italic,
+    Link,
+    LinkImage,
+    List,
+    Paragraph,
+    PasteFromOffice,
+    RemoveFormat,
+    SelectAll,
+    SimpleUploadAdapter,
+    SpecialCharacters,
+    SpecialCharactersArrows,
+    SpecialCharactersCurrency,
+    SpecialCharactersEssentials,
+    SpecialCharactersLatin,
+    SpecialCharactersMathematical,
+    SpecialCharactersText,
+    Subscript,
+    Superscript,
+    Table,
+    TableCaption,
+    TableCellProperties,
+    TableColumnResize,
+    TableProperties,
+    TableToolbar,
+    TextTransformation,
+    Underline,
+    Undo
+  ],
+  toolbar: {
+    items: [
+      'heading',
+      '|',
+      'undo',
+      'redo',
+      'findAndReplace',
+      'link',
+      'selectAll',
+      'removeFormat',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      'subscript',
+      'superscript',
+      'fontColor',
+      '|',
+      'alignment',
+      'outdent',
+      'indent',
+      'bulletedList',
+      'numberedList',
+      '|',
+      'horizontalLine',
+      'blockQuote',
+      'insertTable',
+      'imageInsert',
+      'specialCharacters',
+      'codeBlock'
+    ]
+  },
+  language: 'ru',
+  image: {
+    toolbar: [
+      'imageTextAlternative',
+      'toggleImageCaption',
+      'imageStyle:inline',
+      'imageStyle:block',
+      'imageStyle:side',
+      'linkImage'
+    ]
+  },
+  table: {
+    contentToolbar: [
+      'tableColumn',
+      'tableRow',
+      'mergeTableCells',
+      'tableCellProperties',
+      'tableProperties'
+    ]
+  },
+  simpleUpload: {
+    // URL-адреса, на яку завантажуються зображення.
+    uploadUrl: '/api/Images/AddImages',
+    withCredentials: true,
+    // Заголовки, надіслані разом із XMLHttpRequest на сервер завантаження.
+    headers: {
+      'X-CSRF-TOKEN': 'CSRF-Token',
+      Authorization: `Bearer ${token}`,
+
+    }
+  },
+}
 
 onMounted(()=>{
  editorData.value=props.initialContent;
@@ -41,41 +190,7 @@ onMounted(()=>{
  editorRef.value = document.querySelector('#editor');
  if (editorRef.value){
    ClassicEditor
-       .create(editorRef.value, {
-         plugins: [Essentials, GeneralHtmlSupport,Bold, Italic,Subscript, Superscript, Underline,
-           BlockQuote, Font, Link, Paragraph,Alignment,Heading, List, ListProperties,SimpleUploadAdapter,
-           Table, TableToolbar,Image, ImageResizeEditing, ImageResizeHandles, ImageInsert, AutoImage],
-         fontSize: {
-           options: [8, 10, 12,'default', 16, 18, 20],
-           supportAllValues: true
-         },
-         list: {
-           properties: {
-             styles: true,
-             startIndex: true,
-             reversed: false
-           }
-         },
-         table: {
-           contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
-         },
-         simpleUpload: {
-           // URL-адреса, на яку завантажуються зображення.
-           uploadUrl: '/api/Images/AddImages',
-           withCredentials: true,
-           // Заголовки, надіслані разом із XMLHttpRequest на сервер завантаження.
-           headers: {
-             'X-CSRF-TOKEN': 'CSRF-Token',
-             Authorization: `Bearer ${token}`,
-
-           }
-         },
-         toolbar: {
-           items: ['undo', 'redo','|','heading','|','bold', 'italic','underline','subscript', 'superscript', '|',
-             'link', 'blockQuote','insertImage','insertTable','|',
-             'fontFamily', 'fontSize', 'fontColor','|','alignment','bulletedList', 'numberedList','|'],
-         }
-       })
+       .create(editorRef.value, editorConfig)
        .then(editor => {
          editorInstance = editor;
          editorInstance.setData(editorData.value);

@@ -10,6 +10,9 @@ import ItemListArticle from "@/components/ItemListArticle.vue";
 import Like from "@/components/Like.vue";
 import SmallArticleItem from "@/components/SmallArticleItem.vue";
 import {useReactionStore} from "@/stores/reactionStore";
+import Swal from "sweetalert2";
+import {showErrorMessage} from "@/api/authApi";
+import {useAuthStore} from "@/stores/authStore";
 
 //отримуємо id статті з роута
 const  route = useRoute();
@@ -123,7 +126,7 @@ function routerGoBack() {
 }
 
 function redirectToHome() {
-  // Перейти на домашню сторінку або іншу сторінку за замовчуванням
+  // Перейти на домашню сторінку
   router.push('/');
 }
 function getTags(data:string|null):string|undefined{
@@ -141,16 +144,39 @@ function changeArticleSelect(){
   if(!isSelected.value) {
     articleStore.addToFavorites(article_id).then(()=>{
       isSelected.value = true;
-    }).catch((err)=>{
-      console.log(err)
+    }).catch((error)=>{
+      //console.log(error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Помилка авторизації',
+        text: showErrorMessage(error)
+      });
+      if('name' in error
+          && error.name==='AxiosError'
+          && error.response?.status===401){
+        useAuthStore().delUserData();
+        router.push('/login');
+      }
     })
   }else {
     articleStore.deleteFromFavorites(article_id)
         .then(()=>{
           isSelected.value = false;
-        }).catch((err)=>{
-          console.log(err)
-    })
+        }).catch((error)=>{
+          //console.log(error)
+          Swal.fire({
+            icon: 'error',
+            title: 'Помилка авторизації',
+            text: showErrorMessage(error)
+          });
+          if('name' in error
+              && error.name==='AxiosError'
+              && error.response?.status===401){
+            useAuthStore().delUserData();
+            router.push('/login');
+          }
+        }
+    )
   }
 }
 
@@ -172,9 +198,22 @@ function  saveUserReaction(){
           .then(() => {
             setReaction.value = true;
             countLike.value++
-          }).catch((error)=>{
-        console.log(error)
-      })
+          })
+          .catch((error)=>{
+              console.log(error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Помилка',
+                text: showErrorMessage(error)
+              });
+              if('name' in error
+                  && error.name==='AxiosError'
+                  && error.response?.status===401) {
+
+                useAuthStore().delUserData();
+                router.push('/login');
+              }
+          })
     }
   }
 

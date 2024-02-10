@@ -49,7 +49,7 @@ namespace apiServer.Controllers.Authentication
                     }
                     users = await _context.Users.Include(a => a.people_).ToListAsync();
                 }
-                return Ok("Вы не вошли");
+                return BadRequest("Вы не вошли");
             }
             catch (Exception ex)
             {

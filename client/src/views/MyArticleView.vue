@@ -1,22 +1,15 @@
 <script setup lang="ts">
   import {useArticleStore} from "@/stores/articleStore";
-  import {onMounted, ref} from "vue";
+  import { ref} from "vue";
   import ArticleItem from "@/components/ArticleItem.vue";
   import NewArticleForm from "@/components/NewArticleForm.vue";
   import MyLocalStorage from "@/services/myLocalStorage";
   import FilterForMyArticle from "@/components/FilterForMyArticle.vue";
   import {useRouter} from "vue-router";
-  //import type {IArticle} from "@/api/type";
 
   const articleStore = useArticleStore();
   const router = useRouter();
- /* const props = defineProps({
-    myArticles:{
-      type: Array<IArticle>,
-      default:[],
-      required: true
-    }
-  })*/
+
   const showDialog = ref(false);
   const showSelected = false;//не показуємо в кабінеті користувача
   const showMenu = true; //меню показуємо тільки в кабінеті користувача
@@ -26,16 +19,9 @@
   let tags = ref<string|null>('');
   let sortParam = ref<number|null>(0)
 
-  /*onMounted(() => {
-    articleStore.getMyArticleList(peopleId); //список моїх статей
-    articleStore.getScienceList(); //отримуємо список наукових сфер
-    articleStore.getScienceSectionList(); //отримуємо список підкатегорій
-
-  });*/
-
   function closeDialog(show:boolean, saveArticleId: string|undefined){
     showDialog.value=show;
-    console.log('saveArticleId', saveArticleId);
+    //console.log('saveArticleId', saveArticleId);
     if(saveArticleId!==undefined)
         router.push({ name: 'edit_article', params: { id: saveArticleId } });
   }
@@ -47,13 +33,13 @@
       })
       tags.value = tags.value ? tags.value?.substring(1) : '';
     }
-    console.log('tags =', tags.value)
+    //console.log('tags =', tags.value)
     articleStore.searchArticlesByParam(currentPage.value-1,undefined,undefined,
         undefined,sortParam.value,tags.value,peopleId);
   }
   function sortParamChoose(data:number){
     sortParam.value = data;
-    console.log("sortedParam=", sortParam.value)
+    //console.log("sortedParam=", sortParam.value)
     articleStore.searchArticlesByParam(currentPage.value-1,undefined,undefined,
         undefined,sortParam.value,tags.value,peopleId);
   }
@@ -62,9 +48,10 @@
   const currentPage = ref(1); // Поточна сторінка
   const onPageChange = () => {
     // Оновлення поточної сторінки при зміні
-    console.log('currentPage =',currentPage.value)
+    //console.log('currentPage =',currentPage.value)
     articleStore.searchArticlesByParam(currentPage.value-1,undefined,undefined,
         undefined,sortParam.value,tags.value,peopleId);
+    window.scroll(0,0)
   };
 </script>
 
@@ -118,6 +105,9 @@
             color="primary"
         ></v-progress-circular>
       </v-overlay>
+      <div v-if="articleStore.cntRec==0" class="d-flex justify-center py-16 text-h4">
+        Ви ще не написали жодної статті :(
+      </div>
       <ArticleItem
           v-for="article in articleStore.articles"
           :key="article.id"

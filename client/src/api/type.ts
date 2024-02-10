@@ -148,3 +148,9 @@ export interface IFullArticle<T>{
     countReactions:number;
     selected:boolean;
 }
+
+export interface INewArticleModel {
+    scienceId: string;
+    article_:IArticle;
+}
+
