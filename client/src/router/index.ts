@@ -2,6 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import MyArticleView from "@/views/MyArticleView.vue";
 import MyLocalStorage from "@/services/myLocalStorage";
+import AuthView from "@/views/AuthView.vue";
+import VerifyEmailView from "@/views/VerifyEmailView.vue";
+import CategoryList from "@/views/CategoryList.vue";
+import EditArticleView from "@/views/EditArticleView.vue";
+import SearchResultView from "@/views/SearchResultView.vue";
+import SearchCategoryResultView from "@/views/SearchCategoryResultView.vue";
+import ReadArticleView from "@/views/ReadArticleView.vue";
+import UserOfficeView from "@/views/UserOfficeView.vue";
+import UserProfileView from "@/views/UserProfileView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,147 +23,71 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('@/views/AuthView.vue'),
-      beforeEnter: (to, from, next) => {
+      component: AuthView, //() => import('@/views/AuthView.vue'),
+      /*beforeEnter: (to, from, next) => {
         import('../views/AuthView.vue')
             .then(module => {
               next();
             }).catch(error => {
           console.error('Помилка завантаження модуля LoginView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
+          return{name:'nofFound'}
         });
-      }
+      }*/
     },
-    /*{
-      path: '/register',
-      name: 'register',
-      component: () => import('../views/RegisterView.vue')
-    },*/
+
     {
       path: '/verify_email',
       name: 'verify_email',
-      component: () => import('../views/VerifyEmailView.vue'),
-      beforeEnter: (to, from, next) => {
-       import('../views/VerifyEmailView.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля VerifyEmailView.vue:', error);
-         next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
+      component: VerifyEmailView ,
     },
     {
       path: '/category-list',
       name: 'category_list',
-      component: () => import('../views/CategoryList.vue'),
-      beforeEnter: (to, from, next) => {
-        import('../views/CategoryList.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля MyArticleView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
+      component: CategoryList,
     },
     {
       path: '/my_article',
       name: 'my_article',
-      component: () => import('../views/MyArticleView.vue'),
+      component: MyArticleView,
       meta: { requiresAuth: true },
-      beforeEnter: (to, from, next) => {
-        import('../views/MyArticleView.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля MyArticleView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
     },
     {
       path: '/edit_article/:id',
       name: 'edit_article',
-      component: ()=>import('../views/EditArticleView.vue'),
+      component: EditArticleView,
       meta: { requiresAuth: true },
-      beforeEnter: (to, from, next) => {
-        import('../views/EditArticleView.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля EditArticleView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
 
     },
     {
       path: '/search/:search',
       name: 'search_article',
-      component: ()=>import('../views/SearchResultView.vue'),
-      beforeEnter: (to, from, next) => {
-        import('../views/SearchResultView.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля SearchResultView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
+      component: SearchResultView,
 
     },
     {
       path: '/search_science/:scienceId',
       name: 'search_science_article',
-      component: ()=>import('../views/SearchCategoryResultView.vue'),
-      beforeEnter: (to, from, next) => {
-        import('../views/SearchCategoryResultView.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля SearchCategoryResultView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
+      component: SearchCategoryResultView,
 
     },
     {
       path: '/read_article/:id',
       name: 'read_article',
-      component: ()=>import('../views/ReadArticleView.vue'),
-      beforeEnter: (to, from, next) => {
-        import('../views/ReadArticleView.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля ReadArticleView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
+      component: ReadArticleView,
 
     },
     {
       path: '/office',
       name: 'user_office',
-      component: ()=>import('../views/UserOfficeView.vue'),
+      component:UserOfficeView ,
       meta: { requiresAuth: true },
-      beforeEnter: (to, from, next) => {
-        import('../views/UserOfficeView.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля UserOfficeView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
 
     },
     {
       path: '/profile',
       name: 'profile',
-      component: ()=>import('../views/UserProfileView.vue'),
+      component: UserProfileView,
       meta: { requiresAuth: true },
-      beforeEnter: (to, from, next) => {
-        import('../views/UserProfileView.vue').then(module => {
-          next();
-        }).catch(error => {
-          console.error('Помилка завантаження модуля UserProfileView.vue:', error);
-          next({ name: 'notFound', params: { pathMatch: to.path.substring(1).split('/') } });
-        });
-      }
 
     },
     {
