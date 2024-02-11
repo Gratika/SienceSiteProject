@@ -44,7 +44,7 @@ namespace apiServer.Controllers.Authentication
                         audience: _configuration["Jwt:Audience"],
                         /*notBefore: now,*/
                         claims: identity.Claims,
-                        expires: now.Add(TimeSpan.FromMinutes(2)), // Срок действия токена в минутах (15)
+                        expires: now.Add(TimeSpan.FromMinutes(7200)), // Срок действия токена в минутах (15)
                         signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"])), SecurityAlgorithms.HmacSha256));
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
