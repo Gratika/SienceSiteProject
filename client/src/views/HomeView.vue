@@ -11,6 +11,7 @@ import ScienceCarousels from "@/components/ScienceCarousels.vue";
 import {useAuthStore} from "@/stores/authStore";
 import type {IArticle} from "@/api/type";
 
+const title = "Останні опубліковані статті";
 const articleStore = useArticleStore();
 const showSelected = ref(false);
 const showMenu = false; //меню показуємо тільки в кабінеті користувача
@@ -19,6 +20,7 @@ const page = ref(0);
 const pointer = ref<Element|undefined>();
 const newArticleList = ref<Array<IArticle>>([])
 onMounted(() => {
+  window.scroll(0,0);
   const isLoginString = MyLocalStorage.getItem('isLogin');
   if (isLoginString!=null){
     showSelected.value = isLoginString;
@@ -62,7 +64,9 @@ const observer = new IntersectionObserver(callback, options);
     </v-row>
   </v-container>
   <Heder/>
-  <ArticleCarousels :articles="newArticleList"/>
+  <div class="w-100 carousel-color">
+    <ArticleCarousels :articles="newArticleList" :title="title"/>
+  </div>
   <ScienceCarousels :science="articleStore.sciences"/>
   <v-container>
     <v-row>
@@ -92,6 +96,9 @@ const observer = new IntersectionObserver(callback, options);
 </template>
 
 <style scoped>
+.carousel-color{
+  background-color: #E2E2E2;
+}
 .footer-distance{
   min-height: 100px;
 }

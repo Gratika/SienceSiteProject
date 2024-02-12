@@ -134,7 +134,7 @@ const submitLogin= handleSubmit(()=>{
 
 <template>
   <v-container>
-    <v-sheet class="mt-10 pa-10">
+    <v-sheet class="mt-10 pa-10 mx-3 mx-md-0">
       <v-row>
         <v-col cols="12">
           <div class="gradient"/>

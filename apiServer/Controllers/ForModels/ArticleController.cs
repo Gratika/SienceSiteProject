@@ -43,18 +43,10 @@ namespace apiServer.Controllers.ForModels
         }
         [Authorize]
         [HttpGet("GetArticlesForUser")]
-        public async /*Task<ActionResult>*/Task<List<FullArticle<Articles>>> GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
+        public async Task<List<FullArticle<Articles>>> GetArticlesForUser(string id_people/*, string acessToken, string refreshToken*/) // Возвращение статей конкретного пользователя
         {
             try
             {
-                //string id = "20a6f9b0-f0dc-44b3-b505-662bd0156104";
-                //var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-                //if (_tokensController.IsTokenExpired(acessToken))
-                //{
-                //    return _tokensController.CheckTokens(id, acessToken, refreshToken);
-
-                //}
-
                 List<FullArticle<Articles>> articleAndReactions = new List<FullArticle<Articles>>();
                 List<Articles> articles = await _context.Articles.Where(a => a.author_id == id_people).Include(a => a.author_).Include(a => a.theory_).ToListAsync();
                 foreach (var article in articles)
@@ -77,13 +69,13 @@ namespace apiServer.Controllers.ForModels
         [HttpPost("CreateArticle")]
         public async Task<ActionResult> CreateArticle(Articles? article) // Создание статьи
         {
-            //article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
-            //article.title = "12Atrticle";
-            //article.tag = "FullNew";
-            //article.text = "Example for everyone";
-            //article.views = 70;
-            //article.theory_id = "2";
-            //article.path_file = "";
+            /*article.author_id = "eeb84033-8e9a-49c9-bf8e-dc1af18bef57";
+            article.title = "Science";
+            article.tag = "All";
+            article.text = "Тест";
+            article.views = 150;
+            article.theory_id = "2";
+            article.path_file = "";*/
             try
             {
                 article.Id = Guid.NewGuid().ToString();
@@ -97,13 +89,10 @@ namespace apiServer.Controllers.ForModels
                 _context.Articles.Add(article);
                 _context.SaveChanges();
 
-                //добавление данных в Redis
-                _redisArticleController.AddOneModel(article);
-
                 _searchController.AddArticle(article);
 
                 ArticlerResponse articlerResponse = new ArticlerResponse();
-                //articlerResponse.Articles = await GetArticlesForUser(article.author_id);
+                // articlerResponse.Articles = await GetArticlesForUser(article.author_id);
                 articlerResponse.articleId = article.Id;
                 if (article.DOI != null)
                 {
@@ -119,18 +108,17 @@ namespace apiServer.Controllers.ForModels
                 throw ex;
             }
         }
-
         [HttpGet("GetArticle")]
-        public async Task<ActionResult<FullArticle<Articles>>> GetArticle(string id, string? peopleId)
+        public async Task<ActionResult<FullArticle<Articles>>> GetArticle(string id, string peopleId)
         {
             try
             {
                 FullArticle<Articles> article = new FullArticle<Articles>();
-                article = await _reactionController.GetReactionForArticle<Articles>(id, emojiId, peopleId);
-                article.Articles = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);
-                article.Selected = _context.Selected_articles.Any(a => a.article_id == article.Articles.Id && a.people_id == peopleId);
+            article = await _reactionController.GetReactionForArticle<Articles>(id, emojiId, peopleId);
+            article.Articles = await _context.Articles.Include(a => a.author_).Include(a => a.theory_).FirstOrDefaultAsync(a => a.Id == id);
+            article.Selected = _context.Selected_articles.Any(a => a.article_id == article.Articles.Id && a.people_id == peopleId);
 
-                return Ok(article);
+             return Ok(article);
             }
             catch (Exception ex)
             {
@@ -139,14 +127,14 @@ namespace apiServer.Controllers.ForModels
         }
         [Authorize]
         [HttpPost("RedactArticle")]
-        public async Task<ActionResult> RedactArticle(/*IFormFile? file1, IFormFile? file2,*/ Articles article/*, string id, string title, string pathFile, string pathBucket*/)
+        public async Task<ActionResult> RedactArticle(Articles article)
         {
             try
             {
                 article.modified_date = DateTime.Now;
 
                 _redisArticleController.AddOneModel(article);
-                _searchController.RedactArticle(article);
+               // _searchController.RedactArticle(article);
 
                 //List<string> FieldsDb = await _minioController.RedactFiles(article.path_file, pathBucket, files);
 
@@ -168,15 +156,14 @@ namespace apiServer.Controllers.ForModels
             try
             {
                 _searchController.DeleteArticle(article.Id);
-                //_redisArticleController.DeleteData(article.Id);
-                if (!string.IsNullOrEmpty(article.urls))
-                {
-                    _imagesController.Delete(article);
-                }
                 if (!string.IsNullOrEmpty(article.path_file))
                 {
                     await _minioController.DeleteFiles(article.Id);
                 }
+                List<Reactions> reactions = _context.Reactions.Where(r => r.article_id == article.Id).ToList();
+                List<Selected_articles> selectedArticles = _context.Selected_articles.Where(s => s.article_id == article.Id).ToList();
+                _context.Reactions.RemoveRange(reactions);
+                _context.Selected_articles.RemoveRange(selectedArticles);
                 _context.Articles.Remove(article);
                 _context.SaveChanges();
 
@@ -242,6 +229,7 @@ namespace apiServer.Controllers.ForModels
                 articles.IsActive = true;
                 _context.Articles.Update(articles);
                 _context.SaveChanges();
+                _searchController.RedactArticle(articles);
             }
             catch (Exception ex)
             {

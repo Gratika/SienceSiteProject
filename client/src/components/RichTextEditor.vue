@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref} from 'vue';
+import {onBeforeUpdate, onMounted, onUpdated, ref, watch} from 'vue';
 import { ClassicEditor } from '@ckeditor/ckeditor5-editor-classic';
 import { Essentials } from '@ckeditor/ckeditor5-essentials';
 import { FindAndReplace } from '@ckeditor/ckeditor5-find-and-replace';
@@ -222,62 +222,24 @@ onMounted(()=>{
        });
  }
 })
-//плагін для налаштування редактора. Зобороняємо вкладати в комірку таблиці іншу таблицю
-/*function DisallowNestingTables( editor:ClassicEditor ) {
-  editor.model.schema.addChildCheck( ( context, childDefinition ) => {
-    if ( childDefinition.name == 'table' && Array.from( context.getNames() ).includes( 'table' ) ) {
-      return false;
-    }
-  } );
-}
-//заборона вкладати цитату в цитату
-function DisallowNestingBlockQuotes( editor:ClassicEditor  ) {
-  editor.model.schema.addChildCheck( ( context, childDefinition ) => {
-    if ( context.endsWith( 'blockQuote' ) && childDefinition.name == 'blockQuote' ) {
-      return false;
-    }
-  } );
-}
-const editorConfig = {
-  //extraPlugins: [ DisallowNestingTables, DisallowNestingBlockQuotes ],
-  plugins: [Essentials, GeneralHtmlSupport,Bold, Italic,Subscript, Superscript, Underline,
-            BlockQuote, Font, Link, Paragraph,Alignment,Heading, List, ListProperties,SimpleUploadAdapter,
-           Table, TableToolbar,Image, ImageResizeEditing, ImageResizeHandles, ImageInsert, AutoImage],
-  fontSize: {
-    options: [8,10,12,'default', 16, 18, 20],
-    supportAllValues: true
-  },
-  list: {
-    properties: {
-      styles: true,
-      startIndex: true,
-      reversed: false
-    }
-  },
-  table: {
-    contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
-  },
-  simpleUpload: {
-    // URL-адреса, на яку завантажуються зображення.
-    uploadUrl: '/api/Images/AddImages',
-    withCredentials: true,
-    // Заголовки, надіслані разом із XMLHttpRequest на сервер завантаження.
-    headers: {
-      'X-CSRF-TOKEN': 'CSRF-Token',
-      Authorization: `Bearer ${token}`,
+onUpdated(()=>{
+  if (props.isReadOnly===true &&  props.initialContent!==undefined &&props.initialContent!=='') {
+    console.log('Update')
+    editorData.value = props.initialContent;
+    if (editorInstance)
+      editorInstance.setData(editorData.value);
+  }
+})
+/*onBeforeUpdate(()=>{
+  console.log('onBeforeUpdate')
+  editorData.value=props.initialContent;
+  if (editorInstance)
+    editorInstance.setData(editorData.value);
+})*/
+/*watch(() => props.initialContent, (newValue, oldValue) => {
+  console.log('Значення пропса inputData змінилося з', oldValue, 'на', newValue);
 
-    }
-  },
-  toolbar: {
-    items: ['undo', 'redo','|','heading','|','bold', 'italic','underline','subscript', 'superscript', '|',
-            'link', 'blockQuote','insertImage','insertTable','|',
-            'fontFamily', 'fontSize', 'fontColor','|','alignment','bulletedList', 'numberedList','|'],
-  },
-
-}
-*/
-
-
+});*/
 </script>
 
 <template>

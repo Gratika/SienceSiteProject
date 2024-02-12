@@ -16,9 +16,37 @@ function handleKeyDown(event:KeyboardEvent) {
 </script>
 
 <template>
-<div class="header">
+<div class="py-15 px-10 px-md-0 my-md-10">
   <v-container>
-    <v-row class="justify-center">
+    <!--для малих екранів. Планшетна версія-->
+    <v-row class="d-md-none justify-center">
+      <v-col cols="12">
+        <div class="mb-10">
+          <v-text-field
+              label="Пошук за назвою, автором, темою..."
+              class="custom-text-field"
+              single-line
+              hide-details
+              v-model="searchStr"
+              @keydown="handleKeyDown"
+
+          ></v-text-field>
+        </div>
+        <div class="text-h3 font-weight-bold py-8">Discovery Science, Uncover Knowledge with SciFindHub</div>
+        <div class="d-flex w-100 justify-end">
+          <div class="d-flex">
+            <v-img
+                :width="400"
+                aspect-ratio="1/1"
+                cover
+                src="mainFrame.png"
+            ></v-img>
+          </div>
+        </div>
+      </v-col>
+      <!--Для екранів починаючи з розміру md-->
+    </v-row>
+    <v-row class="d-none d-md-flex justify-center">
       <v-col cols="7">
         <div class="text-h3 font-weight-bold pb-12 mb-12">Discovery Science, Uncover Knowledge with SciFindHub</div>
         <div class="mb-8">
@@ -39,7 +67,7 @@ function handleKeyDown(event:KeyboardEvent) {
         >Пошук
         </v-btn>
       </v-col>
-      <v-col cols="5">
+      <v-col cols="5" >
         <v-img
             :width="500"
             aspect-ratio="1/1"
@@ -96,9 +124,7 @@ function handleKeyDown(event:KeyboardEvent) {
   border: 1px solid black; /* Додати границю 1px чорного кольору */
   border-radius: 0; /* Скруглення = 0 */
 }
-.header{
-  padding: 100px 0;
-}
+
 .total-text-size{
   font-size: 32px!important;
   font-style: normal;

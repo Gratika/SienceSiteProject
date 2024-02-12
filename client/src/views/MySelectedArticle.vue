@@ -19,6 +19,9 @@ const onPageChange = () => {
   console.log('currentPage =',currentPage.value)
   articleStore.getMySelectedArticleList(peopleId,currentPage.value-1); //список моїх обраних статей
 };
+onMounted(()=>{
+  articleStore.getMySelectedArticleList(peopleId,0); //список моїх обраних статей
+})
 
 
 

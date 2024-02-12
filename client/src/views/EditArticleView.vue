@@ -136,6 +136,7 @@ const submitArticle= handleSubmit(()=>{//публікація
          if('name' in error
               && error.name==='AxiosError'
               && error.response?.status===401){
+           article.value.isActive=false;
            saveLayout(article.value);
            useAuthStore().delUserData();
            router.push('/login');

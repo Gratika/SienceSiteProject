@@ -51,12 +51,12 @@ function readArticle(){
         height="300"
         @click="readArticle"
     >
-      <v-card-text
-          class="pa-0 my-auto text-h5 font-weight-medium"
+      <div
+          class="px-0 py-3 text-h5 font-weight-bold d-flex flex-wrap"
           style="line-height: 1.5rem"
       >
         {{ props.article.title }}
-      </v-card-text>
+      </div>
       <v-card-actions class=" flex-grow-1 flex-column card-align pa-0 my-auto">
         <div class="my-auto card-text-size font-weight-medium" >
           <div>
@@ -69,19 +69,19 @@ function readArticle(){
             Мова: українська
           </div>
         </div>
-        <div class="wrapper">
-          <div class="my-auto d-flex">
+
+          <div class="my-auto d-flex justify-start">
             <v-chip
                 v-for="(item, index) in props.article.tagItems.slice(0,2)"
                 :key="index"
-                class="text-subtitle-2 mt-1 me-4 d-flex font-weight-bold"
+                class="text-subtitle-2 mt-2 me-4 d-flex font-weight-bold"
             >
               {{ item }}
             </v-chip>
           </div>
-        </div>
 
-        <div class=" d-flex flex-row justify-end mt-2">
+
+        <div class=" d-flex flex-row justify-end mb-2">
           <Like :is-selected="setReaction"/>
           <span class="d-inline text-subtitle-2 font-weight-bold ms-3">{{article.countLike}}</span>
         </div>
@@ -103,7 +103,7 @@ function readArticle(){
   width: 390px;
 }
 .card-text-size{
-  font-size: 18px!important;
+  font-size: 20px!important;
   line-height: normal;
 }
 .left-border{
@@ -115,9 +115,6 @@ function readArticle(){
 .card-align{
   align-items: normal!important;
 }
-.wrapper{
-  overflow: hidden;
-  margin: auto 0;
-}
+
 
 </style>

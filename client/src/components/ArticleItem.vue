@@ -159,7 +159,7 @@ function formatDate(date: null | string): string {
         <v-col cols="1">
           <div v-if="props.showSelected">
             <v-icon
-                class="flex-grow-1"
+                class="flex-grow-1 pt-2"
                 @click="changeArticleSelect"
             >
               <svg
@@ -239,9 +239,17 @@ function formatDate(date: null | string): string {
         </v-col>
         <v-col cols="1" md="2">
           <div v-if="!isActive && showBtnPublic" class="d-flex justify-end">
-            <v-chip variant="outlined" class="rounded-btn card-chips-text-size" >
+            <div class="d-none d-md-flex">
+              <v-chip variant="outlined" class="rounded-btn card-chips-text-size" >
               Чернетка
             </v-chip>
+            </div>
+            <div class="d-flex d-md-none">
+              <v-chip variant="outlined" class="rounded-btn card-chips-text-size" >
+                Ч
+              </v-chip>
+            </div>
+
           </div>
           <div v-else class="d-flex justify-end">
             <Like :is-selected="setReaction"/>

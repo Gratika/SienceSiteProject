@@ -145,12 +145,11 @@ export const useAuthStore = defineStore({
             verifyEmailFn(code)
                 .then(res=>{
                     this.isLoading = false;
-                    createToast(res, {
-                        position: 'top-right',
-                    });
-                    console.log(res);
+                    //console.log(res);
                     //MyLocalStorage.setItem('email','');
-                    router.push('/login');
+                    const isLogin = MyLocalStorage.getItem('isLogin');
+                    if (isLogin===true) router.push('/');
+                    else router.push('/login');
                 }).catch(err=>{
                 this.isLoading = false;
                 Swal.fire({
@@ -158,16 +157,25 @@ export const useAuthStore = defineStore({
                     title: 'Помилка при перевірці email',
                     text: showErrorMessage(err)
                 });
-                console.log('error from onVerifEmail: ',err);
+                //console.log('error from onVerifEmail: ',err);
             })
         },
         onRepeatVerificationCode(){
             let email:string = MyLocalStorage.getItem('email');
             getRepeatCodeFn(email)
                 .then(res=>{
-                    console.log(res)
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Код надіслано на email',
+                        text: 'Перевірте вашу поштову скриньку'
+                    });
                 })
                 .catch(err=>{
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Помилка при відправці перевірочного коду',
+                        text: 'Спробуйте ще раз або ж просто продовжіть роботу з сайтом'
+                    });
                     console.log('err from RepeatVerificationCode: ',err)
                 })
         },

@@ -14,19 +14,18 @@
       ></v-img>
     </div>
   </v-row>
-    <v-row class="justify-center">
+    <v-row class="justify-center ma-10">
       <div class="d-flex">
-        <div class="text-h3 font-weight-medium py-3 py-md-5 py-xl-14">
+        <div class="text-h3 text-center font-weight-medium py-3 py-md-5 py-xl-14">
           Вибачте, сторінка на даний момент в розробці :(
         </div>
       </div>
     </v-row>
   <v-row class="justify-center">
-    <v-col md="2" sm="3" xl="6">
+    <v-col md="3" sm="6">
       <v-btn
           class="d-flex btn-font-size"
           to="/"
-
       >
         На головну
       </v-btn>

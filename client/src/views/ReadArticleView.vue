@@ -13,6 +13,7 @@ import {useReactionStore} from "@/stores/reactionStore";
 import Swal from "sweetalert2";
 import {showErrorMessage} from "@/api/authApi";
 import {useAuthStore} from "@/stores/authStore";
+import ArticleCarousels from "@/components/ArticleCarousels.vue";
 
 //отримуємо id статті з роута
 const  route = useRoute();
@@ -20,6 +21,7 @@ const {id} = route.params;
 
 const router = useRouter();
 
+const title="Схожі за тегами";
 const editorReadOnly = true;
 const article = ref<IArticle>({
   id: '',
@@ -61,6 +63,7 @@ const emotionStore = useReactionStore();
 const isLoading = ref(true);
 let setReaction = ref(false);
 let cntPopulateArticle = ref(0);
+
 onBeforeMount(()=>{
   const isLoginString = MyLocalStorage.getItem('isLogin');
   if (isLoginString!=null){
@@ -237,7 +240,7 @@ onBeforeUnmount(()=>{
 <template>
   <!--Рядок заголовку-->
   <v-row class="title-head align-content-end" >
-    <v-container style="background-color:#F9F9F9">
+    <v-container style="background-color:#F9F9F9" class="mx-10 mx-md-auto">
       <v-overlay :model-value="isLoading"
                  class="align-center justify-center">
         <v-progress-circular
@@ -248,7 +251,7 @@ onBeforeUnmount(()=>{
       <!--рядок з назвою статті та значком закладки-->
       <v-row class="align-center">
        <v-col cols="12">
-           <div class="d-flex flex-wrap justify-start py-4 px-1 text-h4 font-weight-bold">
+           <div class="d-flex flex-wrap justify-start py-4 ps-5 ps-md-1 pe-md-1 text-h4 font-weight-bold">
              {{article.title}}
            </div>
        </v-col>
@@ -256,8 +259,8 @@ onBeforeUnmount(()=>{
      </v-row>
       <!--рядок з тегами та значком лайк-->
       <v-row class="align-center">
-        <v-col sm="12" md="10"  lg="11">
-            <div class="d-flex flex-wrap">
+        <v-col sm="10" lg="11">
+            <div class="d-flex flex-wrap ps-5 ps-md-0 ">
               <v-chip
                   v-for="(item, index) in article.tagItems"
                   :key="index"
@@ -269,7 +272,7 @@ onBeforeUnmount(()=>{
               </v-chip>
             </div>
         </v-col>
-        <v-col md="2" lg="1" class="d-none d-md-flex">
+        <v-col sm="2" lg="1" class="d-none d-sm-flex">
             <div class="d-flex justify-space-between">
               <Like :is-selected="setReaction" @click="saveUserReaction" :style="{ cursor: isLogin ? 'pointer' : 'not-allowed' }"/>
               <span class="mx-3">{{countLike}}</span>
@@ -278,40 +281,112 @@ onBeforeUnmount(()=>{
       </v-row>
     </v-container>
   </v-row>
+  <!--для екрану менше ніж md-->
+  <v-row class="d-md-none">
+    <v-container class="mx-10">
+      <v-sheet  class="card-shadow">
+          <v-list class="pb-3 mb-3">
+            <v-list-item class="px-0 px-lg-4 py-1">
+              <v-icon class="me-2 text-h5" icon="mdi-account-circle-outline"/>
+              <v-list-item-title class="text-h6 d-inline">
+                Автор: {{article.author_?.surname}} {{article.author_?.name}}
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item class="px-0 px-lg-4 py-1">
+              <v-icon class="me-2 text-h5" icon="mdi-calendar-blank-outline"/>
+              <v-list-item-title class="d-inline text-h6">
+                Дата: {{ formatDate(article.date_created) }}
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item class="px-0 px-lg-4 py-1">
+              <v-icon class="me-2 text-h5" icon="mdi-alpha-a-box-outline"/>
+              <v-list-item-title class="d-inline text-h6">
+                Мова: українська
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item class="px-0 px-lg-4 py-1">
+              <v-icon class="me-2 text-h5" icon="mdi-map-marker-radius-outline"/>
+              <v-list-item-title class="d-inline text-h6">
+                Країна публікації: Україна
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+
+          <!--блок з кнопками Додати в обране, Скачати файл-->
+          <div class="d-flex flex-row justify-start  ps-4">
+            <div v-if="isLogin" class="d-inline me-3" >
+              <v-icon
+                  class="flex-grow-1 pt-2"
+                  @click="changeArticleSelect"
+              >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="30"
+                    height="40"
+                    viewBox="0 0 40 40"
+                    :fill="isSelected ? '#778FD2' : '#FFFFFF'"
+                    stroke="#778FD2"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                  <path d="M30.8574 37.6429L20.0002 26.7857L9.14307 37.6429V5.07146C9.14307 4.35158 9.42904 3.6612 9.93805 3.15217C10.4471 2.64315 11.1375 2.35718 11.8574 2.35718H28.1431C28.8629 2.35718 29.5534 2.64315 30.0623 3.15217C30.5713 3.6612 30.8574 4.35158 30.8574 5.07146V37.6429Z" />
+                </svg>
+              </v-icon>
+            </div>
+            <div v-if="showDownload"
+                 class="d-inline align-center text-h6 color-text me-3"
+                 @click="downloadFile"
+                 :style="{ cursor: 'pointer'}"
+            >
+              <v-icon
+                  class="flex-grow-1"
+                  icon="mdi-arrow-down-bold-box-outline"
+              />
+            </div>
+          </div>
+
+      </v-sheet>
+    </v-container>
+  </v-row>
   <!--рядок з текстом статті та боковою панелю-->
   <v-row>
-    <v-container class=" px-0 pt-6 px-lg-1">
+    <v-container class=" px-0 pt-md-6 px-lg-1 mx-10 mx-md-auto">
       <v-row class="flex-grow-1">
         <!--стовпчик з текстом статті-->
-        <v-col lg="8" md="6" class="d-flex flex-grow-1 pe-3 text-h6">
-          <RichTextEditor v-if="!isLoading"
-              :initialContent="initContent"
-              :is-read-only="editorReadOnly"
-          />
+        <v-col xl="9" md="8" sm="12" class="d-flex flex-grow-1 pe-2 text-h6">
+          <div class="px-5 px-md-0 mx-2 mx-md-0">
+            <RichTextEditor
+                v-if="!isLoading"
+                :initialContent="initContent"
+                :is-read-only="editorReadOnly"
+            />
+          </div>
+
         </v-col>
         <!--стовпчик що являє собою бічну панель зі списками-->
-        <v-col lg="4" md="6" class="d-none d-md-flex px-0 px-lg-1">
-          <div class="d-flex flex-column ps-3">
+        <v-col xl="3" md="4"  class="d-none d-md-flex px-0 px-lg-1">
+          <div class="d-flex flex-column ps-3 mt-4">
             <v-list bg-color="background" class="pb-3 mb-3">
-              <v-list-item >
+              <v-list-item class="px-0 px-lg-4 py-1">
                 <v-icon class="me-2 text-h5" icon="mdi-account-circle-outline"/>
                 <v-list-item-title class="text-h6 d-inline">
                   Автор: {{article.author_?.surname}} {{article.author_?.name}}
                 </v-list-item-title>
               </v-list-item>
-              <v-list-item>
+              <v-list-item class="px-0 px-lg-4 py-1">
                 <v-icon class="me-2 text-h5" icon="mdi-calendar-blank-outline"/>
                 <v-list-item-title class="d-inline text-h6">
                   Дата: {{ formatDate(article.date_created) }}
                 </v-list-item-title>
               </v-list-item>
-              <v-list-item>
+              <v-list-item class="px-0 px-lg-4 py-1">
                 <v-icon class="me-2 text-h5" icon="mdi-alpha-a-box-outline"/>
                 <v-list-item-title class="d-inline text-h6">
                   Мова: українська
                 </v-list-item-title>
               </v-list-item>
-              <v-list-item>
+              <v-list-item class="px-0 px-lg-4 py-1">
                 <v-icon class="me-2 text-h5" icon="mdi-map-marker-radius-outline"/>
                 <v-list-item-title class="d-inline text-h6">
                   Країна публікації: Україна
@@ -364,6 +439,9 @@ onBeforeUnmount(()=>{
           </div>
         </v-col>
       </v-row>
+      <!--v-row v-if="articleLikeTag?.length>0">
+        <ArticleCarousels :title="title" :articles="articleLikeTag"/>
+      </v-row-->
 
       <v-row v-if="articleLikeTag?.length>0">
         <div class="text-h4 font-weight-bold mt-10 pt-10 pb-10"> Схожі за тегами</div>
@@ -387,6 +465,17 @@ onBeforeUnmount(()=>{
 
 </template>
 <style scoped>
+
+.card-shadow{
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: space-between;
+  margin: 0 15px;
+  padding: 20px;
+
+}
 
 .chip-text-size{
   font-size: 16px!important;

@@ -24,7 +24,7 @@ const isVerifPage = computed(() => {
 });
 </script>
 <template>
-  <v-app id="inspire">
+  <v-app id="inspire" >
 
     <v-app-bar v-if="!isNotFoundPage && !isDevelopmentPage">
       <MyToolbar/>
@@ -41,6 +41,9 @@ const isVerifPage = computed(() => {
   </v-app>
 </template>
 <style>
+#inspire{
+  min-width: 800px;
+}
 .v-input .v-label {
   font-size: 1rem;
 }

@@ -44,12 +44,27 @@ function goPopular(){
     </v-col>
     <v-col cols="12" sm="5" md="3" class="d-flex h-100 flex-column justify-space-between align-end">
       <div class="d-flex flex-row">
-        <v-avatar class="me-3" size="50" image="telegram.png"/>
-        <v-avatar class="me-3" size="50" image="linkedin_1.png"/>
-        <v-avatar class="me-3" size="50" image="github.png"/>
+        <v-avatar class="me-3" size="50">
+          <v-img
+              src="telegram.png"
+              alt="T"
+          ></v-img>
+        </v-avatar>
+        <v-avatar class="me-3" size="50">
+          <v-img
+              src="linkedin_1.png"
+              alt="L"
+          ></v-img>
+        </v-avatar>
+        <v-avatar class="me-3" size="50">
+          <v-img
+              src="github.png"
+              alt="G"
+          ></v-img>
+        </v-avatar>
       </div>
       <div class="d-flex justify-end">
-          <div class="ps-sm-0 ps-md-14 text-h5 text-end">Права на всі статті, опубліковані на сайті, належать авторам.</div>
+          <div class="ps-sm-0 ps-lg-14 text-h5 text-end">Права на всі статті, опубліковані на сайті, належать авторам.</div>
 
       </div>
     </v-col>
@@ -71,6 +86,7 @@ function goPopular(){
   background-color: #E2E2E2;
   height: 350px;
   min-height: 250px;
+  min-width: 800px;
   width: 100%;
 }
 .support-text{

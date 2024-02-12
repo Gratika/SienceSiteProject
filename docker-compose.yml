@@ -44,7 +44,7 @@ services:
       context: ./client
       dockerfile: DockerFile
     ports:
-      - "5001:8080"
+      - "5001:80"
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     environment:

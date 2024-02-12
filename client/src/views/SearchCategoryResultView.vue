@@ -105,7 +105,75 @@ const onPageChange = () => {
 
 <template>
   <v-container>
-    <v-row class="justify-space-between pt-7">
+    <!--Для екранів менше md-->
+    <v-row class="d-flex d-md-none justify-space-between pt-7 mx-3 mb-3">
+      <v-overlay :model-value="articleStore.isLoading"
+                 class="align-center justify-center">
+        <v-progress-circular
+            indeterminate
+            color="primary"
+        ></v-progress-circular>
+      </v-overlay>
+      <v-col cols="4">
+        <v-autocomplete
+            density="compact"
+            item-title="name"
+            item-value="id"
+            :items="articleStore.scientificSections"
+            label="Розділ"
+            no-data-text="Розділів не знайдено"
+            variant="outlined"
+            v-model="scienceSectionId"
+            @update:modelValue="setScienceSection"
+        ></v-autocomplete>
+
+      </v-col>
+      <v-col cols="8">
+        <v-combobox
+            label="Теги"
+            :items="articleStore.tagItems"
+            :delimiters="delimiters"
+            density="compact"
+            v-model="selectedTag"
+            multiple
+            chips
+            @update:focused="tagFiltered"
+        ></v-combobox>
+      </v-col>
+      <v-col cols="5">
+        <v-select
+            v-model="filterDoi"
+            density="comfortable"
+            :items="articleStore.filterOptions"
+            item-title="value"
+            item-value="key"
+            label="Тип"
+            @update:focused="selectFilter"
+        ></v-select>
+      </v-col>
+      <v-col cols="5" class="pb-0">
+        <v-select
+            density="compact"
+            v-model="sortedValue"
+            hint="Оберіть параметр сортування"
+            :items="articleStore.sortedOptions"
+            item-title="value"
+            item-value="key"
+            label="Сортувати"
+            @update:modelValue= "selectSortParam"
+        ></v-select>
+      </v-col>
+      <v-col cols="2">
+        <div class="d-flex">
+       <span  @click="clearFilters" class="text-h6 cursor-pointer">
+          <u>Очистити</u>
+       </span>
+        </div>
+      </v-col>
+
+    </v-row>
+    <!--Для екранів більше md-->
+    <v-row class="d-none d-md-flex justify-space-between pt-7">
       <v-overlay :model-value="articleStore.isLoading"
                  class="align-center justify-center">
         <v-progress-circular
@@ -142,6 +210,7 @@ const onPageChange = () => {
       <v-col cols="3">
         <v-select
             v-model="filterDoi"
+            density="comfortable"
             :items="articleStore.filterOptions"
             item-title="value"
             item-value="key"
@@ -153,7 +222,7 @@ const onPageChange = () => {
       </v-col>
       <v-col cols="1">
         <div class="d-flex justify-end">
-       <span  @click="clearFilters" class="text-h6">
+       <span  @click="clearFilters" class="text-h6 cursor-pointer">
           <u>Очистити</u>
        </span>
         </div>
@@ -161,10 +230,10 @@ const onPageChange = () => {
 
     </v-row>
     <v-row class="justify-space-between">
-      <v-col cols="8"  md="6" sm="9" class="pb-0 mt-3">
+      <v-col cols="9"  class="pb-0 mt-3">
         <div class="text-h4">Статті в категорії {{scienceName}} </div>
       </v-col>
-      <v-col cols="2" md="3" sm="3" class="pb-0 mt-3">
+      <v-col cols="3" class="d-none d-md-flex pb-0 mt-3">
         <v-select
             density="compact"
             v-model="sortedValue"
@@ -179,7 +248,7 @@ const onPageChange = () => {
     </v-row>
     <v-row class="justify-center">
       <v-col cols="12" >
-        <div v-if="articleStore.cntRec===0" class="mt-6 not-found">
+        <div v-if="articleStore.cntRec===0" class="mt-6 not-found text-center">
           <span class="text-h3">За вашим запитом нічого не знайдено</span>
         </div>
         <div v-else>
@@ -215,6 +284,9 @@ const onPageChange = () => {
 </template>
 
 <style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
 .footer-distance{
   min-height: 100px;
 }

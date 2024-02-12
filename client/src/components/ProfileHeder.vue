@@ -22,7 +22,7 @@
 
 <template>
 <v-row>
-  <v-col cols="12" class="pt-0">
+  <v-col cols="12" class="pt-0 px-0 px-md-3">
     <div class="gradient">
       <div class="avatar-overlay">
         <v-avatar image="avatar.png" size="x-large"></v-avatar>

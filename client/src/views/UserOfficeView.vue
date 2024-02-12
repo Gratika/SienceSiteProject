@@ -31,7 +31,6 @@ const email = ref('');
 onMounted(()=>{
   articleStore.searchArticlesByParam(0,undefined,undefined,
       undefined,undefined,undefined,peopleId);//список моїх статей
-  articleStore.getMySelectedArticleList(peopleId,0); //список моїх обраних статей
   articleStore.getScienceList(); //отримуємо список наукових сфер (для формування списку тегів)
   articleStore.getScienceSectionList(); //отримуємо список підкатегорій
   authStore.getPeople()

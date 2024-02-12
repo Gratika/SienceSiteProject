@@ -65,7 +65,7 @@ function onShowSearchStr(){
 
 <template>
 
-      <v-toolbar class="pa-2" density="compact">
+      <v-toolbar  class="pa-2" density="compact">
         <v-container class="my-container">
           <div class="d-inline-flex justify-start align-center flex-wrap flex-row">
             <v-avatar   size="32" class="me-3">
@@ -156,6 +156,7 @@ function onShowSearchStr(){
   align-content: center;
   display: flex;
   flex-wrap: wrap;
+  min-width: 800px;
 }
 .logo-text{
   font-family: Ubuntu Mono,Mariupol, sans-serif;

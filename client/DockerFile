@@ -1,35 +1,14 @@
-# Інструкція для видалення всіх старих layers
-FROM node:lts-alpine as cleanup
-
-# Устанавливаем утиліту для видалення кешу
-RUN apk --no-cache add curl
-RUN curl -sSL https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_amd64 -o /usr/local/bin/dumb-init
-RUN chmod +x /usr/local/bin/dumb-init
-
-# Використовуємо dumb-init для запуску команди, яка видалить кеш
-CMD ["dumb-init", "rm", "-rf", "/root/.npm", "/root/.node-gyp"]
-# Викликаємо етап cleanup
-RUN ["docker-entrypoint.sh", "cleanup"]
-
-FROM node:lts-alpine as build
-
-# устанавливаем простой HTTP-сервер для статики
-RUN npm install -g http-server
-
-# делаем каталог 'app' текущим рабочим каталогом
+# Stage 1: Build the Vue application
+FROM node:lts AS build-stage
 WORKDIR /app
-
-# копируем оба 'package.json' и 'package-lock.json' (если есть)
 COPY package*.json ./
-
-# устанавливаем зависимости проекта
 RUN npm install
-
-# копируем файлы и каталоги проекта в текущий рабочий каталог (т.е. в каталог 'app')
 COPY . .
-
-# собираем приложение для production с минификацией
 RUN npm run build
 
-EXPOSE 8080
-CMD [ "http-server", "dist" ]
+# Stage 2: Serve the built application with Nginx
+FROM nginx:alpine AS production-stage
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY nginx.config /etc/nginx/nginx.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

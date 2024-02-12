@@ -58,7 +58,7 @@
 <template>
   <!--відкрити діалог створення нової статті-->
   <v-row class="pt-10  justify-space-between align-content-center">
-      <v-col cols="8" class="ps-0">
+      <v-col sm="11" md="9" lg="8" class="ps-0">
         <FilterForMyArticle
             :sorted-options="articleStore.sortedOptions"
             :tag-items="articleStore.tagItems"
@@ -68,7 +68,7 @@
 
       </v-col>
 
-    <v-col cols="4" class="d-flex justify-end">
+    <v-col sm="1" md="3" lg="4" class="d-flex justify-end">
       <div>
         <v-dialog
             v-model="showDialog"
@@ -76,12 +76,23 @@
             width="1024"
         >
           <template v-slot:activator="{ props }">
-            <v-btn
-                v-bind="props"
-                class="text-center text-h6"
-            >
-              Нова стаття
-            </v-btn>
+            <div class="d-none d-md-flex">
+              <v-btn
+                  v-bind="props"
+                  class="text-center text-h6"
+              >
+                Нова стаття
+              </v-btn>
+            </div>
+            <div class="d-flex d-md-none pt-1">
+              <v-btn
+                  v-bind="props"
+                  class="text-center text-h6 font-weight-bold"
+              >
+                +
+              </v-btn>
+            </div>
+
           </template>
 
           <NewArticleForm

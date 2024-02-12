@@ -122,7 +122,73 @@ const onPageChange = () => {
 
 <template>
   <v-container>
-    <v-row class="justify-space-between pt-7">
+    <!--Для екранів менше md-->
+    <v-row class="d-flex d-md-none justify-space-between pt-7 mx-3">
+      <v-overlay :model-value="articleStore.isLoading"
+                 class="align-center justify-center">
+        <v-progress-circular
+            indeterminate
+            color="primary"
+        ></v-progress-circular>
+      </v-overlay>
+      <v-col cols="12" sm="10">
+        <v-combobox
+            label="Теги"
+            :items="articleStore.tagItems"
+            :delimiters="delimiters"
+            density="compact"
+            hide-no-data
+            v-model="selectedTag"
+            multiple
+            chips
+            @update:focused="tagFiltered"
+        ></v-combobox>
+      </v-col>
+      <v-col cols="2">
+        <div class="d-flex">
+       <span  @click="clearFilters" class="text-h6 cursor-pointer">
+          <u>Очистити</u>
+       </span>
+        </div>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-select
+            v-model="filterDoi"
+            density="comfortable"
+            :items="articleStore.filterOptions"
+            item-title="value"
+            item-value="key"
+            label="Тип"
+            @update:focused="selectFilter"
+        ></v-select>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-select
+            v-model="sortedValue"
+            hint="Оберіть параметр сортування"
+            :items="articleStore.sortedOptions"
+            item-title="value"
+            item-value="key"
+            label="Сортувати"
+            @update:modelValue= "selectSortParam"
+        ></v-select>
+        <!--v-text-field
+            label="Рік"
+            density="compact"
+            v-model="selectedYearStr"
+            @update:focused="updateYear"
+        ></v-text-field-->
+      </v-col>
+      <!--v-col cols="3">
+        <v-combobox
+            label="Мова"
+            :items="['Російська', 'Українська', 'Англійська', 'Німецька', 'Французька', 'Іспанська']"
+            variant="outlined"
+        ></v-combobox>
+      </v-col-->
+    </v-row>
+    <!--Для екранів більше md-->
+    <v-row class="d-none d-md-flex justify-space-between pt-7">
       <v-overlay :model-value="articleStore.isLoading"
                  class="align-center justify-center">
         <v-progress-circular
@@ -146,6 +212,7 @@ const onPageChange = () => {
       <v-col cols="12" sm="3">
         <v-select
             v-model="filterDoi"
+            density="comfortable"
             :items="articleStore.filterOptions"
             item-title="value"
             item-value="key"
@@ -204,7 +271,7 @@ const onPageChange = () => {
     </v-row>
     <v-row class="justify-center">
       <v-col cols="12" >
-        <div v-if="articleStore.cntRec===0" class="mt-6 not-found">
+        <div v-if="articleStore.cntRec===0" class="mt-6 not-found text-center">
           <span class="text-h3">За вашим запитом нічого не знайдено</span>
         </div>
         <div v-else>

@@ -24,14 +24,11 @@ namespace apiServer.Controllers.Authentication
         }
 
         [HttpPost("AuthUser")]
-        public async Task<ActionResult> AuthUser (/*string pas, string email*/UserRequest userRequest) //авторизация
+        public async Task<ActionResult> AuthUser(/*string pas, string email*/UserRequest userRequest) //авторизация
         {
             AuthResponse Response = new AuthResponse();
             try
-            {
-                //UserRequest userRequest = new UserRequest();
-                //userRequest.email = email;
-                //userRequest.password = pas;
+            {                
 
                 List<Users> users = _context.Users.Include(a => a.people_).ToList();
 
@@ -49,7 +46,7 @@ namespace apiServer.Controllers.Authentication
                     }
                     users = await _context.Users.Include(a => a.people_).ToListAsync();
                 }
-                return BadRequest("Вы не вошли");
+                return Ok("Вы не вошли");
             }
             catch (Exception ex)
             {
@@ -61,7 +58,7 @@ namespace apiServer.Controllers.Authentication
         {
             foreach (Users user in users)
             {
-                if (string.Equals(user.password, password, StringComparison.Ordinal) == true && string.Equals(user.email, email, StringComparison.Ordinal) == true)
+                if (string.Equals(user.password, password, StringComparison.Ordinal) == true && string.Equals(user.email, email, StringComparison.OrdinalIgnoreCase) == true)
                 {
                     return user;
                 }

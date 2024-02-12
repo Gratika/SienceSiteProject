@@ -95,7 +95,7 @@ import Swal from "sweetalert2";
     </div>
     <div class="d-flex justify-space-between ">
       <v-btn
-          class="d-flex flex-grow-1"
+          class="d-flex flex-grow-1 align-center"
           color="black"
           variant="outlined"
       >
@@ -107,7 +107,7 @@ import Swal from "sweetalert2";
         Google
       </v-btn>
       <v-btn
-          class="d-flex w-50 ms-2"
+          class="d-flex w-50 ms-2 align-center"
           color="black"
           variant="outlined"
       >

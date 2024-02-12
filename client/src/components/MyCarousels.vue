@@ -37,27 +37,27 @@ const prev = () => {
     currentSlideIndex.value -= 1;
     if (currentSlideIndex.value == 0) isWhiteL.value = true;
   }
-  console.log('currentSlideIndex=',currentSlideIndex.value)
+  //console.log('currentSlideIndex=',currentSlideIndex.value)
 };
 const next = () => {
   // Отримання кількості дочірніх елементів каруселі
 
-  console.log('childrenCount=',props.countChildElement)
+  //console.log('childrenCount=',props.countChildElement)
 
   if (currentSlideIndex.value < props.countChildElement-props.countSlade) {
     currentSlideIndex.value += 1;
     isWhiteL.value = false;
     if (currentSlideIndex.value == props.countChildElement-props.countSlade) isWhiteR.value = true;
   }
-  console.log('currentSlideIndex=',currentSlideIndex.value)
+  //console.log('currentSlideIndex=',currentSlideIndex.value)
 };
 </script>
 
 <template>
   <div class="slide-group">
-    <div class="header">
-      <div class="text-h4 font-weight-bold">{{ props.title }}</div>
-      <div class="navigation">
+    <div class="header px-5 px-md-0">
+      <div class="text-h4 font-weight-bold ms-3 ms-md-0">{{ props.title }}</div>
+      <div class="navigation me-3 me-md-0">
         <v-btn
             icon="mdi-chevron-left"
             :color="isWhiteL ? 'white' : 'black'"
@@ -71,14 +71,17 @@ const next = () => {
             @click="next"/>
       </div>
     </div>
-    <div class="wrapper" :style="{'max-width': (sladeWidth*countSlade)+'px'}">
-      <div
-          class="content"
-          :style="{'margin-left':'-'+(100/countSlade*currentSlideIndex)+'%'}"
-      >
-        <slot></slot>
+    <div class="d-flex justify-center">
+      <div class="wrapper" :style="{'max-width': (sladeWidth*countSlade)+'px'}">
+        <div
+            class="content"
+            :style="{'margin-left':'-'+(100/countSlade*currentSlideIndex)+'%'}"
+        >
+          <slot></slot>
+        </div>
       </div>
     </div>
+
 
   </div>
 </template>
@@ -86,6 +89,7 @@ const next = () => {
 <style>
 .slide-group {
   padding: 25px 0;
+  width: 100%;
 }
 
 .header {
@@ -93,6 +97,7 @@ const next = () => {
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
+  width: 100%;
 }
 
 .navigation {
