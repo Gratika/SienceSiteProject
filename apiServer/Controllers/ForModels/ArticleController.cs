@@ -81,7 +81,6 @@ namespace apiServer.Controllers.ForModels
                 article.Id = Guid.NewGuid().ToString();
                 article.date_created = DateTime.Now;
                 article.modified_date = DateTime.Now;
-                article.IsActive = false;
                 if (CheckDoiValidity(article.DOI) == false)
                 {
                     article.DOI = null;
